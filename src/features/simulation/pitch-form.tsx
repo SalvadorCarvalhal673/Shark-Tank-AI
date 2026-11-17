@@ -2,15 +2,17 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { currencies, money, readPitch, type Pitch } from "./pitch";
+import { currencies, money, readFounderOwnership, readPitch } from "./pitch";
 import { PracticeRoom } from "./practice-room";
-import { startPractice, type Practice } from "./practice";
+import { startNegotiation, type NegotiationPitch, type NegotiationSession } from "./negotiation/session";
+import { percent, ValuationDetails } from "./negotiation/terms-display";
 
 export function PitchForm() {
-  const [session, setSession] = useState<Practice | null>(null);
-  const [pitch, setPitch] = useState<Pitch | null>(null);
-  const [draft, setDraft] = useState<Pitch | null>(null);
+  const [session, setSession] = useState<NegotiationSession | null>(null);
+  const [pitch, setPitch] = useState<NegotiationPitch | null>(null);
+  const [draft, setDraft] = useState<NegotiationPitch | null>(null);
   const [error, setError] = useState("");
+  const ownershipInput = useRef<HTMLInputElement>(null);
   const previewHeading = useRef<HTMLHeadingElement>(null);
   const startupInput = useRef<HTMLInputElement>(null);
 
@@ -28,12 +30,24 @@ export function PitchForm() {
       return;
     }
     setError("");
-    setDraft(result);
-    setPitch(result);
+    const field = ownershipInput.current;
+    const ownership = readFounderOwnership(field?.value ?? "", field?.validity.badInput ?? false);
+    if (typeof ownership === "string") {
+      setError(ownership);
+      if (field) {
+        const details = field.closest("details");
+        if (details) details.open = true;
+        field.focus();
+      }
+      return;
+    }
+    const next = { ...result, founderOwnershipBps: ownership };
+    setDraft(next);
+    setPitch(next);
   }
 
   function beginPractice() {
-    const next = startPractice(pitch);
+    const next = startNegotiation(crypto.randomUUID(), pitch);
     if (next === null) {
       setError("Check your pitch and funding terms before starting practice.");
       return;
@@ -42,7 +56,7 @@ export function PitchForm() {
     setSession(next);
   }
 
-  if (session) return <PracticeRoom initialSession={session} onExit={() => setSession(null)} />;
+  if (session) return <PracticeRoom key={session.id} initialSession={session} onExit={() => setSession(null)} />;
 
   return pitch ? (
     <section className="form-card" aria-label="Pitch preview">
@@ -51,6 +65,8 @@ export function PitchForm() {
       <h2 className="startup-name" ref={previewHeading} tabIndex={-1}>{pitch.startup}</h2>
       <p className="pitch-text">{pitch.pitch}</p>
       <p className="ask-line">{money(pitch.amount, pitch.currency)} for {pitch.equity / 100}% equity</p>
+      <ValuationDetails terms={pitch} currency={pitch.currency} />
+      <p className="muted">Founder ownership before investment · {percent(pitch.founderOwnershipBps)}</p>
       <div className="preview-actions">
         <button className="button secondary" type="button" onClick={() => setPitch(null)}>
           <ArrowLeft size={17} aria-hidden /> Edit pitch
@@ -83,6 +99,18 @@ export function PitchForm() {
           <input name="equity" aria-describedby="pitch-number-hint" defaultValue={draft ? draft.equity / 100 : undefined} type="number" step="0.01" min="0.01" max="100" required placeholder="10" />
         </label>
       </div>
+      <details className="negotiation-details" open={draft && draft.founderOwnershipBps !== 10000 ? true : undefined}>
+        <summary>Ownership details <span className="muted">· Optional</span></summary>
+        <p id="ownership-hint" className="muted">Your share of the company before investment. Other existing shareholders own the rest. Leave blank for 100%.</p>
+        <label>Founder ownership (%)
+          <input ref={ownershipInput} name="founderOwnership" type="number" min="0" max="100" step="0.01"
+            defaultValue={draft ? draft.founderOwnershipBps / 100 : undefined} aria-describedby="ownership-hint"
+            onInvalid={(event) => {
+              const details = event.currentTarget.closest("details");
+              if (details) details.open = true;
+            }} />
+        </label>
+      </details>
       {error && <p className="error" role="alert">{error}</p>}
       <button type="submit" className="button">Review pitch <ArrowRight size={18} aria-hidden /></button>
     </form>

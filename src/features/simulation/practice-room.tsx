@@ -1,72 +1,51 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowRight } from "lucide-react";
-import { panel } from "./panel";
-import { money, readPitch, type Pitch } from "./pitch";
-import {
-  answerQuestion, assessment, counterOffer, finishPractice, postMoneyValue, type Offer, type Practice,
-} from "./practice";
+import { money } from "./pitch";
+import { Debrief } from "./negotiation/debrief";
+import { NegotiationHistory } from "./negotiation/history";
+import { INVESTOR_ORDER, NEGOTIATION_RULES, type InvestorId } from "./negotiation/investor-policy";
+import { OfferCard } from "./negotiation/offer-card";
+import { counterCopy, latestCounter, pendingForSession, specialties, type PendingOffer } from "./negotiation/presentation";
+import { applyFounderAction, type FounderAction, type NegotiationSession } from "./negotiation/session";
+import { percent } from "./negotiation/terms-display";
 
-function OfferTerms({ offer, currency }: { offer: Offer; currency: Pitch["currency"] }) {
-  const valuation = postMoneyValue(offer);
-  if (valuation === null) return <p role="alert">These investment terms are invalid. Restart practice to continue.</p>;
-  return <><p className="ask-line">{money(offer.amount, currency)} for {offer.equity / 100}%</p>
-    <p>{money(valuation, currency)} post-money valuation</p></>;
-}
-
-function CounterForm({ offer, pitch, onCounter }: {
-  offer: Offer;
-  pitch: Pitch;
-  onCounter: (terms: { amount: number; equity: number }) => void;
-}) {
-  const [error, setError] = useState("");
-  const numberHint = useId();
-
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    form.set("startup", pitch.startup);
-    form.set("pitch", pitch.pitch);
-    form.set("currency", pitch.currency);
-    const result = readPitch(form);
-    if (typeof result === "string") setError(result);
-    else onCounter({ amount: result.amount, equity: result.equity });
-  }
-
-  return <details><summary>Make a counteroffer</summary>
-    <form className="counter-form" onSubmit={submit}>
-      <p id={numberHint} className="muted">Use plain decimals, such as 0.50, with up to two decimal places.</p>
-      <div className="field-row counter-fields">
-        <label>Investment ({pitch.currency})<input name="amount" aria-describedby={numberHint} type="number" step=".01" min=".01" max="999999999.99" required defaultValue={offer.amount / 100} /></label>
-        <label>Equity (%)<input name="equity" aria-describedby={numberHint} type="number" step=".01" min=".01" max="100" required defaultValue={offer.equity / 100} /></label>
-      </div>
-      {error && <p className="error" role="alert">{error}</p>}
-      <button className="button secondary" type="submit">Send counteroffer</button>
-    </form>
-  </details>;
-}
-
-export function PracticeRoom({ initialSession, onExit }: { initialSession: Practice; onExit: () => void }) {
+export function PracticeRoom({ initialSession, onExit }: { initialSession: NegotiationSession; onExit: () => void }) {
   const [session, setSession] = useState(initialSession);
+  const [pending, setPending] = useState<PendingOffer | null>(null);
   const [answerError, setAnswerError] = useState("");
+  const [notice, setNotice] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
-  const offerHeadings = useRef<Array<HTMLHeadingElement | null>>([]);
-  const { pitch, stage, answers, offers, counters } = session;
+  const offerHeadings = useRef<Partial<Record<InvestorId, HTMLHeadingElement | null>>>({});
+  const { pitch, stage, answers } = session;
   const turn = answers.length;
-  const currency = pitch.currency;
-  const accepted = offers.find((offer) => offer.status === "accepted");
+  const investor = INVESTOR_ORDER[turn];
+  const profile = investor ? NEGOTIATION_RULES.investors[investor] : null;
+  const committedCounter = latestCounter(session);
+  const activePending = pendingForSession(session, pending);
 
-  const lastCounter = counters.at(-1);
-  const counterInvestor = offers.find((offer) => offer.id === lastCounter?.offerId)?.investor;
 
   useEffect(() => {
-    if (stage === "negotiation" && counterInvestor !== undefined) {
-      offerHeadings.current[counterInvestor]?.focus();
-    } else {
-      heading.current?.focus();
+    // Feedback and focus follow the committed state, outside the pure updater.
+    if (stage === "negotiation" && committedCounter) offerHeadings.current[committedCounter.investor]?.focus();
+    else heading.current?.focus();
+
+  }, [session.revision, stage, committedCounter]);
+
+  function dispatch(action: FounderAction) {
+    if (action.sessionId !== session.id || action.expectedRevision !== session.revision) {
+      setNotice("These controls are out of date. Review the current offer before continuing.");
+      return;
     }
-  }, [stage, turn, counterInvestor, lastCounter]);
+    setNotice("");
+    setSession((current) => applyFounderAction(current, action));
+  }
+
+  function open(kind: PendingOffer["kind"], offerId: string) {
+    setNotice("");
+    setPending({ kind, offerId, sessionId: session.id, expectedRevision: session.revision });
+  }
 
   function submitAnswer(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -76,69 +55,61 @@ export function PracticeRoom({ initialSession, onExit }: { initialSession: Pract
       return;
     }
     setAnswerError("");
-    setSession((current) => answerQuestion(current, text, turn));
+    dispatch({ kind: "answer", sessionId: session.id, expectedRevision: session.revision, turn, text });
   }
 
-  return <section className="practice-room" aria-label="Practice simulation">
-    <div className="room-status"><span className="kicker"><span className="signal" /> Scripted practice</span>
-      <span className="startup-name">{pitch.startup} · {money(pitch.amount, currency)} for {pitch.equity / 100}%</span></div>
-    <p role="status" className="sr-only">
-      {lastCounter && counterInvestor !== undefined && (
-        lastCounter.outcome === "accepted"
-          ? panel[counterInvestor].name + " accepted your counter terms. Confirm the deal to accept the offer."
-          : panel[counterInvestor].name + " declined your counteroffer and withdrew."
+  const counterAnnouncement = committedCounter
+    ? NEGOTIATION_RULES.investors[committedCounter.investor].name + " · " + counterCopy[committedCounter.reason] +
+      " Counter " + committedCounter.round + " of " + NEGOTIATION_RULES.counterBudget + "."
+    : "";
+  const isNegotiating = stage === "negotiation" || stage === "final-offers";
+
+  return (
+    <section className="practice-room" aria-label="Practice simulation" data-session-id={session.id}>
+      <div className="room-status"><span className="kicker"><span className="signal" /> Scripted practice</span>
+        <span className="startup-name">Original ask · {pitch.startup} · {money(pitch.amount, pitch.currency)} for {percent(pitch.equity)}</span>
+      </div>
+      <p className="muted">Refreshing clears this session.</p>
+      <p role="status" className="sr-only">{counterAnnouncement}</p>
+      {notice && <p role="alert">{notice}</p>}
+      <div className="practice-panel">
+        {INVESTOR_ORDER.map((id) => <div key={id} className={stage === "questions" && id === investor ? "active-investor" : ""}>
+          <strong>{NEGOTIATION_RULES.investors[id].name}</strong><span>{specialties[id]}</span>
+        </div>)}
+      </div>
+      {stage === "questions" && profile && (
+        <div className="form-card">
+          <p className="kicker">Question {turn + 1} of {INVESTOR_ORDER.length}</p>
+          <h2 ref={heading} tabIndex={-1}>{profile.name}</h2>
+          <p>{profile.question}</p>
+          <p className="muted">This scripted rubric detects written signals. It does not independently verify them.</p>
+          <form className="counter-form" key={turn} onSubmit={submitAnswer}>
+            <label>Your answer<textarea name="answer" rows={4} minLength={10} maxLength={1500} required /></label>
+            {answerError && <p className="error" role="alert">{answerError}</p>}
+            <button className="button" type="submit">Submit answer <ArrowRight size={17} aria-hidden /></button>
+          </form>
+        </div>
       )}
-    </p>
-    <div className="practice-panel">{panel.map((investor, index) => <div key={investor.name} className={stage === "questions" && turn === index ? "active-investor" : ""}>
-      <strong>{investor.name}</strong><span>{investor.role}</span>
-    </div>)}</div>
-
-    {stage === "questions" && <div className="form-card">
-      <p className="kicker">Question {turn + 1} of {panel.length}</p>
-      <h2 ref={heading} tabIndex={-1}>{panel[turn].name}</h2>
-      <p>{panel[turn].question}</p>
-      <form className="counter-form" key={turn} onSubmit={submitAnswer}>
-        <label>Your answer<textarea name="answer" rows={4} minLength={10} maxLength={1500} required /></label>
-        {answerError && <p className="error" role="alert">{answerError}</p>}
-        <button className="button" type="submit">Submit answer <ArrowRight size={17} aria-hidden /></button>
-      </form>
-    </div>}
-
-    {stage === "negotiation" && <div className="form-card">
-      <h2 ref={heading} tabIndex={-1}>Negotiate your terms.</h2>
-      <p className="muted">You may counter once per investor or accept any active offer.</p>
-      {panel.map((investor, index) => {
-        const offer = offers.findLast((item) => item.investor === index);
-        return <article className="offer-card" key={investor.name}>
-          <h3 ref={(element) => { offerHeadings.current[index] = element; }} tabIndex={-1}>{investor.name}</h3>
-          {!offer && <p>Passes on this round.</p>}
-          {offer?.status === "withdrawn" && <p>Declined your counteroffer and withdrew.</p>}
-          {offer?.status === "active" && <>
-            <OfferTerms offer={offer} currency={currency} />
-            {offer.id.startsWith("counter-") && <p>Accepted your counter terms. Confirm the deal below.</p>}
-            <button className="button" type="button" onClick={() => setSession((current) => finishPractice(current, offer.id))}>Accept offer</button>
-            {offer.id.startsWith("initial-") && <CounterForm offer={offer} pitch={pitch} onCounter={(terms) => setSession((current) => counterOffer(current, offer.id, terms))} />}
-          </>}
-        </article>;
-      })}
-      <button className="button secondary" type="button" onClick={() => setSession((current) => finishPractice(current))}>Walk away</button>
-    </div>}
-
-    {stage === "finished" && <div className="form-card">
-      <h2 ref={heading} tabIndex={-1}>Your debrief.</h2>
-      {accepted ? <article className="offer-card"><h3>Deal with {panel[accepted.investor].name}</h3><OfferTerms offer={accepted} currency={currency} /></article> : <p className="ask-line">No deal</p>}
-      <p className="muted">Practice scoring uses response detail and whether the finance answer includes a number. Use the prompts below to review the substance of your answers.</p>
-      {assessment(session).map((item) => <article className="offer-card" key={item.title}>
-        <h3>{item.title} <span className="muted">· {item.result}</span></h3>
-        {item.excerpt && <blockquote className="pitch-text">{item.excerpt}</blockquote>}
-        <p>{item.feedback}</p>
-      </article>)}
-      {counters.length > 0 && <div><h3>Counteroffer history</h3>
-        <ul>{counters.map((counter) => <li key={counter.offerId}>
-          {panel[offers.find((offer) => offer.id === counter.offerId)!.investor].name} · {money(counter.amount, currency)} for {counter.equity / 100}% · {counter.outcome}
-        </li>)}</ul>
-      </div>}
-      <button className="button" type="button" onClick={onExit}>Practice again <ArrowRight size={17} aria-hidden /></button>
-    </div>}
-  </section>;
+      {isNegotiating && <>
+        <div className="negotiation-heading">
+          <h2 ref={heading} tabIndex={-1}>{stage === "final-offers" ? "Final offers." : "Negotiate your terms."}</h2>
+          <p className="rounds-remaining">{NEGOTIATION_RULES.counterBudget - session.roundsUsed} shared counters remaining</p>
+          <p className="muted">{stage === "final-offers"
+            ? "Your counter allowance is used. Accept an active offer or walk away."
+            : "Every valid counter uses one shared round, including withdrawals and unchanged offers."}</p>
+          <p className="muted">Compare funding and dilution alongside valuation. The highest valuation may not meet your funding needs.</p>
+        </div>
+        <div className="negotiation-offers">
+          {INVESTOR_ORDER.map((id) => <OfferCard key={id} session={session} investor={id} pending={activePending}
+            headingRef={(element) => { offerHeadings.current[id] = element; }}
+            onOpen={open} onClose={() => setPending(null)} onAction={dispatch} />)}
+        </div>
+        <button className="button secondary" type="button" onClick={() => dispatch({
+          kind: "walk-away", sessionId: session.id, expectedRevision: session.revision,
+        })}>Walk away</button>
+        <details className="negotiation-details"><summary>Negotiation history</summary><NegotiationHistory session={session} /></details>
+      </>}
+      {stage === "finished" && <Debrief session={session} headingRef={heading} onExit={onExit} />}
+    </section>
+  );
 }

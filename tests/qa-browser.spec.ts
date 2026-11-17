@@ -1,6 +1,7 @@
+import { investorAnswers } from "./browser-fixtures";
 import { expect, test, type Page } from "@playwright/test";
 
-const answer = "Revenue is 9000 each month and the investment funds another four months.";
+const answer = investorAnswers[0];
 
 async function createPitch(page: Page, startup = "Atlas Energy") {
   await page.goto("/simulate");
@@ -16,9 +17,9 @@ async function start(page: Page, startup = "Atlas Energy") {
   await page.getByRole("button", { name: "Start practice" }).click();
 }
 
-async function negotiate(page: Page, response = answer) {
+async function negotiate(page: Page, response?: string) {
   for (let turn = 0; turn < 3; turn++) {
-    await page.getByLabel("Your answer").fill(response);
+    await page.getByLabel("Your answer").fill(response ?? investorAnswers[turn]);
     await page.getByRole("button", { name: "Submit answer" }).click();
   }
 }
@@ -34,7 +35,7 @@ async function expectFits(page: Page) {
   expect(dimensions.width).toBeLessThanOrEqual(dimensions.viewport);
 }
 
-for (const width of [320, 375, 768, 1440]) {
+for (const width of [320, 375, 681, 768, 1440]) {
   test(`long startup names fit every stage at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await createPitch(page, "W".repeat(80));
@@ -44,6 +45,7 @@ for (const width of [320, 375, 768, 1440]) {
     await negotiate(page);
     await expectFits(page);
     await investorCard(page, "Maya Chen").getByRole("button", { name: "Accept offer" }).click();
+    await investorCard(page, "Maya Chen").getByRole("button", { name: "Confirm deal" }).click();
     await expect(page.getByRole("heading", { name: "Your debrief." })).toBeVisible();
     await expectFits(page);
   });
@@ -64,16 +66,17 @@ test("preview, edit, counter results and restart preserve meaningful focus", asy
   await maya.getByLabel("Equity (%)").fill("12");
   await maya.getByRole("button", { name: "Send counteroffer" }).click();
   await expect(maya.getByRole("heading")).toBeFocused();
-  await expect(page.getByRole("status")).toContainText("Maya Chen accepted your counter terms");
+  await expect(page.getByRole("status")).toContainText("Maya Chen · I agreed");
 
   const adrian = investorCard(page, "Adrian Vale");
   await adrian.getByText("Make a counteroffer").click();
   await adrian.getByLabel("Investment (EUR)").fill("100001");
   await adrian.getByRole("button", { name: "Send counteroffer" }).click();
   await expect(adrian.getByRole("heading")).toBeFocused();
-  await expect(page.getByRole("status")).toContainText("Adrian Vale declined");
+  await expect(page.getByRole("status")).toContainText("Adrian Vale · I withdrew");
 
   await maya.getByRole("button", { name: "Accept offer" }).click();
+  await maya.getByRole("button", { name: "Confirm deal" }).click();
   await expect(page.getByRole("heading", { name: "Your debrief." })).toBeFocused();
   await page.getByRole("button", { name: "Practice again" }).click();
   await expect(page.getByRole("heading", { name: "Atlas Energy", exact: true })).toBeFocused();
@@ -89,7 +92,7 @@ test("duplicate same-turn events and ordinary double clicks advance only once", 
     form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   });
   await expect(page.getByRole("heading", { name: "Adrian Vale", exact: true })).toBeFocused();
-  await page.getByLabel("Your answer").fill(answer);
+  await page.getByLabel("Your answer").fill(investorAnswers[1]);
   await page.getByRole("button", { name: "Submit answer" }).dblclick();
   await expect(page.getByRole("heading", { name: "Sofia Mendes", exact: true })).toBeVisible();
   await expect(page.getByLabel("Your answer")).toHaveValue("");
@@ -115,7 +118,7 @@ test("leading decimals and precise syntax errors work in intake and counters", a
   await expect(maya.getByRole("alert")).toContainText("plain decimal");
   await maya.getByLabel("Investment (EUR)").fill(".5");
   await maya.getByRole("button", { name: "Send counteroffer" }).click();
-  await expect(maya.locator(".ask-line")).toHaveText("€0.50 for 3.5%");
+  await expect(maya.locator(".ask-line").first()).toHaveText("€0.50 for 3.5%");
 });
 
 test("no offers, walk away and all withdrawn end with the correct debrief", async ({ page }) => {
@@ -138,15 +141,16 @@ test("no offers, walk away and all withdrawn end with the correct debrief", asyn
   }
   await expect(page.getByRole("heading", { name: "Your debrief." })).toBeFocused();
   await expect(page.locator(".ask-line")).toHaveText("No deal");
-  await expect(page.locator(".practice-room li")).toHaveCount(3);
-  for (const item of await page.locator(".practice-room li").allTextContents()) expect(item).toContain("declined");
+  await expect(page.locator(".debrief .negotiation-timeline li").filter({ hasText: "Founder proposed" })).toHaveCount(3);
+  for (const item of await page.locator(".debrief .negotiation-timeline li").filter({ hasText: "Founder proposed" }).allTextContents()) expect(item).toContain("withdrew");
 });
 
 for (const name of ["Maya Chen", "Adrian Vale", "Sofia Mendes"]) {
   test(`direct acceptance for ${name} ends with exactly one deal`, async ({ page }) => {
     await start(page);
     await negotiate(page);
-    await investorCard(page, name).getByRole("button", { name: "Accept offer" }).dblclick();
+    await investorCard(page, name).getByRole("button", { name: "Accept offer" }).click();
+    await investorCard(page, name).getByRole("button", { name: "Confirm deal" }).evaluate((button) => { (button as HTMLButtonElement).click(); (button as HTMLButtonElement).click(); });
     await expect(page.getByRole("heading", { name: `Deal with ${name}` })).toBeVisible();
     await expect(page.getByRole("button", { name: "Accept offer", exact: true })).toHaveCount(0);
   });

@@ -26,7 +26,7 @@ export function validPitch(value: unknown): value is Pitch {
     currencies.some((currency) => currency === candidate.currency);
 }
 
-function parseHundredths(value: FormDataEntryValue | null, label: string, maximum: number): number | string {
+function parseHundredths(value: FormDataEntryValue | null, label: string, maximum: number, minimum = 1): number | string {
   const text = typeof value === "string" ? value.trim() : "";
   if (!/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text)) {
     return `${label}: use a plain decimal number, such as 0.50, without commas or exponent notation.`;
@@ -37,8 +37,9 @@ function parseHundredths(value: FormDataEntryValue | null, label: string, maximu
 
   // Parse the decimal components separately to preserve exact minor units.
   const units = Number(whole || "0") * 100 + Number(fraction.padEnd(2, "0"));
-  if (text.startsWith("-") || !Number.isSafeInteger(units) || units <= 0 || units > maximum) {
-    return `${label}: enter a value greater than zero and at most ${maximum / 100}.`;
+  if (text.startsWith("-") || !Number.isSafeInteger(units) || units < minimum || units > maximum) {
+    const range = minimum === 0 ? "between 0 and 100" : `greater than zero and at most ${maximum / 100}`;
+    return `${label}: enter a value ${range}.`;
   }
   return units;
 }
@@ -51,11 +52,21 @@ export function readPitch(data: FormData): Pitch | string {
   if (pitch.length < 30 || pitch.length > 3000) return "Write a pitch between 30 and 3,000 characters.";
   if (!currency) return "Select a supported currency.";
 
+  const terms = readTerms(data);
+  if (typeof terms === "string") return terms;
+  return { startup, pitch, currency, ...terms };
+}
+
+export function readTerms(data: FormData): Terms | string {
   const amount = parseHundredths(data.get("amount"), "Investment", 99_999_999_999);
   if (typeof amount === "string") return amount;
   const equity = parseHundredths(data.get("equity"), "Equity", 10000);
-  if (typeof equity === "string") return equity;
-  return { startup, pitch, currency, amount, equity };
+  return typeof equity === "string" ? equity : { amount, equity };
+}
+
+export function readFounderOwnership(value: string, badInput: boolean): number | string {
+  if (badInput) return "Founder ownership must be a plain decimal percentage.";
+  return value === "" ? 10000 : parseHundredths(value, "Founder ownership", 10000, 0);
 }
 
 export function money(amount: number, currency: Currency): string {

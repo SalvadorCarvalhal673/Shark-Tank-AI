@@ -1,3 +1,4 @@
+import { investorAnswers } from "./browser-fixtures";
 import { expect, test } from "@playwright/test";
 
 test("founder completes a pitch and accepts a negotiated deal", async ({ page }) => {
@@ -16,11 +17,7 @@ test("founder completes a pitch and accepts a negotiated deal", async ({ page })
   await page.getByRole("button", { name: "Start practice" }).click();
   await expect(page.getByRole("heading", { name: "Maya Chen" })).toBeFocused();
 
-  for (const answer of [
-    "Revenue is 9000 each month and the investment funds another four months.",
-    "Independent stores buy through local partners that already run their retail operations.",
-    "Five shop owners completed our pilot and requested weekly energy reports for staff.",
-  ]) {
+  for (const answer of investorAnswers) {
     await page.getByLabel("Your answer").fill(answer);
     await page.getByRole("button", { name: "Submit answer" }).click();
   }
@@ -29,11 +26,12 @@ test("founder completes a pitch and accepts a negotiated deal", async ({ page })
   await maya.getByText("Make a counteroffer").click();
   await maya.getByLabel("Equity (%)").fill("12");
   await maya.getByRole("button", { name: "Send counteroffer" }).click();
-  await expect(maya.getByText("Accepted your counter terms.")).toBeVisible();
+  await expect(maya.locator(".offer-response")).toContainText("I agreed");
   await maya.getByRole("button", { name: "Accept offer" }).click();
+  await maya.getByRole("button", { name: "Confirm deal" }).click();
   await expect(page.getByRole("heading", { name: "Your debrief." })).toBeFocused();
   await expect(page.getByRole("heading", { name: "Deal with Maya Chen" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Counteroffer history" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Negotiation performance" })).toBeVisible();
 });
 
 test("landing and pitch form fit a narrow viewport", async ({ page }) => {

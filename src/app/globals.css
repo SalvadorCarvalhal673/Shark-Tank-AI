@@ -115,3 +115,39 @@ h2 { font-size: clamp(35px, 5vw, 64px); line-height: 1.1; letter-spacing: normal
 
 .startup-name { overflow-wrap: anywhere; min-width: 0; }
 .form-card > *, .practice-room > *, .room-status > * { min-width: 0; }
+.valuation-details { display: grid; gap: 8px; margin: 0; }
+.valuation-details div { display: grid; gap: 2px; }
+.valuation-details dt { color: var(--muted); font-size: 12px; }
+.valuation-details dd { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.negotiation-heading { display: grid; gap: 10px; }
+.rounds-remaining { color: var(--lime); font-weight: 700; }
+.negotiation-offers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.negotiation-card { background: #171d17; padding: 18px; gap: 16px; }
+.negotiation-card > *, .current-terms > * { min-width: 0; overflow-wrap: anywhere; }
+.current-terms { display: grid; gap: 12px; }
+.inline-offer-panel { padding: 14px 0 0; border-top: 1px solid var(--line); display: grid; gap: 14px; }
+.inline-offer-panel input, .negotiation-details input { width: 100%; color: var(--text); background: #0f1410; border: 1px solid #7c8974; border-radius: 4px; padding: 10px; font-size: 16px; }
+.inline-offer-panel label, .negotiation-details label { display: grid; gap: 6px; }
+.negotiation-details { border: 1px solid var(--line); border-radius: 5px; padding: 12px; }
+.negotiation-details summary { cursor: pointer; color: var(--lime); }
+.negotiation-details > * + * { margin-top: 12px; }
+.negotiation-timeline { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.negotiation-timeline li { padding-left: 12px; border-left: 2px solid #798c65; overflow-wrap: anywhere; font-size: 14px; }
+.negotiation-timeline p { margin-top: 6px; }
+.offer-actions .button { width: 100%; }
+@media (max-width: 680px) { .negotiation-offers { grid-template-columns: 1fr; } }
+.debrief { display: grid; gap: 18px; }
+.debrief h3, .debrief h4 { font-weight: 700; }
+.debrief section > * + * { margin-top: 12px; }
+.debrief blockquote { margin: 0; border-left: 2px solid #798c65; padding-left: 12px; color: var(--muted); }
+.evidence-list { padding-left: 18px; list-style: disc; }
+.ownership-bar { display: flex; height: 24px; overflow: hidden; border-radius: 4px; }
+.ownership-bar span { flex-basis: 0; }
+.owner-founder { background: var(--lime); }
+.owner-others { background: #94aaa3; }
+.owner-investor { background: #b79bdd; }
+.ownership-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 14px; }
+.ownership-table th, .ownership-table td { padding: 8px 4px; border-bottom: 1px solid var(--line); text-align: right; overflow-wrap: anywhere; }
+.ownership-table th:first-child { width: 48%; text-align: left; }
+.ownership-table caption { text-align: left; margin-bottom: 10px; font-weight: 700; }
+.form-page:has(.negotiation-offers), .form-page:has(.debrief) { max-width: 1180px; }
