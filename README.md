@@ -1,6 +1,6 @@
 # Shark Tank AI
 
-Shark Tank AI is a university programming project for practicing startup pitches and investment negotiations.
+Pitch to three fictional investors, defend your business assumptions, and negotiate a simulated deal.
 
 ## Run locally
 
@@ -11,14 +11,21 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. Choose **Enter the pitch room**, enter your startup details and funding ask, and review the submitted pitch.
+Open http://localhost:3000. Choose **Enter the pitch room**, submit a startup pitch and funding ask, then start scripted practice. Answer one question per investor. If an investor offers a deal, you can counter once, accept an active offer, or walk away. Every completed session ends with a debrief.
 
-## Checks
+Scripted practice uses transparent rules for answer detail and offer decisions. Sessions run in memory and reset on refresh. The practice flow needs no account or API key.
+
+## Verify
 
 ```sh
 npm run lint
-npm run typecheck
+npm test
 npm run build
+npm run typecheck
+npx playwright install chromium
+npm run test:e2e
 ```
 
-The Next.js App Router defines pages in `src/app`. Shared UI is in `src/components`. Pitch validation and money formatting live in `src/features/simulation/pitch.ts` so they can be used independently of the React form.
+The production build runs before the browser tests because they launch the production server. Set `PLAYWRIGHT_CHANNEL=msedge` to test with an installed Edge browser.
+
+Pages live in `src/app`, shared UI in `src/components`, and pitch validation, investor profiles, negotiation rules, and the practice interface in `src/features/simulation`. Amounts use integer minor units and equity uses basis points.

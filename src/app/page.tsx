@@ -2,11 +2,9 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight, BarChart3, Compass, Lightbulb } from "lucide-react";
 import { Header } from "@/components/header";
 
-const panel = [
-  { name: "Maya Chen", role: "Finance", description: "Maya looks for sound margins, a credible runway, and a clear plan for the money.", icon: BarChart3 },
-  { name: "Adrian Vale", role: "Growth", description: "Adrian asks how big the opportunity is and how you’ll reach customers at scale.", icon: Compass },
-  { name: "Sofia Mendes", role: "Operations", description: "Sofia wants customer evidence and a team that can deliver on its promises.", icon: Lightbulb },
-];
+import { panel } from "@/features/simulation/panel";
+
+const panelIcons = [BarChart3, Compass, Lightbulb];
 
 export default function Home() {
   return <>
@@ -33,9 +31,9 @@ export default function Home() {
       </div></section>
       <section id="panel" className="panel-section shell">
         <div className="section-heading"><div><p className="kicker">The panel</p><h2>Three ways to see a deal.</h2></div><p>Each investor tests a different part of your business.</p></div>
-        <div className="panel-grid">{panel.map(({ name, role, description, icon: Icon }) => <article key={name} className="panel-card">
+        <div className="panel-grid">{panel.map(({ name, role, description }, index) => { const Icon = panelIcons[index]; return <article key={name} className="panel-card">
           <div className="role"><Icon size={18} aria-hidden /> {role}</div><h3>{name}</h3><p>{description}</p>
-        </article>)}</div>
+        </article>; })}</div>
       </section>
     </main>
     <footer className="shell site-footer"><span>Shark Tank AI</span><span>University programming project</span></footer>
