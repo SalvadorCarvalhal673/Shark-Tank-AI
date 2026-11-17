@@ -11,12 +11,18 @@ const pitch: Pitch = {
   currency: "EUR",
 };
 
+function initialSession() {
+  const session = startPractice(pitch);
+  assert.ok(session);
+  return session;
+}
+
 function negotiation() {
   return [
     "Revenue is 9000 each month and the investment funds another four months.",
     "Independent stores buy through local partners that already run their retail operations.",
     "Five shop owners completed our pilot and requested weekly energy reports for staff.",
-  ].reduce(answerQuestion, startPractice(pitch));
+  ].reduce(answerQuestion, initialSession());
 }
 
 test("pitch input converts decimal amounts and rejects invalid equity", () => {
@@ -41,19 +47,19 @@ test("a complete pitch can end in one deal after a counteroffer", () => {
 });
 
 test("short answers can produce a no-deal assessment", () => {
-  const finished = ["Not sure yet", "Not sure yet", "Not sure yet"].reduce(answerQuestion, startPractice(pitch));
+  const finished = ["Not sure yet", "Not sure yet", "Not sure yet"].reduce(answerQuestion, initialSession());
   assert.equal(finished.stage, "finished");
   assert.equal(finished.offers.length, 0);
   assert.equal(assessment(finished).at(-1)?.result, "No deal");
 });
 
 test("reject invalid transitions and terms and withdraw on a declined counter", () => {
-  const initial = startPractice(pitch);
+  const initial = initialSession();
   assert.equal(finishPractice(initial), initial);
   const session = negotiation();
   const offer = session.offers[0];
   assert.equal(counterOffer(session, offer.id, { amount: 3, equity: 0 }), session);
-  assert.equal(answerQuestion(session, "An answer after the questions have ended"), session);
+  assert.equal(answerQuestion(session, "An answer after the questions have ended", 3), session);
   const countered = counterOffer(session, offer.id, { amount: 20_000_000, equity: 1000 });
   assert.equal(countered.offers[0].status, "withdrawn");
   assert.equal(finishPractice(countered, offer.id), countered);

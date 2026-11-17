@@ -1,7 +1,6 @@
 import { panel } from "./panel.ts";
-import type { Pitch } from "./pitch.ts";
+import { validPitch, validTerms, type Pitch, type Terms } from "./pitch.ts";
 
-type Terms = { amount: number; equity: number };
 export type Offer = Terms & { id: string; investor: number; status: "active" | "withdrawn" | "superseded" | "accepted" | "closed" };
 type Counter = Terms & { offerId: string; outcome: "accepted" | "declined" };
 type Stage = "questions" | "negotiation" | "finished";
@@ -21,13 +20,25 @@ function meetsPracticeThreshold(answer: string, investor: number): boolean {
   return words(answer) >= 12 && (investor !== 0 || /\d/.test(answer));
 }
 
-export function startPractice(pitch: Pitch): Practice {
+// Invalid runtime inputs return null; callers must handle the failure before use.
+export function startPractice(value: unknown): Practice | null {
+  if (!validPitch(value)) return null;
+  const pitch: Pitch = {
+    startup: value.startup.trim(),
+    pitch: value.pitch.trim(),
+    currency: value.currency,
+    amount: value.amount,
+    equity: value.equity,
+  };
   return { pitch, stage: "questions", answers: [], offers: [], counters: [] };
 }
 
-export function answerQuestion(session: Practice, text: string): Practice {
+export function answerQuestion(session: Practice, text: string, expectedTurn: number): Practice {
+  if (session.stage !== "questions" || expectedTurn !== session.answers.length ||
+      !Number.isInteger(expectedTurn) || expectedTurn < 0 || expectedTurn >= panel.length ||
+      typeof text !== "string") return session;
   const answer = text.trim();
-  if (session.stage !== "questions" || answer.length < 10 || answer.length > 1500) return session;
+  if (answer.length < 10 || answer.length > 1500) return session;
   const answers = [...session.answers, answer];
   if (answers.length < panel.length) return { ...session, answers };
 
@@ -44,41 +55,60 @@ export function answerQuestion(session: Practice, text: string): Practice {
   return { ...session, answers, offers, stage: offers.length > 0 ? "negotiation" : "finished" };
 }
 
-export function postMoneyValue(terms: Terms): number {
+// Valuations are rounded to the nearest minor unit; invalid terms return null.
+export function postMoneyValue(terms: unknown): number | null {
+  if (!validTerms(terms)) return null;
   return Math.round(terms.amount * 10000 / terms.equity);
-}
-
-function validTerms({ amount, equity }: Terms): boolean {
-  return Number.isSafeInteger(amount) && amount > 0 && amount <= 99_999_999_999 &&
-    Number.isInteger(equity) && equity > 0 && equity <= 10000;
 }
 
 export function counterOffer(session: Practice, offerId: string, terms: Terms): Practice {
   const offer = session.offers.find((item) => item.id === offerId && item.status === "active");
   if (session.stage !== "negotiation" || !offer || offer.id.startsWith("counter-") || !validTerms(terms)) return session;
   const acceptable = terms.amount <= offer.amount && terms.equity >= Math.max(1, offer.equity - 200);
-  const updated = session.offers.map((item): Offer => item.id === offerId
-    ? { ...item, status: acceptable ? "superseded" : "withdrawn" }
-    : item);
-  if (acceptable) updated.push({ id: `counter-${offer.investor}`, investor: offer.investor, ...terms, status: "active" });
+  const updated = session.offers.map((item): Offer => ({
+    id: item.id,
+    investor: item.investor,
+    amount: item.amount,
+    equity: item.equity,
+    status: item.id === offerId ? (acceptable ? "superseded" : "withdrawn") : item.status,
+  }));
+  if (acceptable) updated.push({
+    id: `counter-${offer.investor}`,
+    investor: offer.investor,
+    amount: terms.amount,
+    equity: terms.equity,
+    status: "active",
+  });
 
+  const counter: Counter = {
+    offerId,
+    amount: terms.amount,
+    equity: terms.equity,
+    outcome: acceptable ? "accepted" : "declined",
+  };
   return {
     ...session,
     offers: updated,
-    counters: [...session.counters, { offerId, ...terms, outcome: acceptable ? "accepted" : "declined" }],
+    counters: [...session.counters, counter],
     stage: updated.some((item) => item.status === "active") ? "negotiation" : "finished",
   };
 }
 
 export function finishPractice(session: Practice, offerId?: string): Practice {
   if (session.stage !== "negotiation") return session;
-  if (offerId && !session.offers.some((item) => item.id === offerId && item.status === "active")) return session;
+  if (offerId !== undefined && !session.offers.some((item) => item.id === offerId && item.status === "active")) return session;
   return {
     ...session,
     stage: "finished",
-    offers: session.offers.map((item) => item.status === "active"
-      ? { ...item, status: item.id === offerId ? "accepted" : "closed" }
-      : item),
+    offers: session.offers.map((item): Offer => ({
+      id: item.id,
+      investor: item.investor,
+      amount: item.amount,
+      equity: item.equity,
+      status: item.status === "active"
+        ? (item.id === offerId ? "accepted" : "closed")
+        : item.status,
+    })),
   };
 }
 

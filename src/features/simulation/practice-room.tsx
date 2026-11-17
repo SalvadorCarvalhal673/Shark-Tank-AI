@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { ArrowRight } from "lucide-react";
 import { panel } from "./panel";
 import { money, readPitch, type Pitch } from "./pitch";
 import {
-  answerQuestion, assessment, counterOffer, finishPractice, postMoneyValue, startPractice, type Offer,
+  answerQuestion, assessment, counterOffer, finishPractice, postMoneyValue, type Offer, type Practice,
 } from "./practice";
 
 function OfferTerms({ offer, currency }: { offer: Offer; currency: Pitch["currency"] }) {
+  const valuation = postMoneyValue(offer);
+  if (valuation === null) return <p role="alert">These investment terms are invalid. Restart practice to continue.</p>;
   return <><p className="ask-line">{money(offer.amount, currency)} for {offer.equity / 100}%</p>
-    <p>{money(postMoneyValue(offer), currency)} post-money valuation</p></>;
+    <p>{money(valuation, currency)} post-money valuation</p></>;
 }
 
 function CounterForm({ offer, pitch, onCounter }: {
@@ -19,6 +21,7 @@ function CounterForm({ offer, pitch, onCounter }: {
   onCounter: (terms: { amount: number; equity: number }) => void;
 }) {
   const [error, setError] = useState("");
+  const numberHint = useId();
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,14 +31,15 @@ function CounterForm({ offer, pitch, onCounter }: {
     form.set("currency", pitch.currency);
     const result = readPitch(form);
     if (typeof result === "string") setError(result);
-    else onCounter(result);
+    else onCounter({ amount: result.amount, equity: result.equity });
   }
 
   return <details><summary>Make a counteroffer</summary>
     <form className="counter-form" onSubmit={submit}>
+      <p id={numberHint} className="muted">Use plain decimals, such as 0.50, with up to two decimal places.</p>
       <div className="field-row counter-fields">
-        <label>Investment ({pitch.currency})<input name="amount" type="number" step=".01" min=".01" max="999999999.99" required defaultValue={offer.amount / 100} /></label>
-        <label>Equity (%)<input name="equity" type="number" step=".01" min=".01" max="100" required defaultValue={offer.equity / 100} /></label>
+        <label>Investment ({pitch.currency})<input name="amount" aria-describedby={numberHint} type="number" step=".01" min=".01" max="999999999.99" required defaultValue={offer.amount / 100} /></label>
+        <label>Equity (%)<input name="equity" aria-describedby={numberHint} type="number" step=".01" min=".01" max="100" required defaultValue={offer.equity / 100} /></label>
       </div>
       {error && <p className="error" role="alert">{error}</p>}
       <button className="button secondary" type="submit">Send counteroffer</button>
@@ -43,16 +47,26 @@ function CounterForm({ offer, pitch, onCounter }: {
   </details>;
 }
 
-export function PracticeRoom({ pitch, onExit }: { pitch: Pitch; onExit: () => void }) {
-  const [session, setSession] = useState(() => startPractice(pitch));
+export function PracticeRoom({ initialSession, onExit }: { initialSession: Practice; onExit: () => void }) {
+  const [session, setSession] = useState(initialSession);
   const [answerError, setAnswerError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
-  const { stage, answers, offers, counters } = session;
+  const offerHeadings = useRef<Array<HTMLHeadingElement | null>>([]);
+  const { pitch, stage, answers, offers, counters } = session;
   const turn = answers.length;
   const currency = pitch.currency;
   const accepted = offers.find((offer) => offer.status === "accepted");
 
-  useEffect(() => { heading.current?.focus(); }, [stage, turn]);
+  const lastCounter = counters.at(-1);
+  const counterInvestor = offers.find((offer) => offer.id === lastCounter?.offerId)?.investor;
+
+  useEffect(() => {
+    if (stage === "negotiation" && counterInvestor !== undefined) {
+      offerHeadings.current[counterInvestor]?.focus();
+    } else {
+      heading.current?.focus();
+    }
+  }, [stage, turn, counterInvestor, lastCounter]);
 
   function submitAnswer(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,12 +76,19 @@ export function PracticeRoom({ pitch, onExit }: { pitch: Pitch; onExit: () => vo
       return;
     }
     setAnswerError("");
-    setSession((current) => answerQuestion(current, text));
+    setSession((current) => answerQuestion(current, text, turn));
   }
 
   return <section className="practice-room" aria-label="Practice simulation">
     <div className="room-status"><span className="kicker"><span className="signal" /> Scripted practice</span>
-      <span>{pitch.startup} · {money(pitch.amount, currency)} for {pitch.equity / 100}%</span></div>
+      <span className="startup-name">{pitch.startup} · {money(pitch.amount, currency)} for {pitch.equity / 100}%</span></div>
+    <p role="status" className="sr-only">
+      {lastCounter && counterInvestor !== undefined && (
+        lastCounter.outcome === "accepted"
+          ? panel[counterInvestor].name + " accepted your counter terms. Confirm the deal to accept the offer."
+          : panel[counterInvestor].name + " declined your counteroffer and withdrew."
+      )}
+    </p>
     <div className="practice-panel">{panel.map((investor, index) => <div key={investor.name} className={stage === "questions" && turn === index ? "active-investor" : ""}>
       <strong>{investor.name}</strong><span>{investor.role}</span>
     </div>)}</div>
@@ -89,7 +110,7 @@ export function PracticeRoom({ pitch, onExit }: { pitch: Pitch; onExit: () => vo
       {panel.map((investor, index) => {
         const offer = offers.findLast((item) => item.investor === index);
         return <article className="offer-card" key={investor.name}>
-          <h3>{investor.name}</h3>
+          <h3 ref={(element) => { offerHeadings.current[index] = element; }} tabIndex={-1}>{investor.name}</h3>
           {!offer && <p>Passes on this round.</p>}
           {offer?.status === "withdrawn" && <p>Declined your counteroffer and withdrew.</p>}
           {offer?.status === "active" && <>
@@ -100,7 +121,7 @@ export function PracticeRoom({ pitch, onExit }: { pitch: Pitch; onExit: () => vo
           </>}
         </article>;
       })}
-      <button className="button secondary" type="button" onClick={() => setSession(finishPractice(session))}>Walk away</button>
+      <button className="button secondary" type="button" onClick={() => setSession((current) => finishPractice(current))}>Walk away</button>
     </div>}
 
     {stage === "finished" && <div className="form-card">
