@@ -46,3 +46,13 @@ The maintainer must apply these controls while this exception is open.
 - Require security sign-off covering the vendored matcher, current reachability and the actual deployment file set before public deployment.
 
 Do not suppress the advisory or present this exception as remediation. This exception authorizes controlled development, testing and repository publication only.
+
+### Phase 3C reassessment — 17 November 2026
+
+Rechecked the official advisory, current npm registry versions, installed dependency paths and the Phase 3C production server trace. The advisory still lists no patched version; latest picomatch remains 4.0.7 and eslint-config-next remains 16.4.6. Full npm audit still reports 14 High propagated package findings from this advisory; the production-only audit reports zero. No dependency or lockfile changes were introduced. The server trace still includes Next's vendored picomatch implementation and metadata; its metadata still does not identify an upstream version. The earlier bounded behavior reproduction remains relevant; no remediation is claimed.
+
+The new persistence boundary accepts only a bounded record (65,536 UTF-16 code units before parsing), exact schema fields and a maximum seven-action journal. It replays through deterministic domain validation, rejects the whole invalid history, renders stored text using React text nodes, and never evaluates saved text or forwards it to a glob matcher. Source inspection found no new path from saved pitch/action text to matcher configuration. The reviewed image manifest still has no remote patterns, and the application still does not import next/image.
+
+All persistence operations stay local. No founder contents are logged by the persistence layer, and no new network integration, credential storage or dependency was added. Storage is not an encrypted or authenticated boundary: same-origin scripts and browser tools can read or replace records, including synthesizing a valid history. Web Locks prevent races only among cooperating contexts. The privacy notice discloses profile sharing, scripts, lack of app encryption and browser cleanup risks before saving. Conservative memory-only fallback is used if coordinated access fails.
+
+This phase does not close SE-001. The maintainer must renew the review at the next phase and obtain separate security sign-off before any public deployment, including review of the actual artifact and vendored matcher reachability.

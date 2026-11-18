@@ -8,11 +8,15 @@ import { NegotiationHistory } from "./negotiation/history";
 import { INVESTOR_ORDER, NEGOTIATION_RULES, type InvestorId } from "./negotiation/investor-policy";
 import { OfferCard } from "./negotiation/offer-card";
 import { counterCopy, latestCounter, pendingForSession, specialties, type PendingOffer } from "./negotiation/presentation";
-import { applyFounderAction, type FounderAction, type NegotiationSession } from "./negotiation/session";
+import { type FounderAction, type NegotiationSession } from "./negotiation/session";
 import { percent } from "./negotiation/terms-display";
 
-export function PracticeRoom({ initialSession, onExit }: { initialSession: NegotiationSession; onExit: () => void }) {
-  const [session, setSession] = useState(initialSession);
+export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: {
+  session: NegotiationSession;
+  onAction: (action: FounderAction) => void;
+  onExit: () => void;
+  persistenceMessage: string;
+}) {
   const [pending, setPending] = useState<PendingOffer | null>(null);
   const [answerError, setAnswerError] = useState("");
   const [notice, setNotice] = useState("");
@@ -39,7 +43,7 @@ export function PracticeRoom({ initialSession, onExit }: { initialSession: Negot
       return;
     }
     setNotice("");
-    setSession((current) => applyFounderAction(current, action));
+    onAction(action);
   }
 
   function open(kind: PendingOffer["kind"], offerId: string) {
@@ -69,7 +73,7 @@ export function PracticeRoom({ initialSession, onExit }: { initialSession: Negot
       <div className="room-status"><span className="kicker"><span className="signal" /> Scripted practice</span>
         <span className="startup-name">Original ask · {pitch.startup} · {money(pitch.amount, pitch.currency)} for {percent(pitch.equity)}</span>
       </div>
-      <p className="muted">Refreshing clears this session.</p>
+      <p className="muted">{persistenceMessage}</p>
       <p role="status" className="sr-only">{counterAnnouncement}</p>
       {notice && <p role="alert">{notice}</p>}
       <div className="practice-panel">

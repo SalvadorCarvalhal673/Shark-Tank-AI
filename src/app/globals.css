@@ -151,3 +151,9 @@ h2 { font-size: clamp(35px, 5vw, 64px); line-height: 1.1; letter-spacing: normal
 .ownership-table th:first-child { width: 48%; text-align: left; }
 .ownership-table caption { text-align: left; margin-bottom: 10px; font-weight: 700; }
 .form-page:has(.negotiation-offers), .form-page:has(.debrief) { max-width: 1180px; }
+.recovery-panel, .privacy-notice { overflow-wrap: anywhere; }
+.recovery-panel .button { white-space: normal; }
+.privacy-notice { display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 16px; }
+.form-card label.save-choice { display: flex; align-items: center; gap: 10px; }
+.form-card .save-choice input { width: 18px; height: 18px; flex-shrink: 0; }
+.button:disabled { opacity: .6; cursor: wait; }

@@ -4,11 +4,19 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { currencies, money, readFounderOwnership, readPitch } from "./pitch";
 import { PracticeRoom } from "./practice-room";
-import { startNegotiation, type NegotiationPitch, type NegotiationSession } from "./negotiation/session";
+import { type NegotiationPitch } from "./negotiation/session";
+import { useSavedSession } from "./negotiation/use-saved-session";
+import { RecoveryPanel } from "./negotiation/recovery-panel";
 import { percent, ValuationDetails } from "./negotiation/terms-display";
 
 export function PitchForm() {
-  const [session, setSession] = useState<NegotiationSession | null>(null);
+  const controller = useSavedSession();
+  const session = controller.run?.session ?? null;
+  const [editing, setEditing] = useState(false);
+  const [saveLocally, setSaveLocally] = useState(false);
+  const [replacement, setReplacement] = useState<{ raw: string } | null>(null);
+  const replacementHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { if (replacement) replacementHeading.current?.focus(); }, [replacement]);
   const [pitch, setPitch] = useState<NegotiationPitch | null>(null);
   const [draft, setDraft] = useState<NegotiationPitch | null>(null);
   const [error, setError] = useState("");
@@ -46,18 +54,45 @@ export function PitchForm() {
     setPitch(next);
   }
 
+  async function launch(expectedRaw: string | null) {
+    if (!pitch) return;
+    const started = await controller.begin(pitch, saveLocally, expectedRaw);
+    setReplacement(null);
+    if (!started) setError("Saved information changed. Check the latest saved progress before replacing it.");
+  }
+
   function beginPractice() {
-    const next = startNegotiation(crypto.randomUUID(), pitch);
-    if (next === null) {
-      setError("Check your pitch and funding terms before starting practice.");
+    if (!pitch || controller.busy) return;
+    const latest = controller.refresh();
+    if (saveLocally && (latest.kind === "valid" || latest.kind === "invalid")) {
+      setReplacement({ raw: latest.raw });
       return;
     }
     setError("");
-    setSession(next);
+    void launch(null);
   }
 
-  if (session) return <PracticeRoom key={session.id} initialSession={session} onExit={() => setSession(null)} />;
+  async function practiceAgain() {
+    const previousPitch = await controller.leave();
+    if (previousPitch) {
+      setPitch(previousPitch);
+      setDraft(previousPitch);
+      setEditing(true);
+      setSaveLocally(false);
+    }
+  }
 
+  if (controller.checking) return <RecoveryPanel controller={controller} active={false} onNew={() => setEditing(true)} />;
+  if (session) return <>
+    <RecoveryPanel controller={controller} active onNew={() => setEditing(true)} />
+    <PracticeRoom key={controller.viewKey} session={session} onAction={controller.dispatch}
+      onExit={practiceAgain} persistenceMessage={controller.status === "Not saving"
+        ? "Refreshing clears this in-memory run. Saving is off."
+        : "Only saved actions can be restored after refresh. Check the save status before closing."} />
+  </>;
+  if (!editing && (controller.slot.kind === "valid" || controller.slot.kind === "invalid")) {
+    return <RecoveryPanel controller={controller} active={false} onNew={() => setEditing(true)} />;
+  }
   return pitch ? (
     <section className="form-card" aria-label="Pitch preview">
       {error && <p className="error" role="alert">{error}</p>}
@@ -67,17 +102,35 @@ export function PitchForm() {
       <p className="ask-line">{money(pitch.amount, pitch.currency)} for {pitch.equity / 100}% equity</p>
       <ValuationDetails terms={pitch} currency={pitch.currency} />
       <p className="muted">Founder ownership before investment · {percent(pitch.founderOwnershipBps)}</p>
+      <div className="privacy-notice">
+        <label className="save-choice"><input type="checkbox" disabled={controller.busy} checked={saveLocally} onChange={(event) => setSaveLocally(event.target.checked)} /> Save this session in this browser</label>
+        <p className="muted">Saving stores your pitch and answers in this browser profile. Other users of this profile or scripts on this origin may access them. The app does not encrypt them. Private browsing or clearing browser data may remove them. No founder information is sent externally.</p>
+        <p className="muted">Leave saving off to practice in memory. Existing saved progress will be retained.</p>
+      </div>
+      <RecoveryPanel controller={controller} active={false} preview onNew={() => setEditing(true)} />
+      {replacement && <div className="inline-offer-panel" role="group" aria-label="Replace saved session">
+        <h3 ref={replacementHeading} tabIndex={-1}>Replace saved progress?</h3>
+        <p>Starting with saving enabled will replace the saved pitch and answers. Cancel to keep them.</p>
+        <div className="preview-actions">
+          <button className="button" disabled={controller.busy} type="button" onClick={() => launch(replacement.raw)}>Confirm replacement</button>
+          <button className="button secondary" disabled={controller.busy} type="button" onClick={() => {
+            setReplacement(null);
+            previewHeading.current?.focus();
+          }}>Cancel replacement</button>
+        </div>
+      </div>}
       <div className="preview-actions">
-        <button className="button secondary" type="button" onClick={() => setPitch(null)}>
+        <button className="button secondary" disabled={controller.busy} type="button" onClick={() => { setReplacement(null); setPitch(null); }}>
           <ArrowLeft size={17} aria-hidden /> Edit pitch
         </button>
-        <button className="button" type="button" onClick={beginPractice}>
+        <button className="button" disabled={controller.busy} type="button" onClick={beginPractice}>
           Start practice <ArrowRight size={17} aria-hidden />
         </button>
       </div>
     </section>
   ) : (
-    <form className="form-card" onSubmit={submit}>
+    <form className="form-card" onChangeCapture={() => setEditing(true)} onSubmit={submit}>
+      {controller.slot.kind === "unavailable" && <p>Saved information could not be read. Memory-only practice is available.</p>}
       <p className="lede">Tell the panel what you are building, who needs it, and what you are asking for.</p>
       <label>Startup name
         <input ref={startupInput} name="startup" defaultValue={draft?.startup} required minLength={2} maxLength={80} placeholder="e.g. Atlas Energy" />
