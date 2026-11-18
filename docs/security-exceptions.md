@@ -56,3 +56,10 @@ The new persistence boundary accepts only a bounded record (65,536 UTF-16 code u
 All persistence operations stay local. No founder contents are logged by the persistence layer, and no new network integration, credential storage or dependency was added. Storage is not an encrypted or authenticated boundary: same-origin scripts and browser tools can read or replace records, including synthesizing a valid history. Web Locks prevent races only among cooperating contexts. The privacy notice discloses profile sharing, scripts, lack of app encryption and browser cleanup risks before saving. Conservative memory-only fallback is used if coordinated access fails.
 
 This phase does not close SE-001. The maintainer must renew the review at the next phase and obtain separate security sign-off before any public deployment, including review of the actual artifact and vendored matcher reachability.
+
+
+### Handover reassessment — 18 November 2026
+
+The official GitHub advisory GHSA-fc5q-39xc-vjpf is now marked withdrawn on18 November2026: https://github.com/advisories/GHSA-fc5q-39xc-vjpf . Fresh clean-checkout full and production-only audits report zero findings, unlike the earlier14 propagated records. This is an upstream advisory-status change, not a remediation implemented by this project. No dependency or lockfile change was made during handover. The earlier runtime/artifact observations remain historical evidence; a zero registry audit does not independently establish closure of vendored-code exposure.
+
+SE-001 remains open under the project owner’s explicit instruction. Public deployment remains prohibited until separate formal reassessment, security sign-off and deployment approval. The corresponding security backlog issue must review this status change rather than treating it as automatic clearance. CI runs both audits without suppressing new findings.

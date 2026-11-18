@@ -44,3 +44,7 @@ No remotely supplied or user-uploaded GLB is accepted. Models and requests are f
 
 The advisory was rechecked on 18 November 2026:
 https://github.com/advisories/GHSA-fc5q-39xc-vjpf
+
+
+## Handover status update
+The preceding audit counts describe the Phase4A.2 review snapshot. During handover, the official advisory was withdrawn and fresh full/production audits reported0. No dependency remediation or lockfile change was made; SE-001 remains open and public deployment prohibited. See the latest reassessment in security-exceptions.md and HANDOVER-VERIFICATION.md.

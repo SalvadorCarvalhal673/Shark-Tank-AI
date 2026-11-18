@@ -28,7 +28,6 @@ jobs:
       - run: npm run build
       - run: npm run typecheck
       - name: Full audit — SE-001 remains open; review all findings
-        continue-on-error: true
         run: npm audit
       - name: Production-only audit — does not clear vendored code
         run: npm audit --omit=dev
