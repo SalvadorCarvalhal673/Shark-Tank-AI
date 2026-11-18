@@ -1,0 +1,13 @@
+# 3D studio
+
+Entry /prototype/studio is development-only. Detailed review: phase-4a-2-prototype.md; assets: studio-assets.md.
+src/features/studio/prototype.tsx owns HTML, editable answer/amount/equity drafts and the approved saved-session controller. It lazily loads scene.tsx. model.ts projects committed history to cues and delegates previews to existing helpers. avatar.ts uses SkeletonUtils clones, separate bone hierarchies/mixers/materials and owned-resource disposal. scene.tsx loads the local GLB and handles room/cameras/gestures/visibility/diagnostics.
+No Drei runtime dependency remains: it was evaluated and removed. R3F useLoader and native Three GLTFLoader suffice. The original GLB source is scripts/create-studio-avatar.mjs.
+
+Characters and equivalent HTML buttons select investors; panel/investor presets move from current position without free-roaming controls. Reduced motion uses immediate framing and freezes nonessential gestures.
+Only committed decisions produce offer/withdrawal cues. Camera/animation callbacks never consume rounds or accept deals. HTML remains usable while loading or after GPU failure. Fallback unmounts only rendering; explicit retry clears failed loader entries. Context loss, unavailable WebGL2 and initialization errors preserve run/drafts/journal/save.
+Demand rendering rests after activity and suspends when hidden; return resumes camera movement. Visibility tests synthesize document events, not every OS lifecycle.
+
+Temporary humanoids/room prove feasibility, not final quality. Final style requires polished adult characters, materials/clothing, expressive gestures and premium cinematic architecture. Approve a coherent sample before full cast production.
+Targets: approximately 60 desktop/30 physical-mobile FPS; critical transfer8MB desktop/5MB mobile; triangles150000/90000; draws100/60; previews below100ms. Historical desktop samples:0.698MB incremental transfer, near60 active-camera FPS, at most12688 triangles/52 draws and9.8–14.6ms input-to-DOM updates.
+Phone viewport samples used desktop GPU; physical phones, thermals, production performance and total GPU memory are open. Current original uncompressed175708-byte GLB uses no external buffers/images/decoders. Host future assets/decoders locally with verified rights. Measure expensive effects and idle loops before adopting.

@@ -1,6 +1,6 @@
 # Negotiation rules v1
 
-This engine runs alongside Phase 2 practice. The app continues to call the existing practice engine until Phase 3B. The new engine uses no clock, random source, storage or AI.
+Historical note: this engine was introduced in Phase 3A and integrated into the active practice interface in Phase 3B. Current architecture: docs/ARCHITECTURE.md at the repository root. The new engine uses no clock, random source, storage or AI.
 
 Use the questions in investor-policy.ts in order. Call startNegotiation with a fresh opaque session ID and a validated pitch object. founderOwnershipBps is optional and defaults to 10,000. Invalid initialization returns null. Start a new session with a different ID. Use the original ID only when replaying an existing run.
 

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shark Tank AI — archived Phase 4A storyboard</title><style>body{margin:0;padding:20px;background:#101512;color:#f2f1e9;font-family:Arial,sans-serif}*{box-sizing:border-box}.viz-controls{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}select,button{padding:8px}figure{margin:0}summary{cursor:pointer}</style></head><body><p>Archived 2D planning reference. Final visual direction is stylized 3D. Controls navigate static mockups.</p><div id="shark-4a-board">
+  <div class="viz-controls">
+    <label class="form-label">Scene
+      <select class="form-select" id="p4-scene">
+        <option value="0">01 · Landing</option><option value="1">02 · Investor introductions</option>
+        <option value="2">03 · Guided preparation</option><option value="3">04 · Pitch review</option>
+        <option value="4">05 · Investor conversation</option><option value="5">06 · Offer reveal</option>
+        <option value="6">07 · Interactive negotiation</option><option value="7">08 · Deal confirmation</option>
+        <option value="8">09 · Conclusion</option><option value="9">10 · Personalized scorecard</option>
+        <option value="10">11 · Session recovery</option>
+      </select>
+    </label>
+    <label class="form-label">Wireframes
+      <select class="form-select" id="p4-layout"><option value="compare">Desktop + mobile</option><option value="desktop">Desktop</option><option value="mobile">Mobile</option></select>
+    </label>
+    <label class="form-label" id="p4-outcome-control" hidden>Conclusion
+      <select class="form-select" id="p4-outcome"><option value="deal">Deal confirmed</option><option value="walk">Founder walked away</option><option value="passed">No opening offers</option><option value="withdrawn">All investors withdrew</option></select>
+    </label>
+  </div>
+  <p class="text-small text-muted">Phase 4A · Static product wireframes · Review controls only · Fictional LunchLoop episode</p>
+  <details id="p4-overview-container" open>
+    <summary>Episode overview · 11 scenes</summary>
+    <div class="p4-overview p4-design" id="p4-overview" aria-label="Eleven-scene storyboard overview"></div>
+  </details>
+  <div class="p4-detail-label" aria-live="polite" id="p4-current-label">01 · Landing</div>
+  <div class="p4-pair" id="p4-pair">
+    <figure id="p4-desktop" class="p4-figure"><figcaption>Desktop composition</figcaption><div class="p4-design p4-window" id="p4-desktop-content"></div></figure>
+    <figure id="p4-mobile" class="p4-figure"><figcaption>Mobile composition</figcaption><div class="p4-design p4-window p4-phone" id="p4-mobile-content"></div></figure>
+  </div>
+  <div class="viz-controls">
+    <label class="form-label">Character concept pose
+      <select class="form-select" id="p4-pose"><option value="neutral">Neutral</option><option value="listening">Listening</option><option value="questioning">Questioning</option><option value="offering">Offering</option><option value="agreeing">Agreeing</option><option value="withdrawn">Withdrawn</option></select>
+    </label>
+  </div>
+  <div class="p4-design p4-characters" id="p4-characters" aria-label="Original investor character concepts"></div>
+</div>
+<style>
+#shark-4a-board{display:grid;gap:16px}
+#shark-4a-board .p4-design{--p4-bg:#101512;--p4-surface:#192219;--p4-line:#3b483c;--p4-text:#f2f1e9;--p4-muted:#b2baaa;--p4-lime:#d5f27d;--p4-maya:#c5ab6b;--p4-adrian:#86a9e8;--p4-sofia:#80c7b4;color:var(--p4-text);font:14px/1.5 Arial,sans-serif}
+#shark-4a-board .p4-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#shark-4a-board #p4-overview-container[open] .p4-overview{margin-top:12px}
+#shark-4a-board .p4-landmark{display:grid;grid-template-columns:86px minmax(0,1fr);align-items:center;gap:10px;background:var(--p4-bg);padding:12px;border-radius:5px;min-width:0}
+#shark-4a-board .p4-overview button{font:inherit;color:var(--p4-text);border:0;background:none;text-align:left;padding:0;min-height:44px}
+#shark-4a-board .p4-overview button[aria-pressed=true]{color:var(--p4-lime)}
+#shark-4a-board .p4-landmark small{display:block;color:var(--p4-muted);font-size:11px}
+#shark-4a-board .p4-mini{height:62px;border:1px solid var(--p4-line);background:var(--p4-surface);padding:7px;display:grid;align-content:center;gap:5px;position:relative}
+#shark-4a-board .p4-mini .heads{display:flex;justify-content:space-around;gap:5px}
+#shark-4a-board .p4-mini .heads i{width:14px;height:20px;border-radius:40% 40% 15% 15%;background:var(--p4-maya)}
+#shark-4a-board .p4-mini .heads i:nth-child(2){border-radius:50% 50% 15% 15%;background:var(--p4-adrian)}
+#shark-4a-board .p4-mini .heads i:nth-child(3){border-radius:35% 50% 15% 15%;background:var(--p4-sofia)}
+#shark-4a-board .p4-mini .rule{height:3px;background:var(--p4-line);width:90%}
+#shark-4a-board .p4-mini .accent{height:5px;background:var(--p4-lime);width:50%}
+#shark-4a-board .p4-mini .slidetrack{height:3px;background:var(--p4-muted);position:relative}
+#shark-4a-board .p4-mini .slidetrack:after{content:"";display:block;position:absolute;left:60%;top:-3px;width:9px;height:9px;border-radius:50%;background:var(--p4-lime)}
+#shark-4a-board .p4-mini .slice{display:flex;gap:2px;height:9px}
+#shark-4a-board .p4-mini .slice i:first-child{width:53.4%;background:var(--p4-lime)}
+#shark-4a-board .p4-mini .slice i:nth-child(2){width:35.6%;background:var(--p4-muted)}
+#shark-4a-board .p4-mini .slice i:last-child{width:11%;background:var(--p4-maya)}
+#shark-4a-board .p4-mini .tick{font:24px Georgia,serif;color:var(--p4-lime);text-align:center}
+#shark-4a-board .p4-detail-label{font-weight:500}
+#shark-4a-board .p4-pair{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:18px;align-items:start}
+#shark-4a-board .p4-pair[data-layout=desktop],#shark-4a-board .p4-pair[data-layout=mobile]{grid-template-columns:minmax(0,1fr)}
+#shark-4a-board .p4-figure{margin:0;min-width:0}
+#shark-4a-board figcaption{margin-bottom:8px}
+#shark-4a-board .p4-window{background:var(--p4-bg);border:1px solid var(--p4-line);border-radius:8px;overflow-wrap:anywhere;min-width:0;min-height:520px}
+#shark-4a-board .p4-phone{max-width:375px;margin-inline:auto;border-radius:22px;min-height:600px;width:100%}
+#shark-4a-board .p4-window header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--p4-line)}
+#shark-4a-board .p4-window header .brand{font-weight:700;letter-spacing:-.02em}
+#shark-4a-board .p4-window header .brand em{font-style:normal;color:var(--p4-lime)}
+#shark-4a-board .p4-window .save{font-size:11px;color:var(--p4-muted)}
+#shark-4a-board .p4-content{padding:20px;display:grid;gap:16px}
+#shark-4a-board .p4-content h1{font:400 clamp(26px,3.5vw,40px)/1.05 Georgia,serif;margin:0}
+#shark-4a-board .p4-content h2{font:400 25px/1.15 Georgia,serif;margin:0}
+#shark-4a-board .p4-content p{margin:0}
+#shark-4a-board .p4-kicker{color:var(--p4-lime);font:11px/1.4 Consolas,monospace;text-transform:uppercase;letter-spacing:.08em}
+#shark-4a-board .p4-muted{color:var(--p4-muted);font-size:12px}
+#shark-4a-board .p4-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;min-width:0}
+#shark-4a-board .p4-layout>*{min-width:0}
+#shark-4a-board .p4-stack{display:grid;gap:12px}
+#shark-4a-board .p4-primary{background:var(--p4-lime);color:var(--p4-bg);padding:11px 14px;border-radius:4px;font-weight:700;text-align:center;display:block}
+#shark-4a-board .p4-secondary{color:var(--p4-text);border:1px solid var(--p4-line);padding:9px 12px;border-radius:4px;text-align:center;display:block}
+#shark-4a-board .p4-links{display:flex;gap:12px;flex-wrap:wrap;color:var(--p4-muted);font-size:12px}
+#shark-4a-board .p4-surface{background:var(--p4-surface);padding:14px;border-radius:5px;display:grid;gap:9px}
+#shark-4a-board .p4-room{position:relative;background:#172019;overflow:hidden;padding:20px 8px 26px;border-radius:4px}
+#shark-4a-board .p4-room:before{content:"";position:absolute;inset:0 10% 20%;background:#253023;clip-path:polygon(35% 0,65% 0,100% 100%,0 100%)}
+#shark-4a-board .p4-table{height:34px;background:#34422e;border-top:2px solid #5e7052;border-radius:50% 50% 12% 12%;position:absolute;bottom:8px;left:5%;right:5%}
+#shark-4a-board .p4-room.compact{padding:10px 8px 20px}
+#shark-4a-board .p4-room.compact .p4-actor svg{max-width:60px}
+#shark-4a-board .p4-room.compact .p4-table{height:20px}
+#shark-4a-board .p4-investors{display:flex;justify-content:space-around;align-items:end;position:relative;gap:6px}
+#shark-4a-board .p4-actor{display:grid;justify-items:center;min-width:0;flex:1;gap:4px}
+#shark-4a-board .p4-actor svg{width:100%;max-width:100px;height:auto;display:block}
+#shark-4a-board .p4-actor strong{font-size:11px;background:var(--p4-bg);padding:2px 5px;text-align:center;z-index:1}
+#shark-4a-board .p4-actor.selected strong{color:var(--p4-lime)}
+#shark-4a-board .p4-actor.withdrawn svg{opacity:.55}
+#shark-4a-board .p4-actor.listening svg{transform:rotate(-3deg)}
+#shark-4a-board .p4-actor.questioning svg{transform:rotate(3deg)}
+#shark-4a-board .p4-actor.offering svg{transform:translateY(-3px)}
+#shark-4a-board .p4-actor.agreeing svg{transform:rotate(-2deg)}
+#shark-4a-board .p4-field{padding:9px 10px;border:1px solid #7c8974;background:#0f1410;border-radius:3px;display:grid;gap:3px}
+#shark-4a-board .p4-field small{color:var(--p4-muted);font-size:11px}
+#shark-4a-board .p4-line{height:1px;background:var(--p4-line)}
+#shark-4a-board .p4-value{font-size:20px;font-weight:700;color:var(--p4-lime)}
+#shark-4a-board .p4-mark{font:11px Consolas,monospace;color:var(--p4-lime);text-transform:uppercase}
+#shark-4a-board .p4-note{border-left:2px solid var(--p4-maya);padding-left:12px;display:grid;gap:8px}
+#shark-4a-board .p4-notes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#shark-4a-board .p4-meter{display:flex;height:14px;gap:2px;background:#283226}
+#shark-4a-board .p4-meter span:nth-child(1){width:53.4%;background:var(--p4-lime)}
+#shark-4a-board .p4-meter span:nth-child(2){width:35.6%;background:var(--p4-muted)}
+#shark-4a-board .p4-meter span:nth-child(3){width:11%;background:var(--p4-maya)}
+#shark-4a-board .p4-slider{height:3px;background:#7c8974;margin:12px 4px;position:relative}
+#shark-4a-board .p4-slider:after{content:"";position:absolute;left:60%;top:-5px;height:13px;width:13px;border-radius:50%;background:var(--p4-lime)}
+#shark-4a-board .p4-offer-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;padding:9px 0;border-bottom:1px solid var(--p4-line);align-items:center}
+#shark-4a-board .p4-offer-row small{font-size:11px;color:var(--p4-muted)}
+#shark-4a-board .p4-rounds{display:flex;gap:6px;color:var(--p4-muted);font:12px Consolas,monospace}
+#shark-4a-board .p4-rounds i{width:13px;height:13px;background:var(--p4-lime);border-radius:50%}
+#shark-4a-board .p4-rounds i.used{background:var(--p4-line)}
+#shark-4a-board .p4-characters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+#shark-4a-board .p4-character-sheet{background:var(--p4-bg);padding:18px;display:grid;justify-items:center;text-align:center;gap:10px}
+#shark-4a-board .p4-character-sheet .p4-actor{max-width:180px}
+#shark-4a-board .p4-character-sheet .p4-actor svg{max-width:160px}
+#shark-4a-board .p4-character-sheet h3{font:400 23px Georgia,serif;margin:0}
+#shark-4a-board .p4-character-sheet p{margin:0;font-size:12px;color:var(--p4-muted)}
+#shark-4a-board .p4-phone .p4-layout{grid-template-columns:1fr}
+#shark-4a-board .p4-phone .p4-notes{grid-template-columns:1fr}
+#shark-4a-board .p4-phone .p4-content{padding:16px}
+#shark-4a-board .p4-phone .p4-actor svg{max-width:78px}
+#shark-4a-board [hidden]{display:none!important}
+@media(max-width:780px){
+ #shark-4a-board .p4-pair{grid-template-columns:1fr}
+ #shark-4a-board .p4-overview{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:500px){
+ #shark-4a-board .p4-overview,#shark-4a-board .p4-characters{grid-template-columns:1fr}
+ #shark-4a-board .p4-layout,#shark-4a-board .p4-notes{grid-template-columns:1fr}
+ #shark-4a-board .p4-content{padding:16px}
+}
+</style>
+<script>
+(function(){
+const root=document.getElementById('shark-4a-board');
+if(!root)return;
+const scenes=[
+ ['Landing','Invitation + studio table'],
+ ['Investor introductions','Explore the three personalities'],
+ ['Guided preparation','Idea + editable funding preview'],
+ ['Pitch review','Validate pitch + saving choice'],
+ ['Investor conversation','Active speaker + one reply'],
+ ['Offer reveal','All competing offers available'],
+ ['Interactive negotiation','Draft terms + exact consequences'],
+ ['Deal confirmation','Explicit acceptance of current terms'],
+ ['Conclusion','Committed deal / no-deal outcome'],
+ ['Personalized scorecard','Results + inspectable decisions'],
+ ['Session recovery','Resume any saved stage']
+];
+const people=[
+ {id:'maya',name:'Maya Chen',role:'Finance',accent:'#c5ab6b',coat:'#3d4437',skin:'#cf9f7d',cue:'Straight bob · brass clip · angular jacket'},
+ {id:'adrian',name:'Adrian Vale',role:'Growth',accent:'#86a9e8',coat:'#30486b',skin:'#d6aa8d',cue:'Copper curls · round glasses · open overshirt'},
+ {id:'sofia',name:'Sofia Mendes',role:'Operations',accent:'#80c7b4',coat:'#2d5b52',skin:'#ad7b58',cue:'Low bun · cream hoops · teal collar'}
+];
+function portrait(p,pose){
+ const hair=p.id==='maya'?'<path d="M28 72V45C28 13 92 13 92 45V78L76 89H43Z" fill="#24272a"/>':
+ p.id==='adrian'?'<g fill="#905b38"><circle cx="38" cy="31" r="12"/><circle cx="54" cy="24" r="13"/><circle cx="70" cy="24" r="13"/><circle cx="85" cy="33" r="12"/><circle cx="31" cy="45" r="10"/><circle cx="91" cy="46" r="10"/></g>':
+ '<circle cx="94" cy="53" r="15" fill="#302925"/><path d="M28 55C19 9 94 7 93 53L83 70H36Z" fill="#302925"/>';
+ const front=p.id==='maya'?'<path d="M31 48C28 16 86 14 89 47L75 31 60 43 48 31Z" fill="#24272a"/><path d="M31 46V76L40 82V43ZM84 44V80L92 74V46Z" fill="#24272a"/><rect x="31" y="46" width="5" height="17" rx="2" fill="'+p.accent+'"/>':
+ p.id==='adrian'?'<path d="M31 42Q36 17 61 26Q84 12 92 45L82 32 67 38 49 32Z" fill="#905b38"/><g stroke="#292e2a" fill="none" stroke-width="3"><circle cx="47" cy="53" r="10"/><circle cx="74" cy="53" r="10"/><path d="M57 53H64"/></g><path d="M48 73Q60 67 72 73" fill="none" stroke="#905b38" stroke-width="3"/>':
+ '<path d="M30 45Q26 12 65 24Q90 14 92 45Q74 42 62 29Q49 46 30 45" fill="#302925"/><g fill="none" stroke="#e5dcc4" stroke-width="3"><ellipse cx="29" cy="67" rx="5" ry="8"/><ellipse cx="92" cy="67" rx="5" ry="8"/></g>';
+ const brow=pose==='questioning'?'M42 43L52 40M69 42H80':'M42 43H52M69 43H80';
+ const mouth=pose==='agreeing'?'M48 68Q60 79 73 68':pose==='questioning'?'M52 71Q61 67 69 71':'M51 71Q60 74 69 71';
+ const arm=pose==='questioning'?'<path d="M91 120L105 91 99 83" fill="none" stroke="'+p.skin+'" stroke-width="9" stroke-linecap="round"/>':
+ pose==='offering'?'<path d="M84 122L105 114" stroke="'+p.skin+'" stroke-width="9" stroke-linecap="round"/><rect x="88" y="107" width="22" height="18" rx="2" fill="#f2f1e9"/>':'';
+ return '<div class="p4-actor '+pose+'"><svg viewBox="0 0 120 145" role="img" aria-label="'+p.name+' original concept, '+pose+' pose"><path d="M9 145L18 109Q37 92 46 94H76Q91 98 103 111L114 145Z" fill="'+p.coat+'"/>'+hair+'<path d="M49 78H74V102L61 111 48 102Z" fill="'+p.skin+'"/><ellipse cx="61" cy="54" rx="28" ry="35" fill="'+p.skin+'"/>'+front+'<g stroke="#302b26" stroke-width="2" fill="none" stroke-linecap="round"><path d="'+brow+'"/><path d="M46 54H49M72 54H75M61 56L58 64H64"/><path d="'+mouth+'"/></g><path d="M44 97L61 110 39 126 30 105M77 98L61 110 82 126 94 107" fill="'+p.accent+'"/><path d="M53 105L61 111 70 105 75 145H47Z" fill="#e5dcc4"/>'+arm+'</svg></div>';
+}
+function room(active,withdrawn,compact,activePose){
+ return '<div class="p4-room '+(compact?'compact':'')+'"><div class="p4-investors">'+people.map(p=>'<div class="p4-actor '+(p.id===active?'selected ':'')+(p.id===withdrawn?'withdrawn':'')+'">'+portrait(p,p.id===withdrawn?'withdrawn':p.id===active?(activePose||'questioning'):'neutral')+'<strong>'+p.name+'</strong></div>').join('')+'</div><div class="p4-table"></div></div>';
+}
+function cta(t,secondary){return '<div class="'+(secondary?'p4-secondary':'p4-primary')+'">'+t+'</div>';}
+function field(label,value){return '<div class="p4-field"><small>'+label+'</small><span>'+value+'</span></div>';}
+function ownership(draft){return '<div class="p4-stack"><span class="p4-mark">'+(draft?'Ownership if accepted':'Ownership after this deal')+'</span><div class="p4-meter" role="img" aria-label="Founder 53.4 percent, other existing holders 35.6 percent, investor 11 percent"><span></span><span></span><span></span></div><div class="p4-muted">Founder 53.4% · Others 35.6% · Investor 11%</div></div>';}
+function offerRows(final,currentEquity){
+ if(final && !currentEquity)currentEquity="12%";
+ return '<div class="p4-stack">'+
+ '<div class="p4-offer-row"><span>Maya <small>'+(final?'Selected':'Active')+'</small></span><span>€100,000</span><strong>'+(final?(currentEquity||'11%'):'13%')+'</strong></div>'+
+ '<div class="p4-offer-row"><span>Adrian <small>Active</small></span><span>€90,000</span><strong>15%</strong></div>'+
+ '<div class="p4-offer-row"><span>Sofia <small>'+(final?'Withdrawn':'Active')+'</small></span><span>'+(final?'—':'€80,000')+'</span><strong>'+(final?'—':'12%')+'</strong></div></div>';
+}
+function financial(){return '<div class="p4-surface"><span class="p4-mark">Exact terms preview</span><strong>€100,000 for 11%</strong>'+ownership(true)+'<div class="p4-muted">Before investment: €809,090.91<br>After investment: €909,090.91</div></div>';}
+function content(i,outcome){
+ if(i===0)return '<div class="p4-layout"><div class="p4-stack"><div class="p4-kicker">An investment-show episode</div><h1>Take your seat.<br>Make your case.</h1><p>Pitch. Defend. Negotiate.</p>'+cta('Take your seat')+'<div class="p4-links"><span>Try LunchLoop example</span><span>How to play</span></div><div class="p4-muted">Fictional investors · Educational simulation</div></div><div><span class="p4-mark">A · Shared studio environment</span>'+room()+'</div></div>';
+ if(i===1)return room('maya')+'<div class="p4-layout"><div class="p4-stack"><span class="p4-kicker">Maya Chen · Finance</span><h2>Show me what the money changes.</h2><p class="p4-muted">Explore Adrian · Explore Sofia</p></div><div class="p4-stack">'+cta('Continue to your pitch')+'<div class="p4-links"><span>Skip introductions</span><span>Back</span></div></div></div>';
+ if(i===2)return '<span class="p4-kicker">Backstage · Idea → Ask</span><h1>Bring your business.</h1><div class="p4-layout"><div class="p4-stack">'+field('Startup name','LunchLoop')+field('The idea','Reusable lunch containers for campus cafés.')+field('Money requested','€100,000.00')+field('Share offered','10.00%')+'<div class="p4-slider" role="img" aria-label="Illustrative equity slider"></div><span class="p4-muted">Precise inputs + optional guidance</span></div><div class="p4-surface"><span class="p4-mark">B · Draft preview; no game action</span><strong>Ask implies €1,000,000 after investment</strong><p>Founder: 60% → 54%<br>Other holders: 40% → 36%<br>Investor: 10%</p><div class="p4-muted">Before investment: €900,000</div></div></div>'+cta('Review pitch')+'<div class="p4-links"><span>Use example</span><span>Explain ownership</span></div>';
+ if(i===3)return '<span class="p4-kicker">Pitch review</span><h1>LunchLoop</h1><p>Borrow a box. Return it to a partner café. We wash and recirculate it.</p><div class="p4-layout"><div class="p4-surface"><span class="p4-value">€100,000 for 10%</span><p>Founder ownership: 60% before → 54% if accepted at this ask</p><span class="p4-muted">Implied value after investment €1,000,000</span></div><div class="p4-stack"><span class="p4-mark">C · Explicit saving choice</span><div class="p4-field">□ Save this session in this browser</div><p class="p4-muted">Off by default · Browser profile data is not encrypted by the app</p></div></div>'+cta('Enter the room')+'<div class="p4-links"><span>Edit pitch</span><span>Calculation details</span></div>';
+ if(i===4)return room('maya')+'<span class="p4-kicker">Scripted practice · Finance</span><div class="p4-note"><strong>Maya Chen</strong><h2>What named financial figure can you share?</h2><p class="p4-muted">Runway and use of funds help explain your answer.</p></div>'+field('Your editable answer','Revenue: 9000; Runway: 8 months; Use of funds: equipment and containers.')+cta('Send answer')+'<div class="p4-links"><span>Use example answer</span><span>Explain runway</span><span>Transcript</span></div><div class="p4-muted">Later AI: optional clarification + editable evidence summary; separate approval required.</div>';
+ if(i===5)return room()+'<span class="p4-kicker">A · All opening decisions</span><h1>Your options are on the table.</h1>'+offerRows(false)+cta('Compare offers')+'<div class="p4-links"><span>Show all now</span><span>Why these terms?</span></div>';
+ if(i===6)return room('maya','sofia',true)+'<span class="p4-kicker">Maya selected · Counter draft</span>'+offerRows(true)+'<div class="p4-rounds"><i class="used"></i><i class="used"></i><i></i><span>1 shared counter left</span></div><div class="p4-layout"><div class="p4-stack">'+field('Funding · exact number input','€100,000.00')+'<div class="p4-slider" role="img" aria-label="Funding slider, illustrative"></div>'+field('Equity · exact number input','11.00%')+'<div class="p4-slider" role="img" aria-label="Equity slider, illustrative"></div><span class="p4-muted">Draft only · Sending uses one counter</span></div>'+financial()+'</div>'+cta('Send counteroffer')+'<div class="p4-links"><span>Cancel draft</span><span>Review current offer</span><span>History</span><span>Walk away</span></div><div class="p4-muted">Preview before counter 3: current Maya offer is 12%; draft is 11%. Previewing does not change the active offer.</div>';
+ if(i===7)return '<span class="p4-kicker">Final offers · Review before accepting</span><h1>Deal with Maya?</h1>'+financial()+'<p>Confirming accepts this offer and closes the other active offers.</p>'+cta('Confirm deal')+cta('Back to offers',true)+'<div class="p4-muted">No deal is accepted until this action commits.</div>';
+ if(i===8){
+  const titles={deal:'Deal confirmed.',walk:'You chose to walk away.',passed:'No opening offers.',withdrawn:'All investors withdrew.'};
+  return room(outcome==='deal'?'maya':null,outcome==='withdrawn'?'sofia':null,false,'agreeing')+'<span class="p4-kicker">Committed outcome</span><h1>'+titles[outcome]+'</h1>'+(outcome==='deal'?'<p class="p4-value">€100,000 for 11%</p>'+ownership():'<p>No investment completed. Founder keeps 60%; other existing holders keep 40%.</p>')+cta('See my scorecard')+'<div class="p4-links"><span>Show scorecard now</span><span>Review history</span></div>';
+ }
+ if(i===9)return '<span class="p4-kicker">LunchLoop · Episode scorecard</span><h1>You improved Maya’s terms.</h1><div class="p4-notes"><div class="p4-surface"><strong>Funding result</strong><span>€100,000 / €100,000 asked</span></div><div class="p4-surface"><strong>Ownership</strong><span>60% → 53.4%</span></div><div class="p4-surface"><strong>Negotiation</strong><span>3 counters · 1 withdrawal</span></div><div class="p4-surface"><strong>Pitch coverage</strong><span>Finance, growth, delivery supplied</span></div></div><div class="p4-note"><span class="p4-mark">Selected moment · Counter 1</span><p>You asked Sofia for more than her cash limit. Her offer withdrew.</p><span class="p4-muted">Inspect proposal → response → consequence</span></div>'+cta('Try another strategy')+'<div class="p4-muted">Next challenge: reach the same Maya terms using one counter.</div>';
+ return '<span class="p4-kicker">Saved episode</span><h1>Return to your seat.</h1><div class="p4-surface"><strong>LunchLoop</strong><span>Negotiation · 2 counters used</span><span class="p4-muted">Restore saved progress; no new investor decision</span></div>'+cta('Resume episode')+cta('Start a new pitch',true)+'<div class="p4-links"><span>Remove saved information</span><span>Privacy and saving details</span></div><p class="p4-muted">Replacement and removal require explicit confirmation. Changed records are protected.</p>';
+}
+function miniature(i){
+ const heads='<div class="heads"><i></i><i></i><i></i></div>',lines='<div class="rule"></div><div class="rule" style="width:65%"></div>';
+ if([0,1,4,5].includes(i))return heads+(i===5?'<div class="slice"><i></i><i></i><i></i></div>':lines);
+ if([2,6].includes(i))return lines+'<div class="slidetrack"></div>';
+ if(i===7)return '<div class="tick">11%</div><div class="accent"></div>';
+ if(i===8)return '<div class="tick">Deal</div><div class="accent"></div>';
+ if(i===9)return '<div class="slice"><i></i><i></i><i></i></div>'+lines;
+ return lines+'<div class="accent"></div>';
+}
+root.querySelector('#p4-overview').innerHTML=scenes.map((s,i)=>'<div class="p4-landmark"><div class="p4-mini" aria-hidden="true">'+miniature(i)+'</div><button type="button" class="cursor-interaction" data-scene="'+i+'" aria-pressed="'+(i===0)+'">'+String(i+1).padStart(2,'0')+' · '+s[0]+'<small>'+s[1]+(i===9?' · Replay → 03':i===10?' · Resume → saved scene':i<9?' → '+String(i+2).padStart(2,'0'):'')+'</small></button></div>').join('');
+let state={scene:0,layout:'compare',outcome:'deal',pose:'neutral'};
+function readState(value){
+ const v=value&&value.modelContent?value.modelContent:value;
+ if(!v||typeof v!=='object')return;
+ if(Number.isInteger(v.scene)&&v.scene>=0&&v.scene<11)state.scene=v.scene;
+ if(['compare','desktop','mobile'].includes(v.layout))state.layout=v.layout;
+ if(['deal','walk','passed','withdrawn'].includes(v.outcome))state.outcome=v.outcome;
+ if(['neutral','listening','questioning','offering','agreeing','withdrawn'].includes(v.pose))state.pose=v.pose;
+}
+readState(window.openai&&window.openai.widgetState);
+function render(){
+ root.querySelector('#p4-scene').value=String(state.scene);
+ root.querySelector('#p4-layout').value=state.layout;
+ root.querySelector('#p4-outcome').value=state.outcome;
+ root.querySelector('#p4-pose').value=state.pose;
+ root.querySelector('#p4-outcome-control').hidden=state.scene!==8;
+ root.querySelector('#p4-current-label').textContent=String(state.scene+1).padStart(2,'0')+' · '+scenes[state.scene][0];
+ root.querySelector('#p4-pair').dataset.layout=state.layout;
+ root.querySelector('#p4-desktop').hidden=state.layout==='mobile';
+ root.querySelector('#p4-mobile').hidden=state.layout==='desktop';
+ root.querySelector('#p4-desktop-content').innerHTML=frame(false);
+ root.querySelector('#p4-mobile-content').innerHTML=frame(true);
+ root.querySelectorAll('[data-scene]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.scene)===state.scene)));
+ root.querySelector('#p4-characters').innerHTML=people.map(p=>'<div class="p4-character-sheet">'+portrait(p,state.pose)+'<h3>'+p.name+'</h3><span>'+p.role+' · '+state.pose+'</span><p>'+p.cue+'</p></div>').join('');
+}
+function frame(mobile){
+ const utility=state.scene<2?'How to play':state.scene<4?'Backstage':state.scene===10?'Privacy':'Save details';
+ return '<div class="'+(mobile?'mobile':'desktop')+'"><header><span class="brand">Shark Tank <em>AI</em></span><span class="save">'+utility+'</span></header><div class="p4-content">'+content(state.scene,state.outcome)+'</div></div>';
+}
+function remember(){
+ if(window.openai&&window.openai.setWidgetState)window.openai.setWidgetState({modelContent:{scene:state.scene,layout:state.layout,outcome:state.outcome,pose:state.pose},privateContent:null}).catch(function(){});
+}
+root.querySelector('#p4-scene').addEventListener('change',function(e){state.scene=Number(e.target.value);render();remember();});
+root.querySelector('#p4-layout').addEventListener('change',function(e){state.layout=e.target.value;render();remember();});
+root.querySelector('#p4-outcome').addEventListener('change',function(e){state.outcome=e.target.value;render();remember();});
+root.querySelector('#p4-pose').addEventListener('change',function(e){state.pose=e.target.value;render();remember();});
+root.querySelector('#p4-overview').addEventListener('click',function(e){const b=e.target.closest('[data-scene]');if(!b)return;state.scene=Number(b.dataset.scene);render();remember();});
+window.addEventListener('openai:set_globals',function(e){if(e.detail&&e.detail.globals&&e.detail.globals.widgetState){readState(e.detail.globals.widgetState);render();}});
+const narrow=window.matchMedia('(max-width:600px)');
+function overviewSize(){root.querySelector('#p4-overview-container').open=!narrow.matches;}
+narrow.addEventListener('change',overviewSize);
+overviewSize();
+render();
+})();
+</script>
+</body></html>

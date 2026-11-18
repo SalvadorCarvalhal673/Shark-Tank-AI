@@ -1,0 +1,39 @@
+name: Scoped feature
+description: Propose one independently reviewable project improvement
+title: "[Feature] "
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective and user benefit
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Existing implementation and source files
+    validations:
+      required: true
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables and acceptance checklist
+      description: Use task lists. State stable financial and persistence contracts.
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Required tests and evidence
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Prerequisite issue numbers and parallel work
+  - type: textarea
+    id: planning
+    attributes:
+      label: Workstream, milestone, priority, complexity, labels and suggested branch
+    validations:
+      required: true

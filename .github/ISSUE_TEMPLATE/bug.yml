@@ -1,0 +1,32 @@
+name: Bug report
+description: Report reproducible incorrect behavior without private data
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps and expected/actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Commit, browser, operating system and rendering mode
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence and relevant files
+      description: Never include API keys, private pitches or personal data.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Correction acceptance criteria and regression tests
+    validations:
+      required: true
+  - type: textarea
+    id: planning
+    attributes:
+      label: Dependencies, priority, complexity, milestone and suggested branch
