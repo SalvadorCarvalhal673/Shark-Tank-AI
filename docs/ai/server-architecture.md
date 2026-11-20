@@ -1,0 +1,10 @@
+# Server API architecture — #48
+Implemented: provider interface, deterministic MockProvider with fault modes and injectable mock-service. NO app/api route, provider SDK, fetch, billing activation or live adapter. Phase4C mock service exercises parse -> canonical replay -> provider -> runtime output validation. Full isolated privacy/budget/lifecycle composition follows the dependent controls and is not an HTTP endpoint.
+
+Future POST /api/investor: validate content-type/actual streamed byte bound before JSON parsing; reject unknown fields; verify consent/provider; apply request/principal/global budgets; reconstruct canonical journal with existing engine; build minimized context; provider call with abort/deadline/output limits; validate whole completed response; bind result; emit safe metadata. Map invalid requests400, oversized413, exhausted429, unavailable503; never expose credentials/raw provider errors. No streaming of unvalidated text. Proposed ordinary completed response p50 2–4s, p95<=8s, max15s deadline; UNMEASURED targets.
+
+Client journal replay establishes mechanical validity, not authenticity or truthful founder facts. No auth/database/authoritative server session introduced. Never trust browser financial snapshots. No model dispatch or budget mutation. Explanations of binding terms come from existing presentation/financial functions.
+
+Future live endpoint MUST wait for #49 credentials, #50 cancellation, #51 fallback, #53 consent, #54 server-wide budget/exposure review and #55 evaluation. Transcript extension waits #52. Browser session IDs and CORS are not authorization; in-memory single-process controls are not a production paid-API security boundary. No public exposure while SE-001 open.
+
+Node24/Next16.4.6 App Router future route design follows installed next/dist/docs/01-app/03-api-reference/03-file-conventions/route.md. Future route must mark imports server-only and use Node runtime. Only public contract types/events reach clients. UI adapters are explicitly outside this PR.
