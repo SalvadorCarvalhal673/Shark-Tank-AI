@@ -705,7 +705,9 @@ test("review: a delayed older acknowledgement cannot label a newer revision Save
     let first = true;
     navigator.locks.request = (async (...args: unknown[]) => {
       const result = await (real as (...args: unknown[]) => Promise<unknown>)(...args);
-      if (first) { first = false; state.qaCommitted = true; await gate; }
+      if (first && JSON.parse(localStorage.getItem("shark-tank-ai.session")!).actions.length === 1) {
+        first = false; state.qaCommitted = true; await gate;
+      }
       return result;
     }) as typeof navigator.locks.request;
     new MutationObserver(() => {
@@ -716,6 +718,10 @@ test("review: a delayed older acknowledgement cannot label a newer revision Save
       if (status === "Save status · Saved" && count < expected) state.qaFalseSaved++;
     }).observe(document.body, { subtree: true, childList: true, characterData: true });
   });
+  // An idempotent checkpoint may acquire a lock before the first answer.
+  // The acknowledgement gate must target the one-action commit, not lock order.
+  await page.evaluate(() => navigator.locks.request("shark-tank-ai.session.write", () => {}));
+  expect(await journalLength(page)).toBe(0);
   await page.getByLabel("Your answer").fill(investorAnswers[0]);
   await page.getByRole("button", { name: "Submit answer" }).click();
   await expect.poll(() => page.evaluate(() => (window as unknown as { qaCommitted: boolean }).qaCommitted)).toBe(true);
