@@ -1,3 +1,8 @@
+A	docs/qa/comprehensive-audit/changed-files.txt
+A	docs/qa/comprehensive-audit/check-results.json
+A	docs/qa/comprehensive-audit/defects.md
+A	docs/qa/comprehensive-audit/progress.md
+A	docs/qa/comprehensive-audit/report.md
 M	src/features/ai/evaluation.ts
 M	src/features/ai/evidence.ts
 A	src/features/ai/json.ts
@@ -10,7 +15,3 @@ M	src/features/ai/validation.ts
 A	tests/audit-ai-inputs.test.ts
 A	tests/audit-ai-races.test.ts
 A	tests/audit-financial-journals.test.ts
-docs/qa/comprehensive-audit/changed-files.txt
-docs/qa/comprehensive-audit/defects.md
-docs/qa/comprehensive-audit/progress.md
-docs/qa/comprehensive-audit/report.md
