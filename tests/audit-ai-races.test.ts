@@ -54,3 +54,23 @@ test("audit: already-aborted work must not supersede an active request",async()=
  const result=await runMockConversation(JSON.stringify({...r,binding:{...r.binding,requestId:"already-cancelled"}}),{lifecycle,budget,signal:stopped.signal,principal:"p"});
  assert.equal(result.kind,"discarded");assert.equal(active.aborted,false);assert.equal(lifecycle.consume(r.binding),true);
 });
+
+test("blocker review: deadline and external cancellation settle reservations once despite late completion",async()=>{
+ for(const mode of ["deadline","external"]){
+  const r=request(),lifecycle=new RequestLifecycle(),budget=new BudgetController(),abort=new AbortController();
+  lifecycle.setContext({sessionId:r.binding.sessionId,revision:0,investorId:"maya",mode:"html",recoveryId:"fresh"});
+  let entered!:()=>void,release!:()=>void;
+  const started=new Promise<void>(resolve=>{entered=resolve;});
+  const provider:InvestorProvider={kind:"mock",generate:async(input)=>{entered();await new Promise<void>(resolve=>{release=resolve;});return new MockProvider().generate(input,new AbortController().signal);}};
+  const pending=runMockConversation(JSON.stringify(r),{lifecycle,budget,signal:abort.signal,principal:"p",provider,deadlineMs:mode==="deadline"?5:15000});
+  await started;const reserved=budget.snapshot().reservedNano;assert.ok(reserved>BigInt(0));
+  if(mode==="external")abort.abort();
+  const result=await pending;
+  if(mode==="deadline"){assert.equal(result.kind,"ready");if(result.kind==="ready")assert.equal(result.response.fallback,"timeout");}
+  else assert.equal(result.kind,"discarded");
+  assert.equal(budget.snapshot().active,0);assert.equal(budget.snapshot().reservedNano,BigInt(0));assert.equal(budget.snapshot().chargedNano,reserved);
+  const before=budget.snapshot(),events=lifecycle.drainEvents();release();await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(budget.snapshot(),before);assert.deepEqual(lifecycle.drainEvents(),[]);
+  assert.equal(events.filter(e=>e.kind==="dialogue-ready").length,mode==="deadline"?1:0);
+ }
+});

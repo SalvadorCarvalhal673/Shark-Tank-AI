@@ -1,0 +1,20 @@
+import {test,expect} from '@playwright/test';
+import fs from 'node:fs';
+test('diagnostic controlled recovery focus',async({page},info)=>{
+ await page.addInitScript(()=>{
+  const w=window as unknown as {events:unknown[];held:FrameRequestCallback[];release:()=>void};w.events=[];w.held=[];
+  const log=(kind:string,detail:unknown)=>w.events.push({kind,detail,time:performance.now(),scroll:scrollY,focus:(document.activeElement as HTMLElement)?.outerHTML.slice(0,180)});
+  for(const type of ['pointerdown','pointerup','click','focusin','submit','input'])document.addEventListener(type,e=>log(type,(e.target as HTMLElement)?.outerHTML.slice(0,200)),true);
+  const original=requestAnimationFrame.bind(window);window.requestAnimationFrame=(cb)=>{if(String(cb).includes('.practice-room h2')){log('scheduled-focus',String(cb));w.held.push(time=>{const focused=document.activeElement;if(focused!==document.body&&focused instanceof HTMLElement&&!focused.closest(".recovery-panel"))return;cb(time);});return 999999;}return original(cb);};
+  w.release=()=>{for(const cb of w.held.splice(0)){log('release-focus',null);cb(performance.now());log('focus-completed',null);}};
+  new MutationObserver(()=>{const h=document.querySelector('.practice-room h2')?.textContent;const status=document.querySelector('[aria-label="Save status"]')?.textContent;log('react-dom',{h,status});}).observe(document,{subtree:true,childList:true});
+ });
+ await page.goto('/simulate');await page.getByLabel('Startup name').fill('Diagnostic');await page.getByLabel('Your pitch').fill('We sell energy monitoring subscriptions to local retail shops.');await page.getByLabel('Investment',{exact:true}).fill('100000');await page.getByLabel('Equity (%)').fill('10');await page.getByRole('button',{name:'Review pitch'}).click();await page.getByLabel('Save this session in this browser').check();await page.getByRole('button',{name:'Start practice',exact:true}).click();
+ await page.getByRole('button',{name:'Remove saved information'}).click();await page.getByRole('button',{name:'Confirm removal'}).click();await expect(page.getByText('Saved information removed. This run will not be saved again.')).toBeVisible();
+ await page.getByLabel('Your answer').evaluate(el=>el.addEventListener('focus',()=>queueMicrotask(()=>(window as unknown as {release:()=>void}).release()),{once:true}));
+ await page.getByLabel('Your answer').fill('Revenue: EUR9000; Runway: 8 months.');
+ const button=page.getByRole('button',{name:'Submit answer'});await button.scrollIntoViewIfNeeded();const box=(await button.boundingBox())!;
+ await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.evaluate(()=> (window as unknown as {release:()=>void}).release());await page.mouse.up();
+ await page.waitForTimeout(100);const events=await page.evaluate(()=>(window as unknown as {events:unknown[]}).events);fs.writeFileSync(info.outputPath('events.json'),JSON.stringify(events,null,2));
+ await expect(page.getByRole('heading',{name:'Adrian Vale',exact:true})).toBeFocused();
+});
