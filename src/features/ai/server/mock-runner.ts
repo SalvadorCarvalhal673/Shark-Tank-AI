@@ -17,12 +17,13 @@ export async function runMockConversation(raw:string,options:{
 }):Promise<MockRunResult>{
   const request=parseRequest(raw),context=request&&buildContext(request);
   if(!context)return {kind:"invalid-request"};
+  if(options.signal.aborted)return {kind:"discarded"};
   const signal=options.lifecycle.begin(request!.binding);
   if(!signal)return {kind:"discarded"};
   const combined=AbortSignal.any([signal,options.signal]);
   const deliver=(response:AppResponse):MockRunResult=>
     !combined.aborted&&options.lifecycle.consume(response.binding)?{kind:"ready",response}:{kind:"discarded"};
-  if(combined.aborted){options.lifecycle.cancel();return {kind:"discarded"};}
+  if(combined.aborted){options.lifecycle.cancelRequest(request!.binding);return {kind:"discarded"};}
   if(options.testConsentBoundary&&!prepareTransmission(context,request!.consent,"openai"))
     return deliver(scriptedFallback(context,"no-consent"));
   const provider=options.provider??new MockProvider();
@@ -34,7 +35,7 @@ export async function runMockConversation(raw:string,options:{
   const outputTokens=options.budget.limits.maxOutputTokens;
   const reserve=options.budget.reserve(options.principal,request!.binding.sessionId,request!.binding.requestId,inputTokens,outputTokens);
   if(!reserve.ok){
-    if(reserve.reason==="duplicate"){options.lifecycle.cancel();return {kind:"discarded"};}
+    if(reserve.reason==="duplicate"){options.lifecycle.cancelRequest(request!.binding);return {kind:"discarded"};}
     return deliver(scriptedFallback(context,"budget"));
   }
   let usage:ProviderUsage|undefined;
@@ -48,7 +49,7 @@ export async function runMockConversation(raw:string,options:{
       question:validated.value.question,observations:validated.value.observations,
       provenance:"mock",fallback:null,limitations:["Synthetic mock dialogue; no model inference.","Founder information is unverified."]}));
   }catch(error){
-    if(combined.aborted){options.lifecycle.cancel();return {kind:"discarded"};}
+    if(combined.aborted){options.lifecycle.cancelRequest(request!.binding);return {kind:"discarded"};}
     return deliver(scriptedFallback(context,error instanceof RequestTimeout?"timeout":"network"));
   }finally{options.budget.finish(reserve.lease,usage);}
 }

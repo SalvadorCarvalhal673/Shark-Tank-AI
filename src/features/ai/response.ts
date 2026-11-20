@@ -1,3 +1,4 @@
+import { parseUniqueJson } from "./json.ts";
 import type { AppResponse,Failure } from "./contracts.ts";
 import { MAX_OUTPUT_BYTES } from "./contracts.ts";
 import type { ConversationContext } from "./context.ts";
@@ -7,7 +8,7 @@ import { validateProvider } from "./validation.ts";
 /** Validate a transport envelope before rendering. Provenance comes from the trusted server, not a model. */
 export function parseAppResponse(raw:string,context:ConversationContext):AppResponse|null {
   if(typeof raw!=="string"||new TextEncoder().encode(raw).length>MAX_OUTPUT_BYTES)return null;
-  let v:unknown;try{v=JSON.parse(raw);}catch{return null;}
+  let v:unknown;try{v=parseUniqueJson(raw);}catch{return null;}
   if(!exact(v,["contractVersion","binding","dialogue","question","observations","provenance","fallback","limitations"])||
     v.contractVersion!==1||!validBinding(v.binding)||!sameBinding(v.binding,context.request.binding)||
     !["ai","mock","scripted"].includes(String(v.provenance))||!Array.isArray(v.limitations)||

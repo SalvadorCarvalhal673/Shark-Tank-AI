@@ -8,12 +8,18 @@ export function summarizeEvaluation(samples:readonly EvaluationSample[]){
     ![s.inputTokens,s.outputTokens].every(n=>Number.isSafeInteger(n)&&n>=0)||typeof s.costNano!=="bigint"||s.costNano<BigInt(0)||
     ![s.schemaValid,s.financialConsistent,s.grounded,s.fallback].every(v=>typeof v==="boolean"))
     throw new RangeError("Invalid evaluation sample");
+  const tokens=(key:"inputTokens"|"outputTokens")=>{
+    const total=samples.reduce((sum,s)=>sum+BigInt(s[key]),BigInt(0));
+    if(total>BigInt(Number.MAX_SAFE_INTEGER))throw new RangeError("Token total exceeds exact integer range");
+    return Number(total);
+  };
+  const inputTokens=tokens("inputTokens"),outputTokens=tokens("outputTokens");
   const times=samples.map(s=>s.durationMs).sort((a,b)=>a-b);
   const percentile=(p:number)=>times[Math.ceil(times.length*p)-1];
   const rate=(key:"schemaValid"|"financialConsistent"|"grounded"|"fallback")=>samples.filter(s=>s[key]).length/samples.length;
   return Object.freeze({count:samples.length,p50Ms:percentile(.5),p95Ms:percentile(.95),
     schemaValidRate:rate("schemaValid"),financialConsistentRate:rate("financialConsistent"),
     groundedRate:rate("grounded"),fallbackRate:rate("fallback"),
-    inputTokens:samples.reduce((a,s)=>a+s.inputTokens,0),outputTokens:samples.reduce((a,s)=>a+s.outputTokens,0),
+    inputTokens,outputTokens,
     costNano:samples.reduce((a,s)=>a+s.costNano,BigInt(0))});
 }

@@ -35,7 +35,8 @@ export function mockExtract(source:Source,binding:Binding): EvidenceProposal {
     const revenue=/\b(?:revenue|generate|sales)\b/.test(prefix.toLowerCase());
     if(!expense&&!revenue)continue;
     const negated=/\b(?:not|no|never|don't|isn't|without)\b/i.test(prefix);
-    const period=/\b(?:month|monthly)\b/i.test(local)?"month":/\b(?:year|annual|annually)\b/i.test(local)?"year":null;
+    const monthly=/\b(?:month|monthly)\b/i.test(local), yearly=/\b(?:year|annual|annually)\b/i.test(local);
+    const period=monthly===yearly?null:monthly?"month":"year";
     const currency=match[1]==="€"||match[1]==="EUR"?"EUR":match[1]==="£"||match[1]==="GBP"?"GBP":match[1]==="USD"?"USD":null;
     const signedOrRange=/-\s*$/.test(prefix)||/^\s*[-–]\s*\d/.test(source.text.slice(end))||/\b(?:between|at least|up to|more than|less than)\b/i.test(prefix);
     const valueMinor=signedOrRange?null:money(match[2]);

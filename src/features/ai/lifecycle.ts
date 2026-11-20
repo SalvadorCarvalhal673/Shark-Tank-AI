@@ -38,6 +38,11 @@ export class RequestLifecycle {
     if(!this.#delivered||!sameBinding(this.#delivered,binding)||binding.epoch!==this.#epoch)return false;
     this.#events.push({kind:"presentation-finished",binding:this.#delivered});this.#delivered=null;return true;
   }
+  /** Request-local cleanup must never invalidate a replacement or delivered response. */
+  cancelRequest(binding:Binding):boolean {
+    if(!this.#active||!sameBinding(this.#active.binding,binding))return false;
+    this.cancel();return true;
+  }
   cancel():void {
     if(this.#active){this.#active.controller.abort();this.#events.push({kind:"request-cancelled",binding:this.#active.binding});}
     this.#active=null;this.#delivered=null;this.#epoch++;

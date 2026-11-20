@@ -1,3 +1,4 @@
+import { parseUniqueJson } from "./json.ts";
 import { MAX_OUTPUT_BYTES, type ProviderOutput, type Failure } from "./contracts.ts";
 import type { ConversationContext } from "./context.ts";
 import { bounded, exact, frozenCopy, sameBinding, validBinding } from "./schemas.ts";
@@ -11,7 +12,7 @@ export function validateProvider(packet: unknown, context: ConversationContext):
   if(packet.status==="refusal") return fail("refusal");
   if(packet.status!=="complete") return fail();
   if(new TextEncoder().encode(packet.text).length>MAX_OUTPUT_BYTES) return fail();
-  let v:unknown; try {v=JSON.parse(packet.text);} catch {return fail();}
+  let v:unknown; try {v=parseUniqueJson(packet.text);} catch {return fail();}
   if(!exact(v,["contractVersion","binding","dialogue","question","observations"]) || v.contractVersion!==1 ||
       !validBinding(v.binding) || !sameBinding(v.binding,context.request.binding) || !bounded(v.dialogue,600) ||
       !(v.question===null || bounded(v.question,240)) ||

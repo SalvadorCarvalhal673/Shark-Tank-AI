@@ -1,3 +1,4 @@
+import { parseUniqueJson } from "./json.ts";
 import { bounded,exact,frozenCopy,id,integer,validBinding } from "./schemas.ts";
 import type { Binding,Failure } from "./contracts.ts";
 export type TranscriptCheckpoint=Readonly<{sessionId:string;revision:number;journalDigest:string}>;
@@ -17,7 +18,7 @@ export function inspectTranscript(raw:string,expected:TranscriptCheckpoint):Tran
   if(!id(expected.sessionId)||!integer(expected.revision,7)||!/^[a-f0-9]{64}$/.test(expected.journalDigest))
     return {kind:"checkpoint-mismatch"};
   if(typeof raw!=="string"||new TextEncoder().encode(raw).length>65536)return {kind:"invalid"};
-  let v:unknown;try{v=JSON.parse(raw);}catch{return {kind:"invalid"};}
+  let v:unknown;try{v=parseUniqueJson(raw);}catch{return {kind:"invalid"};}
   if(!exact(v,["transcriptVersion","contractVersion","rulesVersion","storageConsentVersion","checkpoint","entries"]))
     return {kind:"invalid"};
   if(v.transcriptVersion!==1||v.contractVersion!==1||v.rulesVersion!==1||v.storageConsentVersion!==1)

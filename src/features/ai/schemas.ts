@@ -1,3 +1,4 @@
+import { parseUniqueJson } from "./json.ts";
 import { PURPOSES, MAX_REQUEST_BYTES, type Binding, type BrowserRequest } from "./contracts.ts";
 import { INVESTOR_ORDER } from "../simulation/negotiation/investor-policy.ts";
 import { validPitch } from "../simulation/pitch.ts";
@@ -38,7 +39,7 @@ export function frozenCopy<T>(v: T): T {
 }
 export function parseRequest(raw: string): BrowserRequest | null {
   if (typeof raw !== "string" || new TextEncoder().encode(raw).length > MAX_REQUEST_BYTES) return null;
-  let v: unknown; try { v = JSON.parse(raw); } catch { return null; }
+  let v: unknown; try { v = parseUniqueJson(raw); } catch { return null; }
   if (!exact(v,["contractVersion","rulesVersion","binding","pitch","actions","history","consent"]) ||
       v.contractVersion !== 1 || v.rulesVersion !== 1 || !validBinding(v.binding) ||
       !exact(v.pitch,["startup","pitch","currency","amount","equity","founderOwnershipBps"]) ||
