@@ -36,3 +36,16 @@ test("AI evidence confirmation retains sources and rejects forged quotes, stale 
   assert.equal(validProposal({...p,items:[{...p.items[0],quote:"€99999"}]},s,binding),false);
   assert.equal(validProposal({...p,accepted:true},s,binding),false);
 });
+
+test("AI evidence never turns signed, abbreviated or ranged figures into positive exact evidence",()=>{
+  for(const text of ["Revenue: -€9000 monthly.","Revenue: €9000–12000 monthly."]){
+    const p=mockExtract(source(text),binding);assert.equal(p.items[0].status,"ambiguous");assert.equal(p.items[0].valueMinor,null);
+  }
+  assert.equal(mockExtract(source("Revenue: €9k monthly."),binding).items.length,0);
+});
+
+test("AI evidence validator rejects altered values, currencies and negation status despite a real quote",()=>{
+  const s=source("Revenue is not €9000 monthly."),p=mockExtract(s,binding);
+  for(const change of [{valueMinor:999},{currency:"USD"},{status:"proposed"}])
+    assert.equal(validProposal({...p,items:[{...p.items[0],...change}]},s,binding),false);
+});

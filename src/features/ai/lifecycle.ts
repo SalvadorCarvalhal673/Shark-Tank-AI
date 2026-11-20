@@ -25,7 +25,7 @@ export class RequestLifecycle {
     // New request supersedes the old one at the same context/epoch; exact request identity still differs.
     if(this.#active){this.#active.controller.abort();this.#events.push({kind:"request-cancelled",binding:this.#active.binding});}
     const copy=frozenCopy(binding),controller=new AbortController();
-    this.#active={binding:copy,controller};this.#seen.add(key);
+    this.#delivered=null;this.#active={binding:copy,controller};this.#seen.add(key);
     this.#events.push({kind:"request-started",binding:copy});return controller.signal;
   }
   consume(binding:Binding):boolean {
@@ -59,6 +59,6 @@ export async function withDeadline<T>(task:(signal:AbortSignal)=>Promise<T>,exte
     timer=setTimeout(()=>{controller.abort();reject(new RequestTimeout());},ms);
     if(external.aborted)listener();
   });
-  try{return await Promise.race([Promise.resolve().then(()=>task(controller.signal)),cancelled]);}
+  try{return await Promise.race([Promise.resolve().then(()=>{controller.signal.throwIfAborted();return task(controller.signal);}),cancelled]);}
   finally{clearTimeout(timer);external.removeEventListener("abort",listener);}
 }

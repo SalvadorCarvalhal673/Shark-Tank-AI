@@ -15,11 +15,11 @@ export function buildContext(input: BrowserRequest) {
   }
   const session = run.session, b = request.binding;
   if (session.revision !== b.revision) return null;
-  const last = session.history.at(-1);
+  const lastCounter = session.history.findLast(e => e.kind === "counter");
   const lastAction = run.actions.at(-1);
   if ((b.purpose === "question" && (session.stage !== "questions" || INVESTOR_ORDER[session.answers.length] !== b.investorId)) ||
       (b.purpose === "answer-feedback" && (lastAction?.kind !== "answer" || session.answers.at(-1)?.investor !== b.investorId)) ||
-      (b.purpose === "counter-explanation" && (last?.kind !== "counter" || last.investor !== b.investorId)) ||
+      (b.purpose === "counter-explanation" && (lastAction?.kind !== "counter" || lastCounter?.kind !== "counter" || lastCounter.revision !== session.revision || lastCounter.investor !== b.investorId)) ||
       (b.purpose === "outcome" && session.stage !== "finished")) return null;
   const sources: Source[] = [
     {id:"pitch",text:session.pitch.pitch,provenance:"founder-reported"},

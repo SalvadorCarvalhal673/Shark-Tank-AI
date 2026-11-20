@@ -7,7 +7,7 @@ export function committedExplanation(context:ConversationContext):string {
   const {session,request}=context;
   if(request.binding.purpose==="outcome"&&session.outcome)return outcomeCopy[session.outcome.kind];
   if(request.binding.purpose==="counter-explanation"){
-    const event=session.history.at(-1);
+    const event=session.history.findLast(e=>e.kind==="counter");
     if(event?.kind==="counter")return counterCopy[event.reason];
   }
   const opening=session.history.findLast(e=>e.kind==="opening"&&e.investor===request.binding.investorId);

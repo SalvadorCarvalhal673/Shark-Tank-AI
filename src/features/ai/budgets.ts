@@ -12,7 +12,7 @@ type Lease=Readonly<{id:number;reserved:bigint}>;
 export class BudgetController {
   #limits:BudgetLimits;
   #charged=BigInt(0);#reserved=BigInt(0);#count=0;
-  #active=new Map<number,{principal:string;reserved:bigint}>();
+  #active=new Map<number,{principal:string;reserved:bigint;lease:Lease}>();
   #episodes=new Map<string,number>();#principals=new Set<string>();#seen=new Set<string>();
   constructor(limits:Partial<BudgetLimits>={}){
     const l={...DEFAULT_BUDGETS,...limits};
@@ -37,13 +37,13 @@ export class BudgetController {
       (!this.#principals.has(principal)&&this.#principals.size>=this.#limits.maxPrincipals)||
       this.#charged+this.#reserved+cost>this.#limits.serverNano)return {ok:false,reason:"budget"};
     const lease=Object.freeze({id:++this.#count,reserved:cost});
-    this.#active.set(lease.id,{principal,reserved:cost});this.#reserved+=cost;
+    this.#active.set(lease.id,{principal,reserved:cost,lease});this.#reserved+=cost;
     this.#seen.add(key);this.#principals.add(principal);this.#episodes.set(episodeKey,(this.#episodes.get(episodeKey)??0)+1);
     return {ok:true,lease};
   }
   finish(lease:Lease,usage?:{inputTokens:number;outputTokens:number}):boolean{
     const active=this.#active.get(lease.id);
-    if(!active||active.reserved!==lease.reserved)return false;
+    if(!active||active.lease!==lease)return false;
     let charge=active.reserved;
     if(usage&&integer(usage.inputTokens,this.#limits.maxInputTokens)&&integer(usage.outputTokens,this.#limits.maxOutputTokens)){
       const actual=estimateCostNano(usage.inputTokens,usage.outputTokens,this.#limits.model);

@@ -1,0 +1,11 @@
+# Evaluation framework — #55
+Implemented: offline unit/contract/fixture suites plus composed mock-runner and summarizeEvaluation nearest-rank p50/p95/cost/validity metrics. No live model inference, quality scores or measured provider latency claimed. Synthetic tests validate software boundaries, not intelligent conversation.
+
+## Acceptance gates
+All exact-schema, malformed/incompatible/wrong-identity/stale/duplicate and unauthorized-field cases must pass (100%). No financial mutation, extra binding answers/counters, accepted-deal inference or source replacement permitted. Every fallback preserves engine/journal; every async obsolete response discarded. Privacy denied -> no provider boundary call. No raw secrets/private founder logs or new dependencies. Original136unit/94browser scenarios retained.
+
+Later authorized benchmark: matched fictional fixtures across all3personas; at least30cases/model plus adversarial set. Record model snapshot/name,prompt/schema/rules versions, parameters, provider region/date, billed input/output including reasoning, retries/fallbacks and exact cost assumptions. Two independent blinded reviewers score relevance, useful reasoning, naturalness/personality, recognition of strengths and appropriate uncertainty on1–5 rubric; target mean>=4 per dimension with no repeated systematic failures. Financial contradiction/unauthorized commitment or fabricated evidence escaping display is a release blocker; do not average away safety failures. Report observed raw generation failures separately from validation-protected output.
+
+Targets, not guarantees: completed validated response p50 2–4s, p95<=8s, absolute15s request deadline; schema-valid raw output>=99%, fallback<=5% ordinary cases. Small samples cannot certify99% reliability; report counts/intervals and expand sample under approved budget before claiming confidence. No forced response delays to meet lower bound. Token/cost medians/p95 per episode, rating disagreements and false-positive rejection counts included. Model choice prioritizes user experience over minor cost savings.
+
+No live/paid benchmark in CI. Mock timing measures local scheduling only. SE-001 open; public deployment prohibited.

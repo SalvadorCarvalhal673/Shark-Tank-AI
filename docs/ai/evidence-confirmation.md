@@ -9,3 +9,5 @@ Negation prevents confirmation; conflicting same-metric claims become ambiguous;
 Future natural-language extractor feeds the same proposal contract. Founder can confirm, reject or supply correction text. Confirming an inferred item is explicit acknowledgement, never business verification. Corrections are not automatically parsed/submitted. Only the existing explicit founder submission may produce the single binding answer.
 
 Current policy still requires its existing recognized text patterns. Making confirmed structured evidence influence decisions requires a SEPARATE architecture proposal, independent regression coverage and approval; this module does not secretly serialize labelled testimony or override assessEvidence. Current game/storage schema unchanged. No transcript saving. SE-001 open; no public deployment.
+
+Phase4C proposal validation independently matches normalized value/currency/period/metric/basis/status to the bounded mock extraction, so a real quotation cannot launder an altered number or negation status. A future live extractor needs a separately reviewed extension of this validator; unsupported linguistic forms currently fail closed.

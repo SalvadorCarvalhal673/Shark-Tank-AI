@@ -1,6 +1,6 @@
 # Future AI architecture — proposed
 
-No provider SDK, endpoint, credential, streaming or transcript persistence is implemented. Existing investor responses and evidence patterns are scripted/deterministic.
+No provider SDK, operational endpoint, actual credential, streaming or transcript persistence is implemented. Existing investor responses and evidence patterns are scripted/deterministic.
 
 ## Boundary
 
@@ -17,3 +17,7 @@ Phase 4C issues cover provider evaluation, schemas, personality prompts, output 
 Keys never use NEXT_PUBLIC, localStorage, fixtures or logs. Use ignored local configuration or approved secret stores only after integration approval. External founder-data transmission needs explicit consent, retention limits and deletion policy.
 Ignore/cancel responses after run/revision/context changes. Do not inject model HTML or dispatch model-suggested actions directly. Timeouts, invalid JSON, contradictions and rate limits preserve progress and offer honest scripted continuation. Thinking indicators correspond to actual processing.
 No paid/live provider request is required by setup, normal tests or this handover.
+
+## Isolated Phase4C architecture
+
+[Phase4C modules and integration contracts](ai/README.md) now provide executable offline contracts, mock services, validation, evidence/clarification models, safe configuration, lifecycle, fallback, consent, budgets and evaluation. These modules are not connected to gameplay or rendering. The existing application remains scripted. All14 issue contributions require independent review and integration approval; no live AI or storage migration is implied.

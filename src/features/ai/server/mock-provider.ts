@@ -1,5 +1,4 @@
-import type { InvestorProvider,ProviderResult } from "./provider.ts";
-import type { ConversationContext } from "../context.ts";
+import type { InvestorProvider,ProviderResult,ProviderInput } from "./provider.ts";
 import { PERSONAS } from "../personas.ts";
 import { frozenCopy } from "../schemas.ts";
 export class MockProvider implements InvestorProvider {
@@ -11,7 +10,7 @@ export class MockProvider implements InvestorProvider {
       !Number.isInteger(delayMs)||delayMs<0||delayMs>15000)throw new RangeError("Invalid mock options");
     this.mode=mode;this.delayMs=delayMs;
   }
-  async generate(context:ConversationContext,signal:AbortSignal):Promise<ProviderResult>{
+  async generate(input:ProviderInput,signal:AbortSignal):Promise<ProviderResult>{
     signal.throwIfAborted();
     if(this.delayMs) await new Promise<void>((resolve,reject)=>{
       const done=()=>{signal.removeEventListener("abort",abort);resolve();};
@@ -22,8 +21,10 @@ export class MockProvider implements InvestorProvider {
     });
     signal.throwIfAborted();
     if(this.mode==="network")throw new Error("Synthetic network failure");
-    const b=context.request.binding,p=PERSONAS[b.investorId];
-    const dialogue={maya:"Separate operating costs from the financial assumptions you have supplied.",
+    const b=input.binding,p=PERSONAS[b.investorId];
+    const data=JSON.parse(input.prompt.data);
+    const topic=/container/i.test(JSON.stringify(data.sources))?"the reusable-container business":/bicycle/i.test(JSON.stringify(data.sources))?"the bicycle service":/energy/i.test(JSON.stringify(data.sources))?"the energy service":"the business";
+    const dialogue="For "+topic+", "+{maya:"Separate operating costs from the financial assumptions you have supplied.",
       adrian:"A focused first market helps. Explain what makes your acquisition approach repeatable.",
       sofia:"Connect the customer observation to a concrete delivery milestone."}[b.investorId];
     return frozenCopy({packet:{status:this.mode==="refusal"?"refusal":this.mode==="incomplete"?"incomplete":"complete",

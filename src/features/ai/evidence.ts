@@ -25,7 +25,7 @@ export function mockExtract(source:Source,binding:Binding): EvidenceProposal {
     throw new RangeError("Invalid evidence source");
   const items:EvidenceItem[]=[];
   // Currency is mandatory: dates and unrelated counts cannot become money.
-  const pattern=/(€|£|\$|EUR|USD|GBP)\s*(\d[\d., ]{0,23}\d|\d)(?!\d)/g;
+  const pattern=/(€|£|\$|EUR|USD|GBP)\s*(\d[\d., ]{0,23}\d|\d)(?![\dA-Za-z]|[.,]\d)/g;
   for(const match of source.text.matchAll(pattern)){
     if(items.length===4) break;
     const start=match.index!, end=start+match[0].length;
@@ -37,12 +37,13 @@ export function mockExtract(source:Source,binding:Binding): EvidenceProposal {
     const negated=/\b(?:not|no|never|don't|isn't|without)\b/i.test(prefix);
     const period=/\b(?:month|monthly)\b/i.test(local)?"month":/\b(?:year|annual|annually)\b/i.test(local)?"year":null;
     const currency=match[1]==="€"||match[1]==="EUR"?"EUR":match[1]==="£"||match[1]==="GBP"?"GBP":match[1]==="USD"?"USD":null;
-    const valueMinor=money(match[2]);
+    const signedOrRange=/-\s*$/.test(prefix)||/^\s*[-–]\s*\d/.test(source.text.slice(end))||/\b(?:between|at least|up to|more than|less than)\b/i.test(prefix);
+    const valueMinor=signedOrRange?null:money(match[2]);
     const corrected=/\b(?:actually|correction|corrected|rather|instead)\b/i.test(prefix);
     items.push({id:"item-"+items.length,metric:expense?"operating-expenses":"revenue",valueMinor,currency,period,
       basis:/\b(?:revenue|expenses|operating costs)\b/i.test(prefix)?"supplied":"inferred",
       quote:match[0],start,end,status:negated?"negated":(!currency||!period||valueMinor===null||corrected?"ambiguous":"proposed"),
-      notes:[...(!currency?["Currency requires confirmation."]:[]),...(!period?["Period requires confirmation."]:[]),
+      notes:[...(signedOrRange?["Signed or ranged figure requires correction."]:[]),...(!currency?["Currency requires confirmation."]:[]),...(!period?["Period requires confirmation."]:[]),
         ...(corrected?["Correction: explicitly select the current claim."]:[]),
         ...(/\b(?:around|approximately|about)\b/i.test(prefix)?["Approximate founder report."]:[])]});
   }
@@ -54,6 +55,8 @@ export function validProposal(v:unknown,source:Source,binding:Binding): v is Evi
   if(!exact(v,["version","binding","source","items"])||v.version!==1||!validBinding(v.binding)||!sameBinding(v.binding,binding)||
     !exact(v.source,["id","text","provenance"])||v.source.id!==source.id||v.source.text!==source.text||
     v.source.provenance!=="founder-reported"||!Array.isArray(v.items)||v.items.length>4) return false;
+  if(!bounded(source.text,1500)||!validBinding(binding))return false;
+  const expected=mockExtract(source,binding).items;
   const ids=new Set();
   return v.items.every(i=>{
     if(!exact(i,["id","metric","valueMinor","currency","period","basis","quote","start","end","status","notes"])||
@@ -64,6 +67,8 @@ export function validProposal(v:unknown,source:Source,binding:Binding): v is Evi
       i.end<=i.start||source.text.slice(i.start,i.end)!==i.quote||
       !["proposed","ambiguous","negated"].includes(String(i.status))||!Array.isArray(i.notes)||i.notes.length>4||
       !i.notes.every(n=>bounded(n,120)))return false;
+    const canonical=expected.find(e=>e.id===i.id&&e.start===i.start&&e.end===i.end);
+    if(!canonical||["metric","valueMinor","currency","period","basis","status"].some(k=>canonical[k as keyof EvidenceItem]!==i[k]))return false;
     ids.add(i.id);return true;
   });
 }
