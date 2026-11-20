@@ -1,23 +1,11 @@
-# Comprehensive audit progress
+# Audit continuation checkpoint
 
-Status: IN PROGRESS. No integration readiness claimed.
+Review/publication checkpoint069d378; AI-only correction34f7fff; financial tests935d4de. Branch audit/comprehensive-phase-1-to-4c published. Draft PR106 targets develop; no merge authorized. https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/pull/106
 
-Baseline verified 2026-11-20: develop 7dea5d336034484eb6d7748400b0b12d4bcbcbd4; complete Phase 4C 3eb613b90ddb6bb1abfbaeaf6164c498ca9b4f3a. Remote branches unchanged; PRs 91–104 open/unmerged. Audit branch audit/comprehensive-phase-1-to-4c starts at full cumulative checkpoint, with develop verified as ancestor.
+Local verification complete:196unit pass; clean lint/typecheck; production build; fresh isolated npm ci/build/start; full/production audit0. Edge/Chrome/WindowsWebKit94eachpass. Firefox94distinct pass with initial session-removal failure and5unchanged traced repetitions preserved. All12prototype cases pass in all4engines. Physical mobile/Safari/screenreaders unverified. Two independent safeguard mutations detected. Eight settled renderer cycles stable38geometries/22textures/3mixers, retained unsent answer/session/revision0.
 
-Evidence: local TEMP/shark-comprehensive-audit. Historical Phase 4C evidence remains TEMP/shark-ai-phase4c.
+Five confirmedAI bugs corrected, no shared implementation changes. One suspected intermittent medium/C finding issue105 remains open; root cause unknown and integration readiness withheld pending independent resolution/acceptance. SE-001open/public deployment prohibited/Phase4Dpaused.
 
-Completed: repository checkpoint and architecture instructions inspection. Remaining: deterministic cancellation reproduction/correction; full source/adversarial review phases 1–4C; register/coordination; fresh installation; regression matrix; security reassessment; publication and CI.
+CI run44743558177 started for069d378 and is in progress. Machine-readable local outcomes check-results.json include initial red regressions, expected mutation failures and Firefox initial failure; these are not all mandatory-check failures. Original failed logs retained TEMP/shark-comprehensive-audit.
 
-SE-001 stays open; deployment and feature development prohibited. Preserve all other branches and contributor workstreams.
-
-## Resume checkpoint — 20 November 2026
-
-AI corrections committed locally as 34f7fffd4cca05aaa0531e4aa8cb23ed8f945297. Additional independent financial tests remain uncommitted. Working branch remains audit/comprehensive-phase-1-to-4c; no push or shared-branch edits.
-
-Five distinct confirmed AI defects fixed (AUD-001 includes related pre-aborted admission issue until split in final register): obsolete catch cancellation, pre-aborted request supersession, duplicate JSON keys, mixed reporting-period confidence, evaluation token aggregate precision. Last full check 193 tests passed before the last three test additions; focused final 12 tests passed. Final full suite still required. Lint/typecheck passed before final additions. Clean cloned committed candidate installed with npm ci, built, started: / 200, /simulate 200, /prototype/studio 404.
-
-Edge 82 original +12 prototype passed. Chrome 82 original in four batches +12 prototype passed. Firefox original 81 initial passes plus one failure at session-recovery-browser.spec.ts:145; five unchanged traced reruns passed. All12 Firefox prototype cases passed. Initial failure retained; root cause unknown, GitHub issue105 opened for C/D coordination: https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/105 . No shared implementation correction made.
-
-WebKit runtime launched successfully. Original WebKit suite now running in four batches; inspect persistent webkit-*.log/.exit before resuming. No physical Safari claim. Two isolated mutations (half-up tie rule and request identity guard) caused intended assertion failures; disposable files restored.
-
-Remaining: investigate issue105 further; WebKit outcomes; repeated-renderer resource measurement; final adversarial review including budgets/cancellation/false-positive validation; complete register/report/manifest; final full checks; authorized branch publication + draft PR into develop and complete CI. Do not declare audit complete. SE-001 open, public deployment prohibited.
+Next: finish documentation normalization and final commit; verify CI on final HEAD, remote SHA and clean tree; report candidly. Do not repeat passed browsers without relevant source changes.
