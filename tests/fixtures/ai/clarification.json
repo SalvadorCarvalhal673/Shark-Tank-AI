@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "scenario": "one optional clarification before explicit binding submission",
+  "steps": [
+    "missing period detected",
+    "founder opts into clarification",
+    "investor asks once",
+    "founder answers or skips",
+    "evidence proposal explicitly confirmed or corrected",
+    "founder reviews original and clarification",
+    "existing single binding answer submitted explicitly"
+  ],
+  "cancel": "retains original founder draft; scripted prompt continues; allowance not reopened"
+}
