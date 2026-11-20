@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { useSavedSession } from "./use-saved-session";
 
 export function RecoveryPanel({ controller, onNew, active, preview = false }: {
@@ -10,6 +10,25 @@ export function RecoveryPanel({ controller, onNew, active, preview = false }: {
   preview?: boolean;
 }) {
   const [confirmation, setConfirmation] = useState<{ kind: "remove" | "load"; raw: string } | null>(null);
+  const panel = useRef<HTMLElement>(null);
+  const focusFrame = useRef<number | null>(null);
+  const focusEpoch = useRef(0);
+  const confirming = useRef(false);
+  const mounted = useRef(false);
+  const cancelFocus = useCallback(() => {
+    focusEpoch.current++;
+    if (focusFrame.current !== null) cancelAnimationFrame(focusFrame.current);
+    focusFrame.current = null;
+  }, []);
+  // A new view, unmount or confirmation invalidates obsolete recovery focus.
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      cancelFocus();
+      confirming.current = false;
+    };
+  }, [controller.viewKey, controller.run?.session.id, cancelFocus]);
   const heading = useRef<HTMLHeadingElement>(null);
   const confirmHeading = useRef<HTMLHeadingElement>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
@@ -26,16 +45,26 @@ export function RecoveryPanel({ controller, onNew, active, preview = false }: {
     const latest = controller.refresh();
     if (latest.kind !== "valid" && latest.kind !== "invalid") return;
     if (kind === "load" && latest.kind !== "valid") return;
+    cancelFocus();
     trigger.current = button;
     setConfirmation({ kind, raw: latest.raw });
   }
 
   async function confirm() {
-    if (!confirmation) return;
+    if (!confirmation || confirming.current) return;
+    confirming.current = true;
+    const epoch = ++focusEpoch.current;
+    if (focusFrame.current !== null) cancelAnimationFrame(focusFrame.current);
     if (confirmation.kind === "remove") await controller.discard(confirmation.raw);
     else controller.resume(confirmation.raw);
+    if (!mounted.current || epoch !== focusEpoch.current) return;
     setConfirmation(null);
-    requestAnimationFrame(() => {
+    confirming.current = false;
+    focusFrame.current = requestAnimationFrame(() => {
+      if (!mounted.current || epoch !== focusEpoch.current) return;
+      focusFrame.current = null;
+      const focused = document.activeElement;
+      if (focused !== document.body && focused && !panel.current?.contains(focused)) return;
       const target = document.querySelector<HTMLElement>(".practice-room h2") ??
         document.querySelector<HTMLElement>('input[name="startup"]') ??
         document.querySelector<HTMLElement>('[aria-label="Pitch preview"] h2') ?? heading.current;
@@ -51,7 +80,7 @@ export function RecoveryPanel({ controller, onNew, active, preview = false }: {
     "invalid-replay": "The saved actions could not be replayed safely.",
   }[slot.reason] : null;
 
-  return <section className="form-card recovery-panel" aria-label="Saved progress">
+  return <section ref={panel} className="form-card recovery-panel" aria-label="Saved progress">
     <p aria-label="Save status" aria-live="polite">Save status · {status}</p>
     {message && <p className="storage-message" aria-live="polite">{message}</p>}
     {!active && !preview && slot.kind === "valid" && <>

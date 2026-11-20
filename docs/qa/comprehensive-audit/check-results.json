@@ -1,0 +1,206 @@
+[
+  {
+    "Check": "audit-production",
+    "Exit": "0"
+  },
+  {
+    "Check": "audit",
+    "Exit": "0"
+  },
+  {
+    "Check": "baseline-unit",
+    "Exit": "0"
+  },
+  {
+    "Check": "build",
+    "Exit": "0"
+  },
+  {
+    "Check": "cancellation-green",
+    "Exit": "0"
+  },
+  {
+    "Check": "cancellation-red",
+    "Exit": "1"
+  },
+  {
+    "Check": "chrome-negotiation-ui-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "chrome-practice-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "chrome-qa-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "chrome-session-recovery-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "edge-original",
+    "Exit": "0"
+  },
+  {
+    "Check": "evaluation-green",
+    "Exit": "0"
+  },
+  {
+    "Check": "evaluation-red",
+    "Exit": "1"
+  },
+  {
+    "Check": "financial-generated",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-negotiation-ui-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-practice-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-qa-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-removal-investigation",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-session-recovery-browser",
+    "Exit": "1"
+  },
+  {
+    "Check": "focused-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "focused",
+    "Exit": "0"
+  },
+  {
+    "Check": "fresh-build",
+    "Exit": "0"
+  },
+  {
+    "Check": "fresh-install",
+    "Exit": "0"
+  },
+  {
+    "Check": "inputs-green",
+    "Exit": "0"
+  },
+  {
+    "Check": "inputs-red",
+    "Exit": "1"
+  },
+  {
+    "Check": "lint-clean",
+    "Exit": "0"
+  },
+  {
+    "Check": "lint-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "lint",
+    "Exit": "0"
+  },
+  {
+    "Check": "mutation-identity",
+    "Exit": "1"
+  },
+  {
+    "Check": "mutation-rounding",
+    "Exit": "1"
+  },
+  {
+    "Check": "preaborted-green",
+    "Exit": "0"
+  },
+  {
+    "Check": "preaborted-red",
+    "Exit": "1"
+  },
+  {
+    "Check": "prototype-chrome-actual",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-chrome-other",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-edge-actual",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-edge-other",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-firefox-actual",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-firefox-other",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-webkit-actual",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-webkit-other",
+    "Exit": "0"
+  },
+  {
+    "Check": "renderer-cycles-settled",
+    "Exit": "0"
+  },
+  {
+    "Check": "renderer-cycles",
+    "Exit": "0"
+  },
+  {
+    "Check": "typecheck-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "typecheck",
+    "Exit": "0"
+  },
+  {
+    "Check": "unit-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "unit",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-availability",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-negotiation-ui-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-practice-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-qa-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-session-recovery-browser",
+    "Exit": "1"
+  }
+]

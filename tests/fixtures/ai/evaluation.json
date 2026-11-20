@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "fictionalOnly": true,
+  "liveInference": false,
+  "businesses": [
+    "LunchLoop reusable containers",
+    "GridWise energy monitoring",
+    "CycleAgain refurbished bicycles"
+  ],
+  "personas": [
+    "maya",
+    "adrian",
+    "sofia"
+  ],
+  "adversarial": [
+    "negation",
+    "irrelevant dates",
+    "fabricated references",
+    "contradictory corrections",
+    "injection",
+    "wrong binding",
+    "provider refusal",
+    "late result"
+  ],
+  "liveBenchmark": {
+    "matchedCasesPerModel": 30,
+    "ordinaryP50Ms": [
+      2000,
+      4000
+    ],
+    "p95TargetMs": 8000,
+    "deadlineMs": 15000,
+    "reviewers": 2,
+    "minimumMeanHumanRating": 4,
+    "scale": 5
+  }
+}

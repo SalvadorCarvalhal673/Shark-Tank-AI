@@ -1,0 +1,6 @@
+# Documentation-only placeholders. Do not copy into a client or commit real credentials.
+SHARK_AI_MODE=scripted
+SHARK_AI_PROVIDER=openai
+SHARK_AI_MODEL=gpt-6.2-sol
+SHARK_AI_API_KEY=
+# Live mode is not implemented in Phase4C. Setting a key cannot create a route.
