@@ -1,0 +1,238 @@
+[
+  {
+    "Check": "ack-chrome-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "ack-deterministic-red",
+    "Exit": "1"
+  },
+  {
+    "Check": "ack-firefox-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "ack-msedge-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "ack-webkit-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "audit-production",
+    "Exit": "0"
+  },
+  {
+    "Check": "audit",
+    "Exit": "0"
+  },
+  {
+    "Check": "build-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "build-final2",
+    "Exit": "0"
+  },
+  {
+    "Check": "build-verified",
+    "Exit": "0"
+  },
+  {
+    "Check": "build",
+    "Exit": "0"
+  },
+  {
+    "Check": "build2",
+    "Exit": "0"
+  },
+  {
+    "Check": "chrome-negotiation-ui-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "chrome-practice-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "chrome-qa-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "chrome-session-recovery-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "edge-final-six",
+    "Exit": "0"
+  },
+  {
+    "Check": "extended-final",
+    "Exit": "1"
+  },
+  {
+    "Check": "extended",
+    "Exit": "0"
+  },
+  {
+    "Check": "final-deterministic",
+    "Exit": "0"
+  },
+  {
+    "Check": "final2-deterministic",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-negotiation-ui-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-practice-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-qa-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "firefox-session-recovery-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "green",
+    "Exit": "1"
+  },
+  {
+    "Check": "green2",
+    "Exit": "0"
+  },
+  {
+    "Check": "lint-complete",
+    "Exit": "0"
+  },
+  {
+    "Check": "lint-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "lint-verified",
+    "Exit": "0"
+  },
+  {
+    "Check": "lint",
+    "Exit": "0"
+  },
+  {
+    "Check": "msedge-negotiation-ui-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "msedge-practice-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "msedge-qa-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "msedge-session-recovery-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-chrome-actual",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-chrome-other",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-firefox-actual",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-firefox-other",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-msedge-actual",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-msedge-other",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-webkit-actual",
+    "Exit": "0"
+  },
+  {
+    "Check": "prototype-webkit-other",
+    "Exit": "0"
+  },
+  {
+    "Check": "red",
+    "Exit": "1"
+  },
+  {
+    "Check": "stress-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "stress",
+    "Exit": "-1"
+  },
+  {
+    "Check": "typecheck-complete",
+    "Exit": "0"
+  },
+  {
+    "Check": "typecheck-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "typecheck-six",
+    "Exit": "0"
+  },
+  {
+    "Check": "typecheck",
+    "Exit": "0"
+  },
+  {
+    "Check": "unit-final",
+    "Exit": "0"
+  },
+  {
+    "Check": "unit",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-ack-corrected",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-ack-investigation",
+    "Exit": "1"
+  },
+  {
+    "Check": "webkit-first-rerun",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-negotiation-ui-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-practice-browser",
+    "Exit": "1"
+  },
+  {
+    "Check": "webkit-qa-browser",
+    "Exit": "0"
+  },
+  {
+    "Check": "webkit-session-recovery-browser",
+    "Exit": "1"
+  }
+]

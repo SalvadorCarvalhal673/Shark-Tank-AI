@@ -21,3 +21,15 @@ AUD-006 suspected medium/C interaction defect: Firefox answer click after save r
 ## Issue105 blocker investigation update
 
 AUD-006 is now a CONFIRMED medium interaction defect under controlled scheduling. RecoveryPanel.confirm() unconditionally restores heading focus in a deferred callback even after the player focuses the answer field. Releasing it on textarea focus before insertion causes no input event; submit click is delivered but native required validation prevents submit/controller dispatch, leaving revision0/Maya. Pointerdown/up release alone passed. Original untraced failure's exact ordering remains unproved. Failing and guard-comparison diagnostics are published under ../issue105/; original implementation is unchanged pending required C/D coordination. Related GitHub105 stays open. Expected: user-directed focus/text entry survives storage completion. Proposed fix: conditional, lifecycle-safe focus restoration. No implemented production correction yet. New AI budget/deadline regression passes.
+
+## AUD-006 correction checkpoint
+
+Owner authorized105-only shared edits after prior handoff. Confirmed medium defect corrected in recovery-panel.tsx: user-focus guard, cancellable frame, epoch/mount/view/run invalidation and duplicate confirmation guard. Regression tests/issue105-browser.spec.ts (six permanent cases). Baseline100Firefox94pass/6fail and deterministic red preserved. IsolatedPR107commitfa4369d; cumulativecherry-picka5daec8. Verification ongoing;105OPENpending approval. No financial/controller/persistence/AI/3D/design changes. This update supersedes previous no-implementation status, preserving historical evidence.
+
+## Final AUD-006 verification
+
+Application correction verified: deterministic red-before/green-after; final100Firefox100pass/0fail; six permanent regressions across4engines; original82+prototype12 retained;197unit/lint/type/build/auditspass. Issue105OPENfor approval, not unresolved code dependency once finalCIpasses. Responsible reviewer: projectowner(newauthorization); shared change confined recovery-panel.tsx. Related integration effects: focusownership only, no financial/journal/storage schema/policy/AI/3D/design changes. See issue105/correction.md for complete evidence/limits.
+
+## AUD-007 — low, test synchronization, corrected
+
+Phase3CQA; component tests/session-recovery-browser.spec.ts finaldelayedacktest; related105/PR107. Expected gate actualone-answer commit; actualfirstlockcould be idempotentzero-actioncheckpoint, producing false expected1/actual0 failure. InitialWebKit1failure; unchanged5repeats4fail. Deterministicexplicitzero-actionlock blocks originalgate. Corrected gate identifies actioncount1, adds explicitzero-actionlock/initialcount0assertion; all original assertions remain. Final3repeats each4enginespass. Test-onlycommit226ece7. No application persistencecorrection required. Statusverifiedlocally/finalCIpending. WorkstreamQA; integrationpreservesoriginalcoverage/doesnotweakenassertions.

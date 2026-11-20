@@ -3,6 +3,9 @@ A	docs/qa/comprehensive-audit/check-results.json
 A	docs/qa/comprehensive-audit/defects.md
 A	docs/qa/comprehensive-audit/progress.md
 A	docs/qa/comprehensive-audit/report.md
+A	docs/qa/issue105/investigation.md
+A	docs/qa/issue105/proposed-guard.spec.txt
+A	docs/qa/issue105/reproduction.spec.txt
 M	src/features/ai/evaluation.ts
 M	src/features/ai/evidence.ts
 A	src/features/ai/json.ts
@@ -12,6 +15,11 @@ M	src/features/ai/schemas.ts
 M	src/features/ai/server/mock-runner.ts
 M	src/features/ai/transcript.ts
 M	src/features/ai/validation.ts
+M	src/features/simulation/negotiation/recovery-panel.tsx
 A	tests/audit-ai-inputs.test.ts
 A	tests/audit-ai-races.test.ts
 A	tests/audit-financial-journals.test.ts
+A	tests/issue105-browser.spec.ts
+M	tests/session-recovery-browser.spec.ts
+docs/qa/issue105/check-results.json
+docs/qa/issue105/correction.md

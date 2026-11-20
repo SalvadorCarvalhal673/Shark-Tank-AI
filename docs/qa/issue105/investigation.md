@@ -39,3 +39,7 @@ Five prior AI corrections reviewed again: cancelRequest matches full binding; pr
 ## Stress results
 
 100unchanged targetedFirefox repetitions completed:94passed,6failed (6.5minutes). Initial failures retained TEMP/shark-105/stress-original.log and per-repeat error contexts. No retries used to erase this result. This confirms the ordinary scenario remains intermittent on unchanged shared implementation. Controlled failing input-focus experiment and passing diagnostic guard remain separate evidence, not an application correction. Original audit's5passing repeats never proved resolution. Member3/4must retain these six failures in their correction review.
+
+## Updated owner authorization and implementation
+
+Owner subsequently lifted the shared-file restriction EXCLUSIVELY for105. The authorized correction is now isolated in PR107/commitfa4369d and incorporated into cumulative candidate via cherry-picka5daec8. See correction.md and six permanent browser regressions. Earlier ownership/hold statements above are historical;105 remains open for independent approval and is not automatically closed. No other contributor source changed.
