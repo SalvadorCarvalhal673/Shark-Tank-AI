@@ -1,0 +1,26 @@
+[
+  {
+    "business": "LunchLoop",
+    "concept": "Reusable lunch containers for campus cafes, with washing and return points.",
+    "founder": "Customers asked for a return point beside the library.",
+    "maya": "Which washing and replacement costs are still missing from your financial measure?",
+    "adrian": "Campus cafes are a focused start. Which acquisition channel could reach another campus?",
+    "sofia": "You reported a specific customer request. What milestone would test the library return point?"
+  },
+  {
+    "business": "GridWise",
+    "concept": "Energy monitoring subscriptions for independent retail shops.",
+    "founder": "Shop owners want clearer overnight electricity reports.",
+    "maya": "Which installation costs belong outside your recurring service margin?",
+    "adrian": "What makes independent shops reachable through a repeatable acquisition channel?",
+    "sofia": "What did shop owners do with the reports, and what will the next pilot deliver?"
+  },
+  {
+    "business": "CycleAgain",
+    "concept": "Refurbished bicycle subscriptions with repairs for university students.",
+    "founder": "Pilot riders asked whether repairs would be available during exams.",
+    "maya": "How do repair and replacement costs affect your financial assumptions?",
+    "adrian": "Why would students choose a subscription over buying a used bicycle?",
+    "sofia": "How will the team handle repairs during the exam-period demand peak?"
+  }
+]
