@@ -141,3 +141,57 @@ test('backend mismatched consent provider or session never invokes external adap
   if(result.kind==='ready')assert.equal(result.response.fallback,'no-consent');assert.equal(calls,0);assert.equal(b.budget.snapshot().requests,0);
  }
 });
+
+import { BackendCoordinator, fingerprint } from '../src/features/ai/server/backend-coordinator.ts';
+test('adversarial coordinator publishes ordering before synchronous abort callbacks can reenter',()=>{
+ const c=new BackendCoordinator(),binding=request().binding,checkpoint={pitch:fingerprint(request().pitch),actions:[]};
+ const first=c.begin('principal',binding,checkpoint)!;
+ const newest:{ticket:ReturnType<BackendCoordinator['begin']>}={ticket:null};
+ first.signal.addEventListener('abort',()=>{newest.ticket=c.begin('principal',{...binding,requestId:'newest'},checkpoint);},{once:true});
+ assert.equal(c.begin('principal',{...binding,requestId:'middle'},checkpoint),null);
+ assert.ok(newest.ticket);assert.equal(newest.ticket.current(),true);
+ assert.equal(c.begin('principal',{...binding,requestId:'newest'},checkpoint),null);
+});
+
+test('adversarial coordinator capacity is bounded and rejection cannot invalidate its current ticket',()=>{
+ const c=new BackendCoordinator(),checkpoint={pitch:fingerprint(request().pitch),actions:[]};
+ for(let i=0;i<64;i++)assert.ok(c.begin('principal',{...request().binding,sessionId:'run-'+i},checkpoint));
+ assert.equal(c.begin('principal',{...request().binding,sessionId:'overflow'},checkpoint),null);
+ let last:ReturnType<BackendCoordinator['begin']>=null;
+ for(let i=0;i<64;i++){last=c.begin('principal',{...request().binding,sessionId:'run-'+i,requestId:'second'},checkpoint);assert.ok(last);}
+ assert.ok(last);assert.equal(last.current(),true);
+ assert.equal(c.begin('principal',{...request().binding,sessionId:'run-63',requestId:'third'},checkpoint),null);
+ assert.equal(last.current(),true);
+});
+test('adversarial overlapping requests settle owned reservations once and only the newest may deliver',async()=>{
+ const budget=new BudgetController();let entered:()=>void=()=>{};
+ const releases:Array<()=>void>=[],pending:Array<ReturnType<ConversationBackend['run']>>=[];
+ const backend=new ConversationBackend({budget,provider:{name:'mock',model:'gpt-6.2-sol',generate:async(input)=>{
+  await new Promise<void>(resolve=>{releases.push(resolve);entered();});
+  return new MockProvider().generate(input,new AbortController().signal);
+ }}});
+ let cancelledCost=BigInt(0);
+ for(let i=0;i<12;i++){
+  const ready=new Promise<void>(resolve=>{entered=resolve;});
+  pending.push(backend.run(JSON.stringify({...request(),binding:{...request().binding,requestId:'overlap-'+i}}),options()));await ready;
+  const s=budget.snapshot();assert.equal(s.active,1);assert.equal(s.chargedNano,cancelledCost);
+  if(i<11)cancelledCost+=s.reservedNano;
+ }
+ releases[11]();assert.equal((await pending[11]).kind,'ready');
+ const settled=budget.snapshot();assert.equal(settled.active,0);assert.equal(settled.reservedNano,BigInt(0));assert.ok(settled.chargedNano>=cancelledCost);
+ for(let i=10;i>=0;i--)releases[i]();
+ const results=await Promise.all(pending);assert.equal(results.filter(r=>r.kind==='ready').length,1);
+ await new Promise<void>(resolve=>setImmediate(resolve));assert.deepEqual(budget.snapshot(),settled);
+});
+test('adversarial denied capacity and fabricated journal never preempt a legitimate pending operation',async()=>{
+ let entered!:()=>void,release!:()=>void;const ready=new Promise<void>(resolve=>{entered=resolve;});
+ const backend=new ConversationBackend({provider:{name:'mock',model:'gpt-6.2-sol',generate:async(input,s)=>{
+  entered();await new Promise<void>(resolve=>{release=resolve;});return new MockProvider().generate(input,s);
+ }}});
+ const pending=backend.run(raw(),options());await ready;const before=backend.budget.snapshot();
+ const bad=request();bad.binding.requestId='forged';bad.actions=[{kind:'accept',sessionId:bad.binding.sessionId,expectedRevision:0,offerId:'fictional-run:maya:3'}];
+ assert.equal((await backend.run(JSON.stringify(bad),options())).kind,'invalid-request');
+ const changed=request();changed.binding.requestId='changed';changed.pitch.amount++;
+ assert.equal((await backend.run(JSON.stringify(changed),options())).kind,'discarded');assert.deepEqual(backend.budget.snapshot(),before);
+ release();assert.equal((await pending).kind,'ready');assert.equal(backend.budget.snapshot().active,0);
+});

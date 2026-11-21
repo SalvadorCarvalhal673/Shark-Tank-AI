@@ -58,3 +58,41 @@ test('bounded streams cancel invalid producers and release pending reads on abor
  const result=readBoundedBody(pending,10,abort.signal);await Promise.resolve();release();
  await assert.rejects(result);assert.equal(cancelled,2);assert.equal(pending.locked,false);
 });
+
+test('adversarial pre-aborted bounded reader cancels its unopened source',async()=>{
+ let cancelled=0;const body=new ReadableStream<Uint8Array>({cancel(){cancelled++;}}),abort=new AbortController();abort.abort();
+ await assert.rejects(readBoundedBody(body,16,abort.signal));assert.equal(cancelled,1);assert.equal(body.locked,false);
+});
+
+test('adversarial HTTP pre-abort cancels the source without consuming admission',async()=>{
+ let cancelled=0;const body=new ReadableStream<Uint8Array>({cancel(){cancelled++;}}),abort=new AbortController();abort.abort();
+ const req=new Request('http://localhost/api/investor',{method:'POST',headers:{'Content-Type':'application/json'},body,signal:abort.signal,duplex:'half'} as RequestInit);
+ const endpoint=createInvestorEndpoint(()=> 'mock');
+ assert.equal((await endpoint(req)).status,499);assert.equal(cancelled,1);
+ for(let i=0;i<256;i++)assert.equal((await endpoint(post('{}'))).status,400);
+ assert.equal((await endpoint(post('{}'))).status,429);
+});
+test('adversarial body fragment flooding and a stalled stream are bounded and cancelled',async(t)=>{
+ let cancelled=0,pulls=0;
+ const flood=new ReadableStream<Uint8Array>({pull(c){pulls++;c.enqueue(new Uint8Array(0));},cancel(){cancelled++;}});
+ await assert.rejects(readBoundedBody(flood,16,new AbortController().signal),BodyLimitError);
+ assert.equal(cancelled,1);assert.ok(pulls<=19);assert.equal(flood.locked,false);
+ t.mock.timers.enable({apis:['setTimeout']});
+ let started!:()=>void;const ready=new Promise<void>(resolve=>{started=resolve;});
+ const stalled=new ReadableStream<Uint8Array>({pull(){started();},cancel(){cancelled++;}});
+ const req=new Request('http://localhost/api/investor',{method:'POST',headers:{'Content-Type':'application/json'},body:stalled,duplex:'half'} as RequestInit);
+ const result=createInvestorEndpoint(()=> 'mock')(req);await ready;await Promise.resolve();t.mock.timers.tick(2001);
+ assert.equal((await result).status,408);assert.equal(cancelled,2);assert.equal(stalled.locked,false);
+});
+
+test('adversarial default/production/mock HTTP paths never make a global external request',async(t)=>{
+ let calls=0;t.mock.method(globalThis,'fetch',async()=>{calls++;throw Error('Unexpected external request');});
+ for(const environment of [{},{NODE_ENV:'production',SHARK_AI_BACKEND_MODE:'mock'},
+  {NODE_ENV:'production',SHARK_AI_MODE:'live',SHARK_AI_API_KEY:'SYNTHETIC_CREDENTIAL_SENTINEL'},
+  {NODE_ENV:'test',SHARK_AI_BACKEND_MODE:'mock'}]){
+  const result=await createInvestorEndpoint(()=>backendMode(environment))(post());
+  assert.equal(result.status,environment.NODE_ENV==='test'?200:503);
+  assert.doesNotMatch(await result.text(),/SYNTHETIC_CREDENTIAL_SENTINEL/);
+ }
+ assert.equal(calls,0);
+});

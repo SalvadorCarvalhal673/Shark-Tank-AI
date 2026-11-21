@@ -66,3 +66,26 @@ test('full OpenAI-shaped pipeline uses canonical context, explicit consent and m
  assert.equal(response.kind,'ready');if(response.kind==='ready'){assert.equal(response.response.provenance,'ai');assert.equal(response.response.fallback,null);}
  assert.equal(backend.budget.snapshot().chargedNano,BigInt(1400000));assert.equal(backend.budget.snapshot().active,0);
 });
+
+test('adversarial OpenAI late headers are cancelled after caller abort even when exchange ignores signal',async()=>{
+ let release!:(response:Response)=>void,cancelled=0;
+ const response=new Response(new ReadableStream<Uint8Array>({cancel(){cancelled++;}}));
+ const adapter=new OpenAIResponseAdapter(credential,async()=>new Promise<Response>(resolve=>{release=resolve;}));
+ const abort=new AbortController(),pending=adapter.generate(input(),abort.signal);
+ abort.abort();release(response);await assert.rejects(pending);
+ assert.equal(cancelled,1);assert.equal(response.body?.locked,false);
+});
+
+test('adversarial successful provider output cannot echo the server credential, including escaped JSON',async()=>{
+ for(const escaped of [false,true]){
+  const body=wire(),value={...output(),dialogue:'SYNTHETIC_CREDENTIAL_SENTINEL'};
+  body.output[0].content[0].text=JSON.stringify(value);
+  if(escaped)body.output[0].content[0].text=body.output[0].content[0].text.replace('SYNTHETIC',String.raw`\u0053YNTHETIC`);
+  assert.equal(JSON.parse(body.output[0].content[0].text).dialogue,'SYNTHETIC_CREDENTIAL_SENTINEL');
+  const adapter=new OpenAIResponseAdapter(credential,async()=>Response.json(body)),backend=new ConversationBackend({provider:adapter});
+  const r=request();r.consent={version:1,accepted:true,sessionId:r.binding.sessionId,provider:'openai',scope:'investor-dialogue'};
+  const result=await backend.run(JSON.stringify(r),{principal:'trusted',signal:new AbortController().signal,mode:'mock'});
+  assert.equal(result.kind,'ready');assert.doesNotMatch(JSON.stringify(result),/SYNTHETIC_CREDENTIAL_SENTINEL/);
+  if(result.kind==='ready')assert.equal(result.response.fallback,'invalid-output');
+ }
+});

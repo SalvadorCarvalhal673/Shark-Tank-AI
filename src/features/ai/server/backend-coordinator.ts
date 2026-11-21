@@ -18,9 +18,11 @@ export class BackendCoordinator {
       (previous && (binding.revision < previous.binding.revision || binding.epoch < previous.binding.epoch || checkpoint.pitch !== previous.checkpoint.pitch ||
         previous.checkpoint.actions.length > checkpoint.actions.length ||
         previous.checkpoint.actions.some((hash,index)=>hash !== checkpoint.actions[index])))) return null;
-    previous?.controller.abort();
     const slot: Slot = {binding: frozenCopy(binding), controller: new AbortController(), delivered: false, checkpoint:frozenCopy(checkpoint)};
     this.#slots.set(key, slot); this.#seen.add(requestKey);
+    // Publish before abort dispatch: listeners can synchronously begin a newer request.
+    previous?.controller.abort();
+    if (this.#slots.get(key) !== slot || slot.controller.signal.aborted) return null;
     const current = () => this.#slots.get(key) === slot && !slot.controller.signal.aborted && !slot.delivered && sameBinding(slot.binding,binding);
     return {binding: slot.binding, signal: slot.controller.signal, current,
       finish: () => { if (this.#slots.get(key) === slot) slot.delivered = true; }};

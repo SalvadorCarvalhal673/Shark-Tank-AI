@@ -18,6 +18,7 @@ export function createInvestorEndpoint(mode:()=>BackendMode,backend=new Conversa
     const length=request.headers.get('content-length');
     if(length!==null&&(!/^\d+$/.test(length)||!Number.isSafeInteger(Number(length))))return error('invalid-request',400);
     if(length!==null&&Number(length)>MAX_REQUEST_BYTES)return error('too-large',413);
+    if(request.signal.aborted){void request.body?.cancel().catch(()=>{});return error('cancelled',499);}
     if(admitted++>=256)return error('resource-limit',429);
     try {
       const raw=await withDeadline(signal=>readBoundedBody(request.body,MAX_REQUEST_BYTES,signal),request.signal,2000);

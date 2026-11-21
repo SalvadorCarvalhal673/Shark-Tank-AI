@@ -6,6 +6,11 @@ import type { ProviderInput, ProviderUsage } from './provider.ts';
 import { ServerCredential } from './configuration.ts';
 import { ProviderFault, type BackendProvider } from './backend-provider.ts';
 import { readBoundedBody } from './bounded-body.ts';
+function containsCredential(value:unknown,key:string):boolean {
+  if(typeof value==='string')return value.includes(key);
+  if(Array.isArray(value))return value.some(item=>containsCredential(item,key));
+  return record(value)&&Object.entries(value).some(([name,item])=>name.includes(key)||containsCredential(item,key));
+}
 /** Explicit dependency injection only. There is intentionally NO default fetch transport. */
 export type ProviderExchange=(url:string,init:Readonly<{method:'POST';headers:Readonly<Record<string,string>>;body:string;signal:AbortSignal}>)=>Promise<Response>;
 export class OpenAIResponseAdapter implements BackendProvider {
@@ -22,7 +27,7 @@ export class OpenAIResponseAdapter implements BackendProvider {
     try {response=await this.#credential.use(key=>this.#exchange('https://api.openai.com/v1/responses',{
       method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},body,signal}));}
     catch {throw new ProviderFault('network');}
-    signal.throwIfAborted();
+    if(signal.aborted){void response.body?.cancel().catch(()=>{});signal.throwIfAborted();}
     if(!response.ok){void response.body?.cancel().catch(()=>{});throw new ProviderFault(response.status===429?'rate-limit':'network');}
     let v:unknown;
     try {v=parseUniqueJson(await readBoundedBody(response.body,65536,signal));} catch {throw new ProviderFault('invalid-output');}
@@ -40,6 +45,10 @@ export class OpenAIResponseAdapter implements BackendProvider {
     if(content.type==='refusal')return {packet:{status:'refusal',text:''}};
     if(content.type!=='output_text'||typeof content.text!=='string'||new TextEncoder().encode(content.text).length>MAX_OUTPUT_BYTES)
       throw new ProviderFault('invalid-output');
+    // Decode inner JSON before comparison so Unicode escapes cannot hide credential echoes.
+    const text=content.text;
+    try {if(this.#credential.use(key=>containsCredential(parseUniqueJson(text),key)))throw new Error();}
+    catch {throw new ProviderFault('invalid-output');}
     const usage=record(v.usage)&&integer(v.usage.input_tokens)&&integer(v.usage.output_tokens)
       ?{inputTokens:v.usage.input_tokens,outputTokens:v.usage.output_tokens}:undefined;
     return frozenCopy({packet:{status:'complete',text:content.text},...(usage?{usage}:{})});

@@ -97,3 +97,9 @@ New source:
 New tests/fixture: `tests/ai-backend.test.ts`, `tests/ai-http-boundary.test.ts`, `tests/ai-openai-adapter.test.ts`, `tests/fixtures/ai/backend-adversarial.json`.
 Modified test: `tests/ai-evaluation.test.ts` retains the protected-application no-AI-import assertion, permits exactly the authorized server route, and checks its guarded entry/no direct transport. All original 197 cases remain; no tests are skipped/deleted. Existing browser tests are untouched.
 Documentation: this file and `docs/ai/BACKEND-VERIFICATION.md`. No package/lock/config/style/asset/financial/persistence/gameplay/3D/scorecard file changes.
+
+## Adversarial-review corrections
+
+Follow-up review retains the same16-file cumulative manifest. Four defects were reproduced and corrected: reentrant coordinator ordering, cancellation of late provider bodies, unopened pre-aborted stream cleanup, and a synthetic successful-response credential reflection. The adapter now decodes inner JSON and rejects exact configured-credential substrings before returning provider content, including Unicode escapes. This is defense in depth, not comprehensive secret detection or a live-service approval.
+
+The coordinator publishes identity before synchronous abort events and refuses to return a superseded ticket. Request/resource capacity still fails closed for the process lifetime; no TTL/eviction/authentication infrastructure was introduced. See BACKEND-VERIFICATION.md for red/green evidence, severity,237-test coverage and unchanged activation blockers. No shared financial/persistence/UI contract or provider protocol parameter changed.

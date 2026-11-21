@@ -5,7 +5,7 @@ export class BodyLimitError extends Error {
 /** Stream byte bound precedes decoding/parsing; cancellation never awaits an untrusted source. */
 export async function readBoundedBody(body:ReadableStream<Uint8Array>|null,limit:number,signal:AbortSignal):Promise<string> {
   if (!body) throw new BodyLimitError('invalid-body');
-  signal.throwIfAborted();
+  if(signal.aborted){void body.cancel().catch(()=>{});signal.throwIfAborted();}
   const reader=body.getReader(),bytes=new Uint8Array(limit); let size=0,chunks=0;
   const cancel=()=>{void reader.cancel().catch(()=>{});};
   signal.addEventListener('abort',cancel,{once:true});
