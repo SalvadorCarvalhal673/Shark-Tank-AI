@@ -1,5 +1,7 @@
 # Temporary security exceptions
 
+> Current review (21 November 2026): SE-001 remains OPEN pending independent approval. A formal retirement recommendation is available in [the scoped assessment](security/SE-001-assessment-2026-11-21.md). Advisory withdrawal is not a project code fix; the CVE registry still says PUBLISHED. Public deployment remains prohibited. Entries below are preserved historical investigation records; the latest recommendation is appended at the end.
+
 ## SE-001 — picomatch denial of service
 
 Status accepted by the project owner on 17 November 2026 for controlled development, testing and repository publication. The vulnerability remains unresolved. Public deployment is prohibited until a separate security sign-off. The project maintainer is responsible for reviewing and renewing or closing this exception at every subsequent phase.
@@ -63,3 +65,13 @@ This phase does not close SE-001. The maintainer must renew the review at the ne
 The official GitHub advisory GHSA-fc5q-39xc-vjpf is now marked withdrawn on18 November2026: https://github.com/advisories/GHSA-fc5q-39xc-vjpf . Fresh clean-checkout full and production-only audits report zero findings, unlike the earlier14 propagated records. This is an upstream advisory-status change, not a remediation implemented by this project. No dependency or lockfile change was made during handover. The earlier runtime/artifact observations remain historical evidence; a zero registry audit does not independently establish closure of vendored-code exposure.
 
 SE-001 remains open under the project owner’s explicit instruction. Public deployment remains prohibited until separate formal reassessment, security sign-off and deployment approval. The corresponding security backlog issue must review this status change rather than treating it as automatic clearance. CI runs both audits without suppressing new findings.
+
+### Formal reassessment and proposed retirement — 21 November 2026
+
+Reviewed develop `d6042e1e85dbf78e707c3517f814b5e8d805a647`. **Recommendation only: retire this specific exception after independent approval. SE-001/Issue #79 remain open and public deployment remains prohibited.** See [formal assessment](security/SE-001-assessment-2026-11-21.md) and [sanitized evidence](security/SE-001-evidence-2026-11-21.json).
+
+The official GitHub advisory confirms withdrawal at2026-11-18T15:38:56Z because the report is not considered a security issue. The maintainer's rationale is that arbitrary glob/regex patterns are trusted configuration. The official CVE record nevertheless still reports PUBLISHED; no universal CVE rejection is claimed. Installed picomatch2.3.2/4.0.7 and Next16.4.6 vendored code remain unchanged, and bounded slow-pattern behavior is still observable. There was no project remediation or version upgrade/downgrade.
+
+Fresh full and production-only audits each exited0 with zero findings. The fresh production server trace still includes the vendored matcher and metadata. Reviewed application/Next paths use trusted configuration as patterns; synthetic production image requests logged only fixed `**` patterns while treating request URL text as subjects. No current untrusted pattern-authoring path was found. This combination, rather than withdrawal or a zero audit alone, supports the scoped retirement recommendation.
+
+No separate exploitable application vulnerability was confirmed in this focused review. Paid-AI access control/trusted ownership/durable budgets and consent integration, actual release-artifact/hosting verification, ongoing pattern trust and privacy review remain independent requirements. Live inference stays disabled. Closing this exception would not satisfy these requirements or authorize deployment. All original investigation and prior phase evidence above remain historical records, not rewritten claims of a code fix.
