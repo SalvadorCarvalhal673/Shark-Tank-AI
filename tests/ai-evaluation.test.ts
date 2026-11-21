@@ -42,15 +42,19 @@ test("AI composed runner discards late completion on revision/mode changes",asyn
   s.lifecycle.setContext({sessionId:s.r.binding.sessionId,revision:1,investorId:"maya",mode:"studio",recoveryId:"fresh"});
   assert.equal((await pending).kind,"discarded");assert.equal(s.budget.snapshot().active,0);
 });
-test("AI protected application has no imports of isolated architecture or network inference adapters",()=>{
+test("AI protected UI remains isolated while the authorized server route uses only the guarded entry",()=>{
   const root=new URL("../src/",import.meta.url);
   const files=fs.readdirSync(root,{recursive:true,withFileTypes:true}).filter(e=>e.isFile()&&/\.(ts|tsx)$/.test(e.name));
   for(const f of files){
     const file=new URL((f.parentPath.replaceAll("\\","/").split("/src/")[1]??"")+"/"+f.name,root);
     if(file.pathname.includes("/features/ai/"))continue;
+    if(file.pathname.endsWith("/app/api/investor/route.ts"))continue;
     assert.doesNotMatch(fs.readFileSync(file,"utf8"),/features\/ai|from\s+["'][^"']*\/ai\//);
   }
-  assert.equal(fs.existsSync(new URL("../src/app/api/investor/route.ts",import.meta.url)),false);
+  const route=fs.readFileSync(new URL("../src/app/api/investor/route.ts",import.meta.url),"utf8");
+  assert.match(route,/import ["']server-only["']/);
+  assert.match(route,/createInvestorEndpoint\(\(\) => backendMode\(\)\)/);
+  assert.doesNotMatch(route,/openai-adapter|fetch\(|process\.env|credential/i);
 });
 
 test("AI consent gate never invokes a provider and global duplicate leaves no pending presentation",async()=>{
