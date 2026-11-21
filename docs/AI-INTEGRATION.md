@@ -1,4 +1,4 @@
-# Future AI architecture — proposed
+# Phase 4C architecture — integrated offline
 
 No provider SDK, operational endpoint, actual credential, streaming or transcript persistence is implemented. Existing investor responses and evidence patterns are scripted/deterministic.
 
@@ -20,4 +20,4 @@ No paid/live provider request is required by setup, normal tests or this handove
 
 ## Isolated Phase4C architecture
 
-[Phase4C modules and integration contracts](ai/README.md) now provide executable offline contracts, mock services, validation, evidence/clarification models, safe configuration, lifecycle, fallback, consent, budgets and evaluation. These modules are not connected to gameplay or rendering. The existing application remains scripted. All14 issue contributions require independent review and integration approval; no live AI or storage migration is implied.
+[Phase4C modules and integration contracts](ai/README.md) now provide executable offline contracts, mock services, validation, evidence/clarification models, safe configuration, lifecycle, fallback, consent, budgets and evaluation. These modules are not connected to gameplay or rendering. The existing application remains scripted. All 14 contributions and audit corrections are integrated through PR #106, merge 27043d4d8f3da4ecfe701e95975a27fdd51b6e90. Post-merge CI passed. No live AI or storage migration is implied. See [group handover](PHASE-4C-HANDOVER.md).

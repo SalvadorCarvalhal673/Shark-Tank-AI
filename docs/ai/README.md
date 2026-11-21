@@ -12,7 +12,7 @@ There is NO live AI, HTTP route, UI integration, extra binding turn, persistence
 
 ## Review order and prerequisites
 Stack order: #42 -> #43 -> #44 -> #45 -> #46 -> #47 -> #48 -> #49 -> #50 -> #51 -> #53 -> #52 -> #54 -> #55.
-These are review-stack dependencies; domain prerequisites remain those in each issue (e.g. privacy independent, transcript requires privacy/contracts). Every PR targets the immediate predecessor branch so its diff contains only that contribution. Review/merge bottom-up ONLY AFTER explicit authorization; none is merged or issues closed here. Retarget dependent PRs deliberately after predecessor integration. Do not use a top-stack PR directly into develop without reviewing all ancestors.
+These historical stack dependencies were integrated once through cumulative PR #106 into develop (merge27043d4). All14heads are ancestors and post-merge CI passed. Do not merge PRs #91–#104 or #107 again. See [group handover](../PHASE-4C-HANDOVER.md).
 
 ## Guides
 provider-evaluation, conversation-contracts, investor-personalities, response-validation, evidence-confirmation, clarifications, server-architecture, credentials, request-lifecycle, scripted-fallback, privacy-and-consent, transcript-persistence, budgets, evaluation and verification (all .md in this directory). environment.example.txt is documentation only.

@@ -1,6 +1,6 @@
 # Task backlog and workstreams
 
-All 90 issues are remaining work; no people or deadlines are assigned. [Issues](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues) and [milestones](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestones) provide live status.
+This is the original90-issue plan. Phase4C issues42–55 are integrated through PR106; consult live GitHub status for remaining work. No deadlines are assigned. [Issues](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues) and [milestones](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestones) provide live status.
 
 ## Phase 4B.1 — Production-quality 3D studio and characters
 

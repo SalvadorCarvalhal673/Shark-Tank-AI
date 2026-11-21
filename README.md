@@ -34,7 +34,7 @@ npm run typecheck
 npx playwright install chromium
 npm run test:e2e
 ```
-See [TESTING](docs/TESTING.md) for the separate prototype suite and browser settings. Coverage:136 unit tests and94 browser scenarios(82 original+12 prototype). Production intentionally returns404 for the prototype route.
+See [TESTING](docs/TESTING.md) for the separate prototype suite and browser settings. Current integrated coverage:197 unit tests and100 browser scenarios(82original+6recovery+12prototype). Production intentionally returns404 for the prototype route.
 
 ## Contribute and explore
 
@@ -47,3 +47,6 @@ Read [AGENTS.md](AGENTS.md), [CONTRIBUTING.md](CONTRIBUTING.md) and an available
 
 **SE-001 remains unresolved. Public deployment is prohibited pending separate security clearance and approval.** Zero production-audit findings do not clear vendored framework code. Never assume audit fix --force is a remediation.
 Physical Android/iPhone performance, Safari/WebKit, spoken screen readers, production performance certification and final art remain open. Phone viewport emulation is desktop hardware.
+
+
+Phase4C offline architecture and audit corrections are integrated through PR106. Gameplay remains scripted; live AI is absent. [Group synchronization and contracts](docs/PHASE-4C-HANDOVER.md).
