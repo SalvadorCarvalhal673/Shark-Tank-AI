@@ -87,10 +87,6 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
           <p className="dialogue-speaker founder-speaker">Founder · submitted answer</p>
           <blockquote>{entry.text}</blockquote>
         </article>)}
-        {stage === "questions" && profile && <article className="dialogue-exchange current-dialogue">
-          <p className="dialogue-speaker">{profile.name} · Investor</p>
-          <p>{profile.question}</p>
-        </article>}
       </section>
       <div className="practice-panel">
         {INVESTOR_ORDER.map((id) => <div key={id} className={stage === "questions" && id === investor ? "active-investor" : ""}>
