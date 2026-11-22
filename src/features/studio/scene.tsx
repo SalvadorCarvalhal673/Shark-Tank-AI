@@ -3,8 +3,10 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Color, LoopOnce, Shape, Vector3 } from "three";
+import { Color, LoopOnce, Vector3 } from "three";
 import { createInvestorInstance } from "./avatar";
+import { StudioRoom } from "./room/studio-room";
+import { SEAT_X } from "./room/layout";
 import { cameraPresets, cameraStep, sceneCue, type CameraView } from "./model";
 import { INVESTOR_ORDER, type InvestorId } from "../simulation/negotiation/investor-policy";
 import type { NegotiationSession } from "../simulation/negotiation/session";
@@ -19,7 +21,7 @@ export function clearFailedAsset(){
  useLoader.clear(GLTFLoader,"/studio/investor-v1.glb");
  useLoader.clear(GLTFLoader,"/studio/intentionally-unavailable.glb");
 }
-const positions = [-2.5,0,2.5];
+const positions = SEAT_X;
 function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:StudioSceneProps}){
  const {scene,animations}=useLoader(GLTFLoader,props.fault==="asset"?"/studio/intentionally-unavailable.glb":"/studio/investor-v1.glb");
  const instance=useMemo(()=>createInvestorInstance(scene,investor),[scene,investor]);
@@ -46,29 +48,6 @@ function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:S
   <mesh position={[0,.03,0]} rotation={[-Math.PI/2,0,0]}>
    <ringGeometry args={[.37,.40,28]}/><meshBasicMaterial color={props.selected===investor?"#d5f27d":"#344735"}/>
   </mesh>
- </group>;
-}
-function StudioRoom(){
- const top=useMemo(()=>{
-  const s=new Shape();s.moveTo(-3.95,.56);s.quadraticCurveTo(0,.17,3.95,.56);
-  s.lineTo(4.05,1.35);s.quadraticCurveTo(0,2.4,-4.05,1.35);s.closePath();return s;
- },[]);
- return <group>
-  <mesh position={[0,-.07,0]}><boxGeometry args={[15,.12,13]}/><meshStandardMaterial color="#202e25" roughness={.9}/></mesh>
-  <mesh position={[0,2.7,-2.2]}><boxGeometry args={[14,5.5,.15]}/><meshStandardMaterial color="#18382c" roughness={.9}/></mesh>
-  {[-5.6,-4.8,-3.6,-1.3,1.3,3.6,4.8,5.6].map(x=><mesh key={x} position={[x,2.5,-2.06]}>
-   <boxGeometry args={[.045,4.5,.09]}/><meshStandardMaterial color="#987c46" metalness={.65} roughness={.4}/>
-  </mesh>)}
-  <mesh position={[0,2.8,-2.01]}><torusGeometry args={[.66,.022,6,64]}/><meshStandardMaterial color="#c1c393" emissive="#3c5428" emissiveIntensity={.5}/></mesh>
-  <mesh position={[0,1.19,0]} rotation={[Math.PI/2,0,0]}><extrudeGeometry args={[top,{depth:.12,bevelEnabled:true,bevelThickness:.025,bevelSize:.025,bevelSegments:1,steps:1}]}/>
-   <meshStandardMaterial color="#806447" roughness={.55}/></mesh>
-  {[-3.2,3.2].map(x=><mesh key={x} position={[x,.56,1]}><boxGeometry args={[.18,1.10,.55]}/><meshStandardMaterial color="#ac8d50" metalness={.7} roughness={.5}/></mesh>)}
-  {positions.map(x=><group key={x} position={[x,0,-.11]}>
-   <mesh position={[0,.70,0]}><boxGeometry args={[.72,.16,.72]}/><meshStandardMaterial color="#293a31" roughness={.85}/></mesh>
-   <mesh position={[0,1.12,-.36]} rotation={[-.10,0,0]}><boxGeometry args={[.72,.85,.13]}/><meshStandardMaterial color="#293a31" roughness={.85}/></mesh>
-   <mesh position={[0,.35,0]}><cylinderGeometry args={[.045,.065,.64,8]}/><meshStandardMaterial color="#9a804b" metalness={.7} roughness={.5}/></mesh>
-   <mesh position={[0,.04,0]}><cylinderGeometry args={[.37,.37,.05,16]}/><meshStandardMaterial color="#333e32" metalness={.4}/></mesh>
-  </group>)}
  </group>;
 }
 function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;visible:boolean}){
@@ -138,9 +117,6 @@ export function StudioScene(props:StudioSceneProps){
  return <>
   <Canvas frameloop={visible?"demand":"never"} dpr={dpr} camera={{position:[0,3.1,9.2],fov:43,near:.1,far:40}}
    gl={{antialias:true,powerPreference:"default"}} onCreated={({scene})=>{scene.background=new Color("#17271f");}}>
-   <hemisphereLight args={["#e7f0c7","#283522",2.4]}/>
-   <directionalLight position={[-3,6,5]} color="#ffe2b3" intensity={3}/>
-   <directionalLight position={[4,4,-1]} color="#a7c8bd" intensity={1.5}/>
    <StudioRoom/>
    <Suspense fallback={null}>
     {INVESTOR_ORDER.map((id,index)=><Avatar key={id} investor={id} index={index} props={props}/>)}
