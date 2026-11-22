@@ -24,6 +24,25 @@ async function answer(page: Page, mask = 7, long = false) {
 function card(page: Page, name: string) {
   return page.getByRole("article").filter({ has: page.getByRole("heading", { name, exact: true }) });
 }
+test("no-opening-offers debrief explains missing and repeated evidence", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await prepare(page);
+  const repeatedAnswer = "I still need to collect details for the investors.";
+  for (const text of [repeatedAnswer, repeatedAnswer, "We are still gathering information for operations."]) {
+    await page.getByLabel("Your answer").fill(text);
+    await page.getByRole("button", { name: "Submit answer" }).press("Enter");
+  }
+
+  await expect(page.getByRole("heading", { name: "Your debrief." })).toBeFocused();
+  const explanation = page.getByRole("region", { name: "Why there were no opening offers" });
+  await expect(explanation).toContainText("The simulator can miss valid evidence.");
+  await expect(page.getByText(/Maya Chen.*could not identify all the signals/).first()).toBeVisible();
+  await expect(page.getByText(/Adrian Vale.*This repeats an earlier answer/).first()).toBeVisible();
+  await expect(page.getByRole("region", { name: "Accepted deal" })).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+});
+
 for (let mask = 0; mask < 8; mask++) {
   test(`participation combination ${mask} renders correct offers and pass explanations`, async ({ page }) => {
     await prepare(page);
@@ -186,23 +205,4 @@ test("counters across three investors preserve order and final-offer focus", asy
   await sofia.getByRole("button", { name: "Accept offer", exact: true }).click();
   await sofia.getByRole("button", { name: "Confirm deal" }).click();
   await expect(page.getByRole("heading", { name: "Deal with Sofia Mendes" })).toBeVisible();
-});
-
-test("no-opening-offers debrief explains missing and repeated evidence", async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 900 });
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await prepare(page);
-  const repeatedAnswer = "I still need to collect details for the investors.";
-  for (const text of [repeatedAnswer, repeatedAnswer, "We are still gathering information for operations."]) {
-    await page.getByLabel("Your answer").fill(text);
-    await page.getByRole("button", { name: "Submit answer" }).press("Enter");
-  }
-
-  await expect(page.getByRole("heading", { name: "Your debrief." })).toBeFocused();
-  const explanation = page.getByRole("region", { name: "Why there were no opening offers" });
-  await expect(explanation).toContainText("The simulator can miss valid evidence.");
-  await expect(page.getByText(/Maya Chen.*could not identify all the signals/).first()).toBeVisible();
-  await expect(page.getByText(/Adrian Vale.*This repeats an earlier answer/).first()).toBeVisible();
-  await expect(page.getByRole("region", { name: "Accepted deal" })).toHaveCount(0);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
