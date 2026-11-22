@@ -1,7 +1,8 @@
 import type { Ref } from "react";
 import { NegotiationHistory } from "./history";
 import { NEGOTIATION_RULES } from "./investor-policy";
-import { historicalCounterCopy, openingCopy, outcomeCopy, ownershipPresentation, signalCopy } from "./presentation";
+import { historicalCounterCopy, openingCopy, ownershipPresentation, signalCopy } from "./presentation";
+import { PerformanceScorecard } from "./performance-scorecard";
 import type { NegotiationSession } from "./session";
 import { percent, TermsDisplay } from "./terms-display";
 
@@ -18,7 +19,6 @@ export function Debrief({ session, headingRef, onExit }: {
     <div className="form-card">
       <h2 ref={headingRef} tabIndex={-1}>Your debrief.</h2>
       <p className="ask-line">{accepted ? "Deal confirmed" : "No deal"}</p>
-      {session.outcome && <p>{outcomeCopy[session.outcome.kind]}</p>}
       {accepted && <section aria-label="Accepted deal">
         <h3>Deal with {NEGOTIATION_RULES.investors[accepted.investor].name}</h3>
         <TermsDisplay terms={accepted} currency={session.pitch.currency} />
@@ -28,19 +28,7 @@ export function Debrief({ session, headingRef, onExit }: {
       </section>}
     </div>
 
-    <section className="form-card">
-      <h3>Pitch evidence</h3>
-      <blockquote className="pitch-text">{session.pitch.pitch}</blockquote>
-      <p className="muted">The rubric detects written patterns. Supplied signals are not independently verified facts. A deal does not establish pitch quality.</p>
-      {session.answers.map((answer) => <section key={answer.investor}>
-        <h4>{NEGOTIATION_RULES.investors[answer.investor].name}</h4>
-        <blockquote className="pitch-text">{answer.text}</blockquote>
-        {answer.evidence.repeated && <p>This response repeats an earlier answer.</p>}
-        <ul className="evidence-list">{answer.evidence.signals.map(({ signal, status }) => <li key={signal}>
-          <strong>{status === "supplied" ? "Signal detected" : "Signal not identified"}</strong> · {signalCopy[signal]}
-        </li>)}</ul>
-      </section>)}
-    </section>
+    <PerformanceScorecard session={session} />
 
     <section className="form-card">
       <h3>Investor decisions</h3>
