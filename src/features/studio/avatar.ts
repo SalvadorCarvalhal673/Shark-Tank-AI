@@ -1,6 +1,7 @@
 import { AnimationMixer, MeshStandardMaterial, SkinnedMesh, type Object3D, type Skeleton } from "three";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import type { InvestorId } from "../simulation/negotiation/investor-policy.ts";
+import { belongsToOtherInvestor } from "./rig.ts";
 
 const colors = {
  maya: {Jacket:"#25362f",Hair:"#171c19",Skin:"#b97957"},
@@ -9,6 +10,10 @@ const colors = {
 };
 export function createInvestorInstance(source: Object3D, investor: InvestorId) {
  const root=clone(source);
+ // One file holds the whole cast (rig.ts): keep the shared body and this investor's features only.
+ const others:Object3D[]=[];
+ root.traverse(object=>{if(belongsToOtherInvestor(object.name,investor))others.push(object);});
+ others.forEach(object=>object.removeFromParent());
  const ownedMaterials: MeshStandardMaterial[]=[];
  const ownedSkeletons=new Set<Skeleton>();
  root.traverse(object=>{

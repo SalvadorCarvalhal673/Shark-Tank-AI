@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { Color, LoopOnce, Vector3 } from "three";
 import { createInvestorInstance } from "./avatar";
+import { CAST_URL } from "./rig";
 import { StudioRoom } from "./room/studio-room";
 import { SEAT_X } from "./room/layout";
 import { cameraPresets, cameraStep, sceneCue, type CameraView } from "./model";
@@ -18,12 +19,12 @@ export type StudioSceneProps = {
  onSelect:(investor:InvestorId)=>void;onFailure:(reason:string)=>void;onMetrics:(value:Metrics)=>void;
 };
 export function clearFailedAsset(){
- useLoader.clear(GLTFLoader,"/studio/investor-v1.glb");
+ useLoader.clear(GLTFLoader,CAST_URL);
  useLoader.clear(GLTFLoader,"/studio/intentionally-unavailable.glb");
 }
 const positions = SEAT_X;
 function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:StudioSceneProps}){
- const {scene,animations}=useLoader(GLTFLoader,props.fault==="asset"?"/studio/intentionally-unavailable.glb":"/studio/investor-v1.glb");
+ const {scene,animations}=useLoader(GLTFLoader,props.fault==="asset"?"/studio/intentionally-unavailable.glb":CAST_URL);
  const instance=useMemo(()=>createInvestorInstance(scene,investor),[scene,investor]);
  const {invalidate}=useThree();
  const cue=sceneCue(props.session,investor);
@@ -42,9 +43,6 @@ function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:S
  useFrame((_,delta)=>{if(!props.reducedMotion)instance.mixer.update(Math.min(delta,.05));});
  return <group position={[positions[index],0,0]} onClick={event=>{event.stopPropagation();props.onSelect(investor);}}>
   <primitive object={instance.root} dispose={null}/>
-  {investor==="adrian" && <group position={[0,2.07,.21]}>
-   {[-.088,.088].map(x=><mesh key={x} position={[x,0,0]}><torusGeometry args={[.052,.007,5,14]}/><meshStandardMaterial color="#b59d68" metalness={.5} roughness={.5}/></mesh>)}
-  </group>}
   <mesh position={[0,.03,0]} rotation={[-Math.PI/2,0,0]}>
    <ringGeometry args={[.37,.40,28]}/><meshBasicMaterial color={props.selected===investor?"#d5f27d":"#344735"}/>
   </mesh>
