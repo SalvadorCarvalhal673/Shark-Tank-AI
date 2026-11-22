@@ -40,3 +40,11 @@ export const demonstrationAnswers = [
  "Target segment: university students buying lunch. Acquisition channel: campus ambassadors. CAC: €12.",
  "Customer evidence: students requested repeat weekly lunch orders. Milestone: deliver 500 lunches across three campuses.",
 ];
+export const demoScenarios = [
+ {id:"meal-orders",title:"LunchLoop · campus meal orders",description:"Fictional meal-ordering prototype, with a €100,000 ask for 20% and 80% founder ownership.",pitch:demonstrationPitch,answers:demonstrationAnswers},
+ {id:"reusable-containers",title:"LunchLoop · reusable containers",description:"Fictional reusable-container episode, with a €100,000 ask for 10% and 60% founder ownership.",
+  pitch:{startup:"LunchLoop",pitch:"LunchLoop supplies reusable lunch containers to campus cafes. Students borrow a box with their meal and return it to any partner cafe. We collect, wash and redistribute the containers. Cafes pay a service fee to reduce disposable packaging.",currency:"EUR",amount:10000000,equity:1000,founderOwnershipBps:6000},
+  answers:["Revenue: 9000 per month; Monthly costs: 12000; Cash balance: 24000; Runway: 8 months; Use of funds: washing equipment, reusable containers and partner cafe launches.",
+   "Target segment: university campus cafes; Acquisition channel: campus partnerships and cafe demonstrations; CAC: 300 per cafe.",
+   "Customer evidence: five pilot cafes renewed after students requested more return points; Milestone: add two return stations and sign five more cafes within three months."]},
+] as const;

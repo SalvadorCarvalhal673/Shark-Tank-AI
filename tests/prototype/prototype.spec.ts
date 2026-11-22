@@ -39,6 +39,23 @@ test("preview exactness, invalid input and draft preservation without a binding 
  await page.getByLabel("Investor equity (%)",{exact:true}).fill("0");
  await expect(page.getByRole("button",{name:"Send counter to Maya",exact:true})).toBeDisabled();
 });
+
+test("fictional quick-start scenarios remain drafts until explicit answer submission",async({page})=>{
+ await page.goto("/prototype/studio");
+ await expect(page.getByLabel("Choose a fictional scenario")).toHaveValue("meal-orders");
+ await expect(page.getByText(/Fictional demo data/)).toBeVisible();
+ await page.getByLabel("Choose a fictional scenario").selectOption("reusable-containers");
+ await expect(page.getByText(/€100,000 ask for 10% and 60% founder ownership/)).toBeVisible();
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","0");
+ await page.getByRole("button",{name:"Start LunchLoop episode",exact:true}).click();
+ await expect(page.getByText("FOUNDER OWNS 60% AT START")).toBeVisible();
+ await page.getByRole("button",{name:"Use sample answer",exact:true}).click();
+ const answer=page.getByLabel("Your answer",{exact:true});
+ await expect(answer).toHaveValue(/Revenue: 9000 per month/);
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","0");
+ await page.getByRole("button",{name:"Submit answer",exact:true}).click();
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","1");
+});
 test("committed counter updates history, cue and persisted journal exactly once",async({page})=>{
  await offers(page,true);await enter(page);
  await page.getByLabel("Investment (EUR)",{exact:true}).fill("100000.01");

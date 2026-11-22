@@ -10,7 +10,7 @@ import { INVESTOR_ORDER, NEGOTIATION_RULES, type InvestorId } from "../simulatio
 import { counterCopy, openingCopy, outcomeCopy } from "../simulation/negotiation/presentation";
 import { money } from "../simulation/pitch";
 import { percent } from "../simulation/negotiation/terms-display";
-import { demonstrationAnswers, demonstrationPitch, financialPreview, sceneCue, type CameraView } from "./model";
+import { demoScenarios, financialPreview, sceneCue, type CameraView } from "./model";
 import type { StudioSceneProps } from "./scene";
 
 const Scene = dynamic(()=>import("./scene").then(module=>module.StudioScene),{
@@ -37,6 +37,7 @@ export function StudioPrototype(){
  const [fault,setFault]=useState("");
  const [metrics,setMetrics]=useState<Parameters<StudioSceneProps["onMetrics"]>[0] | null>(null);
  const [feedback,setFeedback]=useState("");
+ const [scenarioId,setScenarioId]=useState<(typeof demoScenarios)[number]["id"]>(demoScenarios[0].id);
  useEffect(()=>{
   const query=new URLSearchParams(location.search);
   Promise.resolve().then(()=>setFault(query.get("fault") ?? ""));
@@ -57,6 +58,7 @@ export function StudioPrototype(){
  const remaining=NEGOTIATION_RULES.counterBudget-(session?.roundsUsed ?? 0);
  const currentInvestor=INVESTOR_ORDER[session?.answers.length ?? 0];
  const readyToStart=!controller.checking && !controller.busy && !session;
+ const scenario=demoScenarios.find(item=>item.id===scenarioId) ?? demoScenarios[0];
  return <main className="studio-page">
   <header className="studio-header">
    <Link href="/">SHARK TANK <span>AI</span></Link>
@@ -121,12 +123,19 @@ export function StudioPrototype(){
     <h2>Your next move.</h2>
     <p className="studio-muted">Explore terms freely. Only submitting an answer or counter changes the negotiation.</p>
     {!session && <div className="studio-start">
-     <p>Start a sample pitch, then explicitly submit three example answers or write your own.</p>
+     <p><strong>Fictional demo data.</strong> Choose either LunchLoop scenario; their pitches, asks and ownership are different. Selecting one only chooses the draft used to start this local scripted episode.</p>
+     <label htmlFor="studio-scenario">Choose a fictional scenario</label>
+     <select id="studio-scenario" value={scenarioId} disabled={!readyToStart} onChange={event=>{
+      const next=demoScenarios.find(item=>item.id===event.target.value);
+      if(next){setScenarioId(next.id);setAnswer("");}
+     }}>{demoScenarios.map(item=><option key={item.id} value={item.id}>{item.title}</option>)}</select>
+     <p>{scenario.description}</p>
+     <p>Review the pitch, then write and explicitly submit each answer. Example answers are optional and never submit themselves.</p>
      <label><input type="checkbox" checked={save} disabled={controller.slot.kind!=="empty"}
       onChange={event=>setSave(event.target.checked)}/> Save this prototype session in this browser</label>
      {controller.slot.kind!=="empty" && <p>Existing saved information is retained. Resume it below, or begin this sample without saving.</p>}
      <button className="button" type="button" disabled={!readyToStart} onClick={async()=>{
-       const started=await controller.begin(demonstrationPitch,save && controller.slot.kind==="empty",null);
+       const started=await controller.begin(scenario.pitch,save && controller.slot.kind==="empty",null);
        if(started) setFeedback("Sample pitch started. Submit each answer to open real investor offers.");
      }}>Start LunchLoop episode</button>
     </div>}
@@ -142,7 +151,7 @@ export function StudioPrototype(){
      <p>{NEGOTIATION_RULES.investors[currentInvestor].question}</p>
      <label htmlFor="studio-answer">Your answer</label>
      <textarea id="studio-answer" minLength={10} maxLength={1500} required value={answer} onChange={event=>setAnswer(event.target.value)}/>
-     <div className="studio-actions"><button type="button" onClick={()=>setAnswer(demonstrationAnswers[session.answers.length])}>Use sample answer</button>
+     <div className="studio-actions"><button type="button" onClick={()=>setAnswer(scenario.answers[session.answers.length])}>Use sample answer</button>
       <button className="button" type="submit">Submit answer</button></div>
     </form>}
     <form className="studio-financial-form" onSubmit={event=>{

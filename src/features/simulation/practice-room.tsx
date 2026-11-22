@@ -76,6 +76,18 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
       <p className="muted">{persistenceMessage}</p>
       <p role="status" className="sr-only">{counterAnnouncement}</p>
       {notice && <p role="alert">{notice}</p>}
+      <section className="dialogue-transcript" aria-label="Investor conversation">
+        <div className="dialogue-heading"><div><p className="kicker">Conversation · scripted</p>
+          <h2>Investor conversation</h2></div>
+          <span className="scripted-badge">Scripted engine · no live AI</span>
+        </div>
+        {answers.map((entry) => <article className="dialogue-exchange" key={entry.investor}>
+          <p className="dialogue-speaker">{NEGOTIATION_RULES.investors[entry.investor].name} · Investor</p>
+          <p>{NEGOTIATION_RULES.investors[entry.investor].question}</p>
+          <p className="dialogue-speaker founder-speaker">Founder · submitted answer</p>
+          <blockquote>{entry.text}</blockquote>
+        </article>)}
+      </section>
       <div className="practice-panel">
         {INVESTOR_ORDER.map((id) => <div key={id} className={stage === "questions" && id === investor ? "active-investor" : ""}>
           <strong>{NEGOTIATION_RULES.investors[id].name}</strong><span>{specialties[id]}</span>
@@ -86,7 +98,7 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
           <p className="kicker">Question {turn + 1} of {INVESTOR_ORDER.length}</p>
           <h2 ref={heading} tabIndex={-1}>{profile.name}</h2>
           <p>{profile.question}</p>
-          <p className="muted">This scripted rubric detects written signals. It does not independently verify them.</p>
+          <p className="muted">Submit your answer when it is ready. The scripted rules respond immediately; there is no simulated waiting or live AI. Detected text signals are not independently verified.</p>
           <form className="counter-form" key={turn} onSubmit={submitAnswer}>
             <label>Your answer<textarea name="answer" rows={4} minLength={10} maxLength={1500} required /></label>
             {answerError && <p className="error" role="alert">{answerError}</p>}
