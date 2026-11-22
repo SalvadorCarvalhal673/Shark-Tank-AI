@@ -410,6 +410,20 @@ for (const outcome of ["no-offers", "founder-walk-away", "all-withdrawn"] as con
     await resume(page);
     await expect(page.getByRole("heading", { name: "Your debrief." })).toBeFocused();
     expect(await page.locator(".debrief").textContent()).toBe(before);
+    const scorecard = page.getByRole("region", { name: "Performance scorecard" });
+    const expectedOutcome = {
+      "no-offers": "The investors passed during the opening decisions.",
+      "founder-walk-away": "You chose to walk away. The remaining offers closed.",
+      "all-withdrawn": "All remaining investors withdrew during negotiation.",
+    }[outcome];
+    await expect(scorecard).toContainText(expectedOutcome);
+    await expect(scorecard).toContainText(`Shared counters used · ${outcome === "all-withdrawn" ? 3 : 0} of 3`);
+    const maya = scorecard.locator("details").filter({ hasText: "Maya Chen" });
+    await expect(maya).not.toHaveAttribute("open", "");
+    await maya.locator("summary").click();
+    await expect(maya).toHaveAttribute("open", "");
+    await resume(page);
+    await expect(maya).not.toHaveAttribute("open", "");
     expect(await page.evaluate((key) => localStorage.getItem(key), key)).toBe(raw);
   });
 }

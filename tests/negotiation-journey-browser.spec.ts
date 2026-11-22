@@ -72,6 +72,9 @@ test("accepted financial output reconciles and ordered history retains original 
   await maya.getByRole("button", { name: "Send counteroffer" }).click();
   await maya.getByRole("button", { name: "Accept offer", exact: true }).click();
   await maya.getByRole("button", { name: "Confirm deal" }).click();
+  const scorecard = page.getByRole("region", { name: "Performance scorecard" });
+  await expect(scorecard).toContainText("You confirmed one offer. All other active offers closed.");
+  await expect(scorecard).toContainText("Shared counters used · 1 of 3");
   const deal = page.getByRole("region", { name: "Accepted deal" });
   await expect(deal.getByText("€700,000.00", { exact: true })).toBeVisible();
   await expect(deal.getByText("€800,000.00", { exact: true })).toBeVisible();
@@ -208,4 +211,36 @@ test("counters across three investors preserve order and final-offer focus", asy
   await sofia.getByRole("button", { name: "Accept offer", exact: true }).click();
   await sofia.getByRole("button", { name: "Confirm deal" }).click();
   await expect(page.getByRole("heading", { name: "Deal with Sofia Mendes" })).toBeVisible();
+});
+
+test("scorecard disclosures support keyboard and narrow reduced-motion layouts", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await prepare(page, { long: true });
+  await page.getByLabel("Your answer").fill(investorAnswers[0]);
+  await page.getByRole("button", { name: "Submit answer" }).click();
+  await page.getByLabel("Your answer").fill(investorAnswers[0]);
+  await page.getByRole("button", { name: "Submit answer" }).click();
+  await page.getByLabel("Your answer").fill(investorAnswers[2]);
+  await page.getByRole("button", { name: "Submit answer" }).click();
+  await page.getByRole("button", { name: "Walk away" }).click();
+
+  const scorecard = page.getByRole("region", { name: "Performance scorecard" });
+  const maya = scorecard.locator("summary").filter({ hasText: "Maya Chen" });
+  const adrian = scorecard.locator("summary").filter({ hasText: "Adrian Vale" });
+  const repeated = scorecard.getByText("This response repeats an earlier answer.");
+  await expect(maya).toContainText("3 of 3 signals detected");
+  await expect(adrian).toContainText("0 of 3 signals detected");
+  await expect(repeated).toBeHidden();
+  await expect(scorecard).toContainText("cannot verify claims or assess startup viability");
+
+  await maya.focus();
+  await page.keyboard.press("Tab");
+  await expect(adrian).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(repeated).toBeVisible();
+  await expect(adrian.locator("..").getByText("Signal not identified", { exact: true })).toHaveCount(3);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  await page.keyboard.press("Space");
+  await expect(repeated).toBeHidden();
 });
