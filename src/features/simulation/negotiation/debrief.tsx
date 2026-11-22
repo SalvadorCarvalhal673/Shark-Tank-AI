@@ -29,6 +29,11 @@ export function Debrief({ session, headingRef, onExit }: {
           <TermsDisplay terms={opening} currency={session.pitch.currency} />
         </details>}
       </section>}
+      {session.outcome?.kind === "founder-walk-away" && <section aria-label="Founder decision">
+        <h3>You ended the negotiation</h3>
+        <p>No offer was accepted. This session raised no investment and left ownership unchanged.</p>
+        <p>For another practice run, decide how much funding you need and how much ownership you are willing to give up.</p>
+      </section>}
     </div>
 
     <section className="form-card">
