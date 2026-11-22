@@ -60,7 +60,7 @@ export function PitchForm() {
     setPitch(next);
   }
 
-  function useExample(example: typeof pitchExamples[number]) {
+  function applyExample(example: typeof pitchExamples[number]) {
     const data = new FormData();
     data.set("startup", example.pitch.startup);
     data.set("pitch", example.pitch.pitch);
@@ -164,7 +164,7 @@ export function PitchForm() {
         <p>Describe a real idea in your own words. The examples below are fictional starting points; choosing one only fills this editable form.</p>
         <div className="example-picker" role="group" aria-label="Fictional pitch examples">
           {pitchExamples.map((example) => <button key={example.id} type="button" className="button secondary"
-            onClick={() => useExample(example)}>
+            onClick={() => applyExample(example)}>
             Use {example.title}
           </button>)}
         </div>

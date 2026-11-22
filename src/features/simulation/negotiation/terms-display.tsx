@@ -23,7 +23,7 @@ export function ValuationDetails({ terms, currency, founderOwnershipBps }: { ter
           <div><dt>Other holders after</dt><dd>{percent(ownership.otherExistingAfterBps)}</dd></div>
           <div><dt>Investor</dt><dd>{percent(ownership.investorBps)}</dd></div>
         </dl>
-        <p className="muted">A preview from the simulator's primary-share calculation, not an accepted deal.</p>
+        <p className="muted">A preview from the simulator&apos;s primary-share calculation, not an accepted deal.</p>
       </section>}
     </>
   );
