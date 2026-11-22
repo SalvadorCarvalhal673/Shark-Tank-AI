@@ -1,0 +1,242 @@
+{
+  "reviewedCommit": "d6042e1e85dbf78e707c3517f814b5e8d805a647",
+  "reviewedAtUtc": "2026-11-21T22:45:51Z",
+  "decision": "recommend retirement for reviewed configuration; not approved/closed/deployment-authorized",
+  "officialSources": {
+    "github": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf",
+    "githubApi": "https://api.github.com/advisories/GHSA-fc5q-39xc-vjpf",
+    "cve": "https://cveawg.mitre.org/api/cve/CVE-2026-112366",
+    "maintainer": "https://github.com/micromatch/picomatch/pull/235#issuecomment-6315749381"
+  },
+  "advisory": {
+    "cveRegistryUpdatedAt": "2026-10-19T16:40:19.321Z",
+    "id": "GHSA-fc5q-39xc-vjpf",
+    "cve": "CVE-2026-112366",
+    "cveRegistryState": "PUBLISHED",
+    "rationale": "GitHub classifies the reported behavior as not a security issue; no project remediation implied",
+    "withdrawnAt": "2026-11-18T15:38:56Z",
+    "updatedAt": "2026-11-19T16:07:41Z"
+  },
+  "originalExceptionFileSha256": "5f489685994566c839cc0579feb339e1a75c6737a77a48c01305d58cc8b15ada",
+  "lockfileSha256": "439367b51170be54b2bdfce21aa19bf82788a1c30a6791710b899c72f6e703d5",
+  "installed": [
+    {
+      "path": "node_modules/picomatch",
+      "version": "2.3.2",
+      "dev": true
+    },
+    {
+      "path": "node_modules/tinyglobby/node_modules/picomatch",
+      "version": "4.0.7",
+      "dev": true
+    }
+  ],
+  "artifactReview": {
+    "node": "v24.22.0",
+    "next": "16.4.6",
+    "modules": [
+      {
+        "name": "installed-2",
+        "file": "node_modules/picomatch/index.js",
+        "sha256": "5695ff5dfcd5a338a40630bd506056f2950bcb08fe1cc068519cbbfe60add480"
+      },
+      {
+        "name": "installed-4",
+        "file": "node_modules/tinyglobby/node_modules/picomatch/index.js",
+        "sha256": "02ae26406508e28f9ba0865be16cf77f0b33de6c4d4d49c212c4176df1d5625a"
+      },
+      {
+        "name": "next-vendored",
+        "file": "node_modules/next/dist/compiled/picomatch/index.js",
+        "sha256": "607dc79784c1161c33076903769dba23e63d9d9ccfe3c4695a32ebe3a5ab892d"
+      }
+    ],
+    "traced": [
+      "node_modules/next/dist/compiled/picomatch/index.js",
+      "node_modules/next/dist/compiled/picomatch/package.json"
+    ],
+    "artifact": {
+      "configOrigin": "default",
+      "output": "default-node-server",
+      "imageDomains": [],
+      "remotePatterns": [],
+      "localPatterns": [
+        {
+          "pathname": "**",
+          "search": ""
+        }
+      ],
+      "allowSVG": false,
+      "allowLocalIP": false,
+      "traceIncludes": {},
+      "traceExcludes": {}
+    },
+    "probes": [
+      {
+        "name": "installed-2",
+        "length": 18,
+        "deadlineMs": 1000,
+        "timedOut": false,
+        "status": 0,
+        "observation": {
+          "matched": false,
+          "elapsedMs": 15.065099999999997
+        }
+      },
+      {
+        "name": "installed-2",
+        "length": 26,
+        "deadlineMs": 1000,
+        "timedOut": true,
+        "status": null
+      },
+      {
+        "name": "installed-4",
+        "length": 18,
+        "deadlineMs": 1000,
+        "timedOut": false,
+        "status": 0,
+        "observation": {
+          "matched": false,
+          "elapsedMs": 14.153400000000001
+        }
+      },
+      {
+        "name": "installed-4",
+        "length": 26,
+        "deadlineMs": 1000,
+        "timedOut": true,
+        "status": null
+      },
+      {
+        "name": "next-vendored",
+        "length": 18,
+        "deadlineMs": 1000,
+        "timedOut": false,
+        "status": 0,
+        "observation": {
+          "matched": false,
+          "elapsedMs": 13.841899999999999
+        }
+      },
+      {
+        "name": "next-vendored",
+        "length": 26,
+        "deadlineMs": 1000,
+        "timedOut": true,
+        "status": null
+      }
+    ]
+  },
+  "fullAudit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "exitCode": 0,
+    "dependencies": {
+      "prod": 36,
+      "dev": 389,
+      "optional": 88,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 462
+    }
+  },
+  "productionAudit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "exitCode": 0,
+    "dependencies": {
+      "prod": 36,
+      "dev": 389,
+      "optional": 88,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 462
+    }
+  },
+  "productionRequests": [
+    {
+      "path": "/",
+      "status": 200,
+      "elapsedMs": 506
+    },
+    {
+      "path": "/simulate",
+      "status": 200,
+      "elapsedMs": 55
+    },
+    {
+      "path": "/prototype/studio",
+      "status": 404,
+      "elapsedMs": 50
+    },
+    {
+      "path": "/api/investor",
+      "status": 405,
+      "elapsedMs": 51
+    },
+    {
+      "path": "/_next/image?url=https%3A%2F%2Fexample.invalid%2Fimage.png&w=32&q=75",
+      "status": 400,
+      "elapsedMs": 76
+    },
+    {
+      "path": "/_next/image?url=%2F%2B%28%2Aa%29aaaaaaaaaaaaaaaaaaaaaaaaaa%21.png&w=32&q=75",
+      "status": 404,
+      "elapsedMs": 66
+    },
+    {
+      "path": "/_next/image?url=%2Ffavicon.ico&w=32&q=75",
+      "status": 200,
+      "elapsedMs": 77
+    },
+    {
+      "path": "POST /api/investor",
+      "status": 503,
+      "body": "{\"error\":\"disabled\"}"
+    }
+  ],
+  "observedRuntimePatterns": [
+    "**",
+    "**"
+  ],
+  "limitations": [
+    "CVE registry remains PUBLISHED; GitHub withdrawal is not a CVE rejection",
+    "Behavior probes are bounded disposable subprocess observations, not route exploits",
+    "Inspected default Node production build only; no final hosted deployment artifact provided",
+    "Dynamic observation covers the listed synthetic requests only",
+    "No application/dependency/lockfile/CI changes or advisory suppression",
+    "Issue79 remains open and public deployment prohibited"
+  ],
+  "originalExceptionGitBlob": "73454d04c19e311dca2dc6e20b31dfb6920e7a05",
+  "additionalFileDigests": [
+    {
+      "file": ".next/next-server.js.nft.json",
+      "sha256": "869144bfbd4844e08e64d3fd4343bba2b2f00d041b1bdaa19a828ea852733ab5"
+    },
+    {
+      "file": ".next/images-manifest.json",
+      "sha256": "89153990319006e8e53593d4cee9a741db8a01b9dd8897513bd4e0a4685d2f42"
+    },
+    {
+      "file": "node_modules/picomatch/lib/parse.js",
+      "sha256": "3a91656f440069aa8f8e15c9d695b9f6b2209df1eab2be8127c72cbcca45ff5f"
+    },
+    {
+      "file": "node_modules/tinyglobby/node_modules/picomatch/lib/parse.js",
+      "sha256": "4e1e05447668aa1e94366c5516a2bcd8f5fff800cc92b1d0cd7d77703b8618c4"
+    }
+  ]
+}
