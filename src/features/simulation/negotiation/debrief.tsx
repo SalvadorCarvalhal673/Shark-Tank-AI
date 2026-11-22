@@ -5,6 +5,7 @@ import { historicalCounterCopy, openingCopy, outcomeCopy, ownershipPresentation,
 import type { NegotiationSession } from "./session";
 import { percent, TermsDisplay } from "./terms-display";
 import styles from "./deal-conclusion.module.css";
+import { WithdrawalConclusion } from "./withdrawal-conclusion";
 
 export function Debrief({ session, headingRef, onExit }: {
   session: NegotiationSession;
@@ -57,6 +58,7 @@ export function Debrief({ session, headingRef, onExit }: {
     <section className="form-card">
       <h3>Negotiation performance</h3>
       <p>You used {session.roundsUsed} of {NEGOTIATION_RULES.counterBudget} shared counters.</p>
+      <WithdrawalConclusion session={session} />
       <p>{counters.length
         ? "Review how your requested funding and equity changed the investors’ responses."
         : "You made your final decision without countering. Review whether the available funding and ownership matched your limits."}</p>
