@@ -3,12 +3,12 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Color, LoopOnce, Vector3 } from "three";
+import { Color, LoopOnce, PerspectiveCamera, Vector3, type Camera } from "three";
 import { createInvestorInstance } from "./avatar";
 import { CAST_URL } from "./rig";
 import { StudioRoom } from "./room/studio-room";
 import { SEAT_X } from "./room/layout";
-import { cameraPresets, cameraStep, sceneCue, type CameraView } from "./model";
+import { cameraFov, cameraPresets, cameraStep, sceneCue, type CameraView } from "./model";
 import { INVESTOR_ORDER, type InvestorId } from "../simulation/negotiation/investor-policy";
 import type { NegotiationSession } from "../simulation/negotiation/session";
 
@@ -48,8 +48,14 @@ function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:S
   </mesh>
  </group>;
 }
+/** Moves a perspective camera's field of view a fraction of the way to the target and reprojects. */
+function easeFov(camera:Camera,fov:number,step:number){
+ if(!(camera instanceof PerspectiveCamera) || Math.abs(camera.fov-fov)<=.01)return;
+ camera.fov+=(fov-camera.fov)*step;camera.updateProjectionMatrix();
+}
 function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;visible:boolean}){
- const {camera,gl,invalidate,scene}=useThree();
+ const {camera,gl,invalidate,scene,size}=useThree();
+ const fov=cameraFov(props.view,size.width/Math.max(size.height,1));
  const target=useRef(new Vector3(0,1.45,.1));
  const settleFrames=useRef(3);
  const onFailure=props.onFailure;
@@ -57,11 +63,14 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
  const pose=cameraPresets[props.view];
  useEffect(()=>{
   wakeUntil.current=performance.now()+3200; samples.current=[];settleFrames.current=3;
-  if(props.reducedMotion){camera.position.fromArray(pose.position);target.current.fromArray(pose.target);camera.lookAt(target.current);}
+  if(props.reducedMotion){
+   camera.position.fromArray(pose.position);target.current.fromArray(pose.target);camera.lookAt(target.current);
+   easeFov(camera,fov,1);
+  }
   invalidate();
   const measurement=setTimeout(()=>invalidate(),900);
   return ()=>clearTimeout(measurement);
- },[pose,props.session?.revision,props.reducedMotion,camera,invalidate,ready,visible]);
+ },[pose,fov,props.session?.revision,props.reducedMotion,camera,invalidate,ready,visible]);
  useEffect(()=>{
   const canvas=gl.domElement;
   const lost=(event:Event)=>{event.preventDefault();onFailure("The graphics context was lost. Simplified view keeps your session, drafts and saved progress.");};
@@ -72,6 +81,8 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
   const step=cameraStep(delta,props.reducedMotion);
   camera.position.lerp(new Vector3(...pose.position),step);
   target.current.lerp(new Vector3(...pose.target),step);camera.lookAt(target.current);
+  // The field of view eases with the same step, so shot changes and window resizes never jump.
+  easeFov(camera,fov,step);
   const now=performance.now();
   if(delta>0 && delta<.25)samples.current.push(delta*1000);
   if(samples.current.length>180)samples.current.shift();

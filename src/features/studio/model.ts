@@ -5,12 +5,42 @@ import type { InvestorId } from "../simulation/negotiation/investor-policy.ts";
 
 export type CameraView = "panel" | InvestorId;
 export type Pose = "Listening" | "Offering" | "Withdrawal";
+/**
+ * Camera presets (Issue #11). The panel shot is the founder's view of all three investors; each
+ * investor shot is a medium close-up from just above eye level, so the face, hands and desk read.
+ * DECISION: investor cameras stay on their seat's axis (x = seat), so selection, picking and the
+ * existing camera tests keep their meaning; composition changes come from height, distance and aim.
+ */
 export const cameraPresets = {
   panel: { position: [0,3.1,9.2], target: [0,1.45,.1] },
-  maya: { position: [-2.5,2.5,5.1], target: [-2.5,1.75,0] },
-  adrian: { position: [0,2.5,5.1], target: [0,1.75,0] },
-  sofia: { position: [2.5,2.5,5.1], target: [2.5,1.75,0] },
+  maya: { position: [-2.5,2.3,4.4], target: [-2.5,1.8,0] },
+  adrian: { position: [0,2.3,4.4], target: [0,1.8,0] },
+  sofia: { position: [2.5,2.3,4.4], target: [2.5,1.8,0] },
 } as const;
+
+/** Vertical field of view used on landscape screens, in degrees. */
+export const BASE_FOV = 43;
+/** Widest field of view any preset may use, to avoid fish-eye distortion on very tall screens. */
+export const MAX_FOV = 74;
+/**
+ * Half-width (metres) each shot must always keep in frame, around its target: the whole panel for
+ * the panel shot, one investor with their arms for an investor shot.
+ */
+export const FRAME_HALF_WIDTH = { panel: 3.1, investor: .62 } as const;
+
+/**
+ * Field of view for a preset at a canvas aspect ratio (width / height).
+ * DECISION: on narrow, portrait canvases the camera widens its view instead of moving, so the panel
+ * shot keeps all three investors in frame without walking the camera off the end of the room.
+ */
+export function cameraFov(view: CameraView, aspect: number) {
+  const preset = cameraPresets[view];
+  const distance = Math.hypot(preset.position[0] - preset.target[0], preset.position[1] - preset.target[1], preset.position[2] - preset.target[2]);
+  const halfWidth = view === "panel" ? FRAME_HALF_WIDTH.panel : FRAME_HALF_WIDTH.investor;
+  const safeAspect = Math.max(aspect, .2);
+  const needed = 2 * Math.atan(halfWidth / distance / safeAspect) * 180 / Math.PI;
+  return Math.min(MAX_FOV, Math.max(BASE_FOV, needed));
+}
 export function cameraStep(deltaSeconds: number, reducedMotion: boolean) {
   return reducedMotion ? 1 : 1-Math.exp(-Math.min(Math.max(deltaSeconds,0),.05)*7);
 }
