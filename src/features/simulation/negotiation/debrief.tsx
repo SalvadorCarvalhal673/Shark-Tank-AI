@@ -67,6 +67,18 @@ export function Debrief({ session, headingRef, onExit }: {
 
     <section className="form-card">
       <h3>Financial consequences</h3>
+      {accepted && cap && <details className="negotiation-details">
+        <summary>How to read your deal</summary>
+        <dl>
+          <div><dt>Pre-money and post-money valuation</dt>
+            <dd>Pre-money is the implied company value before the new cash. Post-money adds the investment. These values come from the agreed terms.</dd></div>
+          <div><dt>Ownership and dilution</dt>
+            <dd>Your share went from {percent(cap.founderBeforeBps)} to {percent(cap.founderAfterBps)}.
+              Percentage-point dilution subtracts those two percentages. Relative dilution measures the decrease against your original share.</dd></div>
+        </dl>
+        <p>For example, a move from 60% to 54% is a drop of 6 percentage points, or 10% of the original share.</p>
+        {cap.founderRelativeDilutionBps === null && <p>Relative dilution is undefined when your original share is zero.</p>}
+      </details>}
       {accepted && cap ? <>
         <p>Primary equity investment. Existing holders keep a proportional share of the remaining equity.</p>
         <div className="ownership-bar" aria-hidden="true">
