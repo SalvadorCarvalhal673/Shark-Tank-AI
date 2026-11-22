@@ -14,19 +14,22 @@ export class RequestLifecycle {
     if(!id(context.sessionId)||!integer(context.revision,7)||!investor(context.investorId)||
       !id(context.mode)||!id(context.recoveryId))throw new RangeError("Invalid view context");
     if(this.#disposed)return this.#epoch;
-    if(this.#context&&Object.keys(context).some(k=>context[k as keyof ViewContext]!==this.#context![k as keyof ViewContext]))
-      this.cancel();
-    this.#context=frozenCopy(context);return this.#epoch;
+    const changed=this.#context!==null&&Object.keys(context).some(k=>context[k as keyof ViewContext]!==this.#context![k as keyof ViewContext]);
+    // Publish the replacement view before synchronous abort listeners can reenter.
+    this.#context=frozenCopy(context);if(changed)this.cancel();return this.#epoch;
   }
   begin(binding:Binding):AbortSignal|null {
     const c=this.#context,key=binding.sessionId+":"+binding.requestId;
     if(this.#disposed||!validBinding(binding)||!c||binding.sessionId!==c.sessionId||binding.revision!==c.revision||
       binding.investorId!==c.investorId||binding.epoch!==this.#epoch||this.#seen.has(key)||this.#seen.size>=128)return null;
-    // New request supersedes the old one at the same context/epoch; exact request identity still differs.
-    if(this.#active){this.#active.controller.abort();this.#events.push({kind:"request-cancelled",binding:this.#active.binding});}
-    const copy=frozenCopy(binding),controller=new AbortController();
-    this.#delivered=null;this.#active={binding:copy,controller};this.#seen.add(key);
-    this.#events.push({kind:"request-started",binding:copy});return controller.signal;
+    const previous=this.#active,copy=frozenCopy(binding),controller=new AbortController();
+    const active={binding:copy,controller};
+    this.#delivered=null;this.#active=active;this.#seen.add(key);
+    if(previous)this.#events.push({kind:"request-cancelled",binding:previous.binding});
+    this.#events.push({kind:"request-started",binding:copy});
+    // Abort dispatch is synchronous: a listener may supersede this request again.
+    previous?.controller.abort();
+    return !this.#disposed&&this.#active===active&&!controller.signal.aborted?controller.signal:null;
   }
   consume(binding:Binding):boolean {
     if(this.#disposed||!this.#active||this.#active.controller.signal.aborted||
@@ -44,10 +47,11 @@ export class RequestLifecycle {
     this.cancel();return true;
   }
   cancel():void {
-    if(this.#active){this.#active.controller.abort();this.#events.push({kind:"request-cancelled",binding:this.#active.binding});}
+    const previous=this.#active;
     this.#active=null;this.#delivered=null;this.#epoch++;
+    if(previous){this.#events.push({kind:"request-cancelled",binding:previous.binding});previous.controller.abort();}
   }
-  dispose():void {this.cancel();this.#disposed=true;}
+  dispose():void {this.#disposed=true;this.cancel();}
   drainEvents():readonly PresentationEvent[] {const result=frozenCopy(this.#events);this.#events=[];return result;}
 }
 export class RequestTimeout extends Error {constructor(){super("AI request deadline exceeded");}}
