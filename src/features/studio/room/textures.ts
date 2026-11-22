@@ -34,7 +34,7 @@ function grain(g: CanvasRenderingContext2D, random: () => number, y0: number, ba
   }
 }
 
-export type StudioTextures = Record<"floor" | "walnut" | "concrete" | "rug" | "contact" | "art", Texture> & { dispose: () => void };
+export type StudioTextures = Record<"floor" | "walnut" | "reeded" | "concrete" | "rug" | "contact" | "art", Texture> & { dispose: () => void };
 
 /** Texture sizes are capped at 1024 px (512 px on narrow screens) to bound GPU memory on phones. */
 export function createStudioTextures(compact: boolean): StudioTextures {
@@ -55,6 +55,21 @@ export function createStudioTextures(compact: boolean): StudioTextures {
     g.fillStyle = PALETTE.walnut; g.fillRect(0, 0, w, h);
     grain(g, random, 0, h, w, 120, "25,12,5");
   });
+  // One reed per texture repeat: a lit crown and shaded valleys over walnut grain, so the curved desk
+  // front reads as fluted joinery without modelled flutes.
+  const reeded = paint(64, small, (g, w, h) => {
+    g.fillStyle = PALETTE.walnut; g.fillRect(0, 0, w, h);
+    const shade = g.createLinearGradient(0, 0, w, 0);
+    shade.addColorStop(0, "rgba(20,10,4,.55)"); shade.addColorStop(.18, "rgba(20,10,4,.12)");
+    shade.addColorStop(.45, "rgba(255,226,190,.16)"); shade.addColorStop(.7, "rgba(20,10,4,.05)");
+    shade.addColorStop(1, "rgba(20,10,4,.5)");
+    g.fillStyle = shade; g.fillRect(0, 0, w, h);
+    for (let k = 0; k < 18; k++) {
+      g.strokeStyle = `rgba(25,12,5,${.05 + random() * .08})`; g.lineWidth = 1;
+      const x = random() * w; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + random() * 4 - 2, h); g.stroke();
+    }
+  });
+  reeded.wrapT = ClampToEdgeWrapping;
   const concrete = paint(small, small, (g, w, h) => {
     g.fillStyle = PALETTE.concrete; g.fillRect(0, 0, w, h);
     for (let i = 0; i < 6000; i++) {
@@ -82,6 +97,6 @@ export function createStudioTextures(compact: boolean): StudioTextures {
     });
     g.globalAlpha = 1;
   });
-  const all = { floor, walnut, concrete, rug, contact, art };
+  const all = { floor, walnut, reeded, concrete, rug, contact, art };
   return { ...all, dispose: () => Object.values(all).forEach(texture => texture.dispose()) };
 }

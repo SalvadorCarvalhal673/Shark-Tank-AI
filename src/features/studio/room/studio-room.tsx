@@ -42,6 +42,7 @@ function createMaterials(t: StudioTextures): Record<RoomMaterial, Material> {
     contact: new MeshBasicMaterial({ map: t.contact, transparent: true, depthWrite: false, toneMapped: false }),
     founderMark: matte({ color: "#2a2f2e" }),
     art: matte({ map: t.art }),
+    reeded: matte({ map: t.reeded }),
   };
 }
 
