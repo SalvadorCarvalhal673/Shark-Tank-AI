@@ -16,7 +16,7 @@ const style: Record<InvestorId, string> = {
   sofia: "Practical and operations focused. She connects customer observations to delivery plans.",
 };
 
-export function InvestorIntroductions({ selected, onSelect, onContinue, onSkip, onBack }: {
+export function InvestorIntroductions({ selected, onSelect, onContinue, onSkip }: {
   selected: InvestorId;
   onSelect: (investor: InvestorId) => void;
   onContinue: () => void;
