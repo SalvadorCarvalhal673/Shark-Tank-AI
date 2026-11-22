@@ -6,7 +6,7 @@ No character, environment, texture, HDRI or animation pack was downloaded or pur
 | Asset | Source and modifications | Rights / redistribution |
 | --- | --- | --- |
 | public/studio/investor-v1.glb | Original procedural humanoid created specifically for this project by scripts/create-studio-avatar.mjs. Primitive geometry is weighted to an 11-bone seated rig. Includes Listening, Offering and Withdrawal quaternion clips. | Original project artwork, not a third-party model. No separate public license has been applied to the original artwork. |
-| Room geometry and materials | Original procedural curved table, seats, architectural wall, trim and lighting in src/features/studio/scene.tsx. | Original project source; no external art licenses. |
+| Room geometry and materials | Original procedural Rooftop VC Boardroom (Issue #1) in src/features/studio/room/: curved desk, chairs, glass wall, slat walls, furniture, plants, miniature skyline and lighting. Textures (wood, concrete, rug, sky, windows, artwork, contact shadows) are painted on canvas in code at load time. | Original project source; no image files, downloads or external art licenses. |
 | Character variations | Original per-instance jacket, skin and hair materials; Adrian's procedural glasses. | Original project source; no downloaded textures or likenesses. |
 | Simplified portraits | Original HTML/CSS silhouettes, sharing the same investor identities. | Original project source. |
 | Fonts | Existing approved local project fonts and OFL notices, unchanged. | Existing notices remain in src/app/fonts. |
