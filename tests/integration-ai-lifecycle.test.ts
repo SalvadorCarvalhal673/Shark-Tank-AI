@@ -15,13 +15,13 @@ test('integration: reentrant provider abort preserves newest AI request and orde
 });
 test('integration: context publishes before abort handlers, rejecting old view work',()=>{
  const l=new RequestLifecycle();l.setContext(view());const a=request().binding,signal=l.begin(a)!;
- let accepted=false;
- signal.addEventListener('abort',()=>{accepted=l.begin({...a,epoch:l.epoch,requestId:'obsolete'})!==null;},{once:true});
- l.setContext({...view(),revision:1});assert.equal(accepted,false);
+ let accepted=false,calls=0;
+ signal.addEventListener('abort',()=>{calls++;accepted=l.begin({...a,epoch:l.epoch,requestId:'obsolete'})!==null;},{once:true});
+ l.setContext({...view(),revision:1});assert.equal(calls,1);assert.equal(signal.aborted,true);assert.equal(accepted,false);
  assert.equal(l.consume({...a,epoch:l.epoch,requestId:'obsolete'}),false);
 });
 test('integration: disposal cannot leave a reentrantly created AI request alive',()=>{
  const l=new RequestLifecycle();l.setContext(view());const a=request().binding,signal=l.begin(a)!;
- let created:AbortSignal|null=null;signal.addEventListener('abort',()=>{created=l.begin({...a,epoch:l.epoch,requestId:'after-dispose'});});
- l.dispose();assert.equal(created,null);assert.equal(l.begin({...a,epoch:l.epoch,requestId:'late'}),null);
+ let created:AbortSignal|null=null,calls=0;signal.addEventListener('abort',()=>{calls++;created=l.begin({...a,epoch:l.epoch,requestId:'after-dispose'});});
+ l.dispose();assert.equal(calls,1);assert.equal(signal.aborted,true);assert.equal(created,null);assert.equal(l.begin({...a,epoch:l.epoch,requestId:'late'}),null);
 });
