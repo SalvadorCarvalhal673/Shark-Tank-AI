@@ -8,6 +8,9 @@ import { type NegotiationPitch } from "./negotiation/session";
 import { useSavedSession } from "./negotiation/use-saved-session";
 import { RecoveryPanel } from "./negotiation/recovery-panel";
 import { percent, ValuationDetails } from "./negotiation/terms-display";
+import { InvestorIntroductions } from "./investor-introductions";
+import { INVESTOR_ORDER, type InvestorId } from "./negotiation/investor-policy";
+import { pitchExamples } from "./pitch-examples";
 
 export function PitchForm() {
   const controller = useSavedSession();
@@ -19,7 +22,10 @@ export function PitchForm() {
   useEffect(() => { if (replacement) replacementHeading.current?.focus(); }, [replacement]);
   const [pitch, setPitch] = useState<NegotiationPitch | null>(null);
   const [draft, setDraft] = useState<NegotiationPitch | null>(null);
+  const [exampleRevision, setExampleRevision] = useState(0);
   const [error, setError] = useState("");
+  const [showIntroductions, setShowIntroductions] = useState(true);
+  const [selectedIntroduction, setSelectedIntroduction] = useState<InvestorId>(INVESTOR_ORDER[0]);
   const ownershipInput = useRef<HTMLInputElement>(null);
   const previewHeading = useRef<HTMLHeadingElement>(null);
   const startupInput = useRef<HTMLInputElement>(null);
@@ -52,6 +58,24 @@ export function PitchForm() {
     const next = { ...result, founderOwnershipBps: ownership };
     setDraft(next);
     setPitch(next);
+  }
+
+  function useExample(example: typeof pitchExamples[number]) {
+    const data = new FormData();
+    data.set("startup", example.pitch.startup);
+    data.set("pitch", example.pitch.pitch);
+    data.set("currency", example.pitch.currency);
+    data.set("amount", String(example.pitch.amount / 100));
+    data.set("equity", String(example.pitch.equity / 100));
+    const parsed = readPitch(data);
+    const ownership = readFounderOwnership(String(example.pitch.founderOwnershipBps / 100), false);
+    if (typeof parsed === "string" || typeof ownership === "string") {
+      setError("This example could not be loaded. Your current draft is unchanged.");
+      return;
+    }
+    setDraft({ ...parsed, founderOwnershipBps: ownership });
+    setExampleRevision((revision) => revision + 1);
+    setError("");
   }
 
   async function launch(expectedRaw: string | null) {
@@ -100,8 +124,12 @@ export function PitchForm() {
       <h2 className="startup-name" ref={previewHeading} tabIndex={-1}>{pitch.startup}</h2>
       <p className="pitch-text">{pitch.pitch}</p>
       <p className="ask-line">{money(pitch.amount, pitch.currency)} for {pitch.equity / 100}% equity</p>
-      <ValuationDetails terms={pitch} currency={pitch.currency} />
+      <ValuationDetails terms={pitch} currency={pitch.currency} founderOwnershipBps={pitch.founderOwnershipBps} />
       <p className="muted">Founder ownership before investment · {percent(pitch.founderOwnershipBps)}</p>
+      {showIntroductions
+        ? <InvestorIntroductions selected={selectedIntroduction} onSelect={setSelectedIntroduction}
+            onContinue={() => setShowIntroductions(false)} onSkip={() => setShowIntroductions(false)} />
+        : <button className="button secondary" type="button" onClick={() => setShowIntroductions(true)}>Meet the investors</button>}
       <div className="privacy-notice">
         <label className="save-choice"><input type="checkbox" disabled={controller.busy} checked={saveLocally} onChange={(event) => setSaveLocally(event.target.checked)} /> Save this session in this browser</label>
         <p className="muted">Saving stores your pitch and answers in this browser profile. Other users of this profile or scripts on this origin may access them. The app does not encrypt them. Private browsing or clearing browser data may remove them. No founder information is sent externally.</p>
@@ -129,8 +157,19 @@ export function PitchForm() {
       </div>
     </section>
   ) : (
-    <form className="form-card" onChangeCapture={() => setEditing(true)} onSubmit={submit}>
+    <form key={`${draft?.pitch ?? "new-pitch"}:${exampleRevision}`} className="form-card" onChangeCapture={() => setEditing(true)} onSubmit={submit}>
       {controller.slot.kind === "unavailable" && <p>Saved information could not be read. Memory-only practice is available.</p>}
+      <section className="pitch-guidance" aria-labelledby="pitch-guide-title">
+        <h2 id="pitch-guide-title">Build your pitch</h2>
+        <p>Describe a real idea in your own words. The examples below are fictional starting points; choosing one only fills this editable form.</p>
+        <div className="example-picker" role="group" aria-label="Fictional pitch examples">
+          {pitchExamples.map((example) => <button key={example.id} type="button" className="button secondary"
+            onClick={() => useExample(example)}>
+            Use {example.title}
+          </button>)}
+        </div>
+        {pitchExamples.map((example) => <p className="muted" key={example.id}>{example.description}</p>)}
+      </section>
       <p className="lede">Tell the panel what you are building, who needs it, and what you are asking for.</p>
       <label>Startup name
         <input ref={startupInput} name="startup" defaultValue={draft?.startup} required minLength={2} maxLength={80} placeholder="e.g. Atlas Energy" />
@@ -138,6 +177,7 @@ export function PitchForm() {
       <label>Your pitch
         <textarea name="pitch" defaultValue={draft?.pitch} required minLength={30} maxLength={3000} rows={6} placeholder="Describe the problem, your solution, target customers, and business model." />
       </label>
+      <p className="muted">Name the product or service and the people it helps. Keep the description between 30 and 3,000 characters.</p>
       <p id="pitch-number-hint" className="muted">Use plain decimals, such as 0.50, with up to two decimal places.</p>
       <div className="field-row">
         <label>Currency
@@ -152,6 +192,10 @@ export function PitchForm() {
           <input name="equity" aria-describedby="pitch-number-hint" defaultValue={draft ? draft.equity / 100 : undefined} type="number" step="0.01" min="0.01" max="100" required placeholder="10" />
         </label>
       </div>
+      <p className="muted">Investment is the amount of cash you are asking for. Equity is the percentage of newly issued company ownership offered in return.</p>
+      <details className="negotiation-details"><summary>What do investment and equity mean?</summary>
+        <p>Investment is the cash requested. Equity is the percentage of newly issued ownership offered to that investor if a deal is accepted. The simulator calculates valuation using its exact financial rules after you review the pitch.</p>
+      </details>
       <details className="negotiation-details" open={draft && draft.founderOwnershipBps !== 10000 ? true : undefined}>
         <summary>Ownership details <span className="muted">· Optional</span></summary>
         <p id="ownership-hint" className="muted">Your share of the company before investment. Other existing shareholders own the rest. Leave blank for 100%.</p>

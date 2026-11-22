@@ -18,6 +18,7 @@
 .studio-controls{padding:25px;background:#1b241e;border:1px solid #3c493b;border-radius:10px}
 .studio-controls h2{font-size:40px;line-height:1.1;margin:15px 0}.studio-muted{color:#abb9a8;font-size:12px;line-height:1.6}
 .studio-start{padding:20px 0;display:grid;gap:15px;font-size:13px;line-height:1.6}
+.studio-controls .studio-start select{background:#111a14;color:#f2f1e9;border:1px solid #52634e;border-radius:5px;padding:12px;width:100%;font:inherit;min-width:0}
 .studio-session-meta{display:flex;justify-content:space-between;border-block:1px solid #384738;padding:15px 0;margin:20px 0;font-size:12px;color:#aebbaa}
 .studio-session-meta b{color:#d5f27d;margin-left:8px}.studio-controls form{display:grid;gap:10px;min-width:0;margin-bottom:18px}
 .studio-controls form>p{font-size:13px;line-height:1.6}.studio-controls label{font-size:12px}

@@ -157,3 +157,28 @@ h2 { font-size: clamp(35px, 5vw, 64px); line-height: 1.1; letter-spacing: normal
 .form-card label.save-choice { display: flex; align-items: center; gap: 10px; }
 .form-card .save-choice input { width: 18px; height: 18px; flex-shrink: 0; }
 .button:disabled { opacity: .6; cursor: wait; }
+.pitch-guidance { display: grid; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+.pitch-guidance h2 { font-size: clamp(30px, 4vw, 42px); }
+.example-picker, .introduction-picker { display: flex; flex-wrap: wrap; gap: 9px; }
+.investor-introductions { padding: 16px; background: #111711; }
+.investor-introductions h2 { font-size: clamp(30px, 4vw, 44px); }
+.introduction-profile { display: grid; gap: 9px; border-left: 2px solid var(--lime); padding: 3px 0 3px 14px; }
+.introduction-profile h3 { font-size: 22px; }
+.dialogue-transcript { display: grid; gap: 16px; border: 1px solid var(--line); border-radius: 7px; background: #141a14; padding: 18px; }
+.dialogue-heading { display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 12px; }
+.dialogue-heading h2 { margin-top: 5px; font-size: clamp(30px, 4vw, 46px); }
+.scripted-badge { border: 1px solid #58664f; border-radius: 99px; padding: 6px 10px; color: var(--muted); font-size: 12px; }
+.dialogue-exchange { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.dialogue-speaker { color: var(--lime); font-size: 13px; font-weight: 700; }
+.founder-speaker { color: #b4c8bf; margin-top: 5px; }
+.dialogue-exchange blockquote { margin: 0; border-left: 2px solid #798c65; padding-left: 12px; color: var(--text); }
+.offer-ownership { display: grid; gap: 8px; margin: 0; border-top: 1px solid var(--line); padding-top: 10px; }
+.offer-ownership div { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+.offer-ownership dt { color: var(--muted); }
+.offer-ownership dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 500px) {
+  .investor-introductions { padding: 13px; }
+  .introduction-picker .button, .example-picker .button { width: 100%; text-align: left; }
+  .dialogue-transcript { padding: 14px; }
+  .offer-ownership div { align-items: start; }
+}

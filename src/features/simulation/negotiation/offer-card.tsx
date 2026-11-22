@@ -3,9 +3,9 @@ import { readTerms } from "../pitch";
 import { valuations } from "./financials";
 import { NegotiationHistory } from "./history";
 import { NEGOTIATION_RULES, type InvestorId } from "./investor-policy";
-import { acceptanceAction, counterCopy, investorActivity, openingCopy, signalCopy, specialties, type PendingOffer } from "./presentation";
+import { acceptanceAction, counterCopy, investorActivity, openingCopy, ownershipPresentation, signalCopy, specialties, type PendingOffer } from "./presentation";
 import type { FounderAction, NegotiationOffer, NegotiationSession } from "./session";
-import { TermsDisplay } from "./terms-display";
+import { percent, TermsDisplay } from "./terms-display";
 
 type Mode = PendingOffer["kind"];
 
@@ -87,10 +87,13 @@ export function OfferCard({ session, investor, pending, headingRef, onOpen, onCl
   const latest = activity.at(-1);
   const openingOffer = session.offers.find(({ id }) => id === opening?.offerId);
   const offer = session.offers.find((item) => item.investor === investor && item.status === "active");
-  const current = offer && valuations(offer);
+  const comparedOffer = offer ?? session.offers.findLast((item) => item.investor === investor && item.status !== "superseded");
+  const current = comparedOffer && valuations(comparedOffer);
+  const ownership = comparedOffer && ownershipPresentation(session.pitch.founderOwnershipBps, comparedOffer.equity);
   const hasCounters = activity.some((event) => event.kind === "counter");
   const name = NEGOTIATION_RULES.investors[investor].name;
-  const status = offer ? "Active offer" : openingOffer ? "Withdrawn" : "Passed";
+  const statusLabel = { active: "Active offer", superseded: "Superseded offer", withdrawn: "Withdrawn offer", closed: "Closed offer", accepted: "Accepted offer" } as const;
+  const status = comparedOffer ? statusLabel[comparedOffer.status] : "Passed";
   const response = latest?.kind === "counter" ? counterCopy[latest.reason] : opening ? openingCopy[opening.reason] : "";
   const panel = offer && pending?.offerId === offer.id ? pending : null;
 
@@ -104,10 +107,15 @@ export function OfferCard({ session, investor, pending, headingRef, onOpen, onCl
       <h3 ref={headingRef} tabIndex={-1}>{name}</h3>
       <p className="muted">{specialties[investor]} · {status}</p>
     </div>
-    {offer && <div className="current-terms">
+    {comparedOffer && <div className="current-terms">
       {current
-        ? <TermsDisplay terms={offer} currency={session.pitch.currency} />
+        ? <><p className="muted">{offer ? "Current comparable terms" : "Last historical terms"}</p><TermsDisplay terms={comparedOffer} currency={session.pitch.currency} /></>
         : <p role="alert" className="error">These terms are unavailable. This offer cannot be confirmed.</p>}
+      {ownership && <dl className="offer-ownership" aria-label={`Ownership at ${name} terms`}>
+        <div><dt>Founder before → after</dt><dd>{percent(ownership.founderBeforeBps)} → {percent(ownership.founderAfterBps)}</dd></div>
+        <div><dt>Other holders after</dt><dd>{percent(ownership.otherExistingAfterBps)}</dd></div>
+        <div><dt>Investor ownership</dt><dd>{percent(ownership.investorBps)}</dd></div>
+      </dl>}
     </div>}
     <p className="offer-response">{response}</p>
     {offer && current && <div className="preview-actions offer-actions">
@@ -127,7 +135,8 @@ export function OfferCard({ session, investor, pending, headingRef, onOpen, onCl
       </ul>
     </details>
     {openingOffer && <details className="negotiation-details">
-      <summary>Opening terms and exchanges</summary>
+      <summary>Offer history · {status}</summary>
+      <p className="muted">Superseded and withdrawn terms are historical; only an active offer can be accepted or countered.</p>
       <TermsDisplay terms={openingOffer} currency={session.pitch.currency} />
       {hasCounters && <NegotiationHistory session={session} investor={investor} />}
     </details>}
