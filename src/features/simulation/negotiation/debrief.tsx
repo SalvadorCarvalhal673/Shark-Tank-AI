@@ -4,6 +4,8 @@ import { NegotiationHistory } from "./history";
 import { NEGOTIATION_RULES } from "./investor-policy";
 import { historicalCounterCopy, openingCopy, ownershipPresentation, signalCopy } from "./presentation";
 import { PerformanceScorecard } from "./performance-scorecard";
+import { historicalCounterCopy, openingCopy, outcomeCopy, ownershipPresentation, signalCopy } from "./presentation";
+import { ReplayChallenge } from "./replay-challenge";
 import type { NegotiationSession } from "./session";
 import { percent, TermsDisplay } from "./terms-display";
 import styles from "./deal-conclusion.module.css";
@@ -116,6 +118,7 @@ export function Debrief({ session, headingRef, onExit }: {
         : session.outcome?.kind === "no-offers"
           ? "Answer each investor’s specific question with separate, clearly labeled evidence."
           : "Compare the funding you need with the ownership you are willing to give up before choosing your next terms."}</p>
+      <ReplayChallenge session={session} onStart={onExit} />
       <button className="button" type="button" onClick={onExit}>Practice again</button>
     </section>
   </div>;
