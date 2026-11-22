@@ -52,6 +52,11 @@ export function Debrief({ session, headingRef, onExit }: {
 
     <section className="form-card">
       <h3>Investor decisions</h3>
+      {session.outcome?.kind === "no-offers" && <section aria-label="Why there were no opening offers">
+        <h4>Why there were no opening offers</h4>
+        <p>The scripted investors need to recognize specific signals in each answer before they make an offer. A repeated answer can also lead an investor to pass.</p>
+        <p>The simulator can miss valid evidence. These decisions give you feedback about this practice run and do not assess the viability of your business.</p>
+      </section>}
       {session.history.map((event, index) => {
         if (event.kind !== "opening" && event.kind !== "counter") return null;
         return <p key={session.id + index}><strong>{NEGOTIATION_RULES.investors[event.investor].name}</strong> · {
