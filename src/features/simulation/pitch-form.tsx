@@ -160,7 +160,7 @@ export function PitchForm() {
     <form key={`${draft?.pitch ?? "new-pitch"}:${exampleRevision}`} className="form-card" onChangeCapture={() => setEditing(true)} onSubmit={submit}>
       {controller.slot.kind === "unavailable" && <p>Saved information could not be read. Memory-only practice is available.</p>}
       <section className="pitch-guidance" aria-labelledby="pitch-guide-title">
-        <h2 id="pitch-guide-title">Build your pitch</h2>
+        <h2 id="pitch-guide-title">Pitch builder</h2>
         <p>Describe a real idea in your own words. The examples below are fictional starting points; choosing one only fills this editable form.</p>
         <div className="example-picker" role="group" aria-label="Fictional pitch examples">
           {pitchExamples.map((example) => <button key={example.id} type="button" className="button secondary"
