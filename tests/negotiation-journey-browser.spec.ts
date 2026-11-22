@@ -138,6 +138,9 @@ test("conflicting walk-away and confirmation cannot accept a stale deal", async 
   });
   await expect(page.getByText("You chose to walk away. The remaining offers closed.").first()).toBeVisible();
   await expect(page.getByRole("region", { name: "Accepted deal" })).toHaveCount(0);
+  const decision = page.getByRole("region", { name: "Founder decision" });
+  await expect(decision.getByRole("heading", { name: "You ended the negotiation" })).toBeVisible();
+  await expect(decision).toContainText("This session raised no investment and left ownership unchanged.");
 });
 
 test("restart uses a fresh ID, and duplicate counters produce one round and one status update", async ({ page }) => {

@@ -19,6 +19,11 @@ export function Debrief({ session, headingRef, onExit }: {
       <h2 ref={headingRef} tabIndex={-1}>Your debrief.</h2>
       <p className="ask-line">{accepted ? "Deal confirmed" : "No deal"}</p>
       {session.outcome && <p>{outcomeCopy[session.outcome.kind]}</p>}
+      {session.outcome?.kind === "founder-walk-away" && <section aria-label="Founder decision">
+        <h3>You ended the negotiation</h3>
+        <p>No offer was accepted. This session raised no investment and left ownership unchanged.</p>
+        <p>For another practice run, decide how much funding you need and how much ownership you are willing to give up.</p>
+      </section>}
       {accepted && <section aria-label="Accepted deal">
         <h3>Deal with {NEGOTIATION_RULES.investors[accepted.investor].name}</h3>
         <TermsDisplay terms={accepted} currency={session.pitch.currency} />
