@@ -30,12 +30,16 @@ export function NegotiationHistory({ session, investor }: { session: Negotiation
         case "counter": {
           const previous = session.offers.find(({ id }) => id === event.previousOfferId);
           const resulting = session.offers.find(({ id }) => id === event.resultingOfferId);
-          return <li key={key}>
-            <strong>Counter {event.round} · {NEGOTIATION_RULES.investors[event.investor].name}</strong>
+          const heading = <>Counter {event.round} · {NEGOTIATION_RULES.investors[event.investor].name}</>;
+          const terms = <>
             {previous && <p>Previous terms · {summary(previous, session.pitch.currency)} · {previous.status} · {ownershipSummary(previous, session.pitch.founderOwnershipBps)}</p>}
             <p>Founder proposed · {summary(event.proposed, session.pitch.currency)} · {ownershipSummary(event.proposed, session.pitch.founderOwnershipBps)}</p>
             <p>{historicalCounterCopy[event.reason]}</p>
             {resulting && <p>Resulting offer · {summary(resulting, session.pitch.currency)} · {resulting.status} · {ownershipSummary(resulting, session.pitch.founderOwnershipBps)}</p>}
+          </>;
+          return <li key={key}>{session.stage === "finished" && !investor
+            ? <details className="negotiation-details"><summary>{heading}</summary>{terms}</details>
+            : <><strong>{heading}</strong>{terms}</>}
           </li>;
         }
         case "finished":

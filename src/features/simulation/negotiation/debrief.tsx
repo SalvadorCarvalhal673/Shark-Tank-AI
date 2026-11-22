@@ -1,9 +1,14 @@
 import type { Ref } from "react";
+import { DecisionAnalysis } from "./decision-analysis";
 import { NegotiationHistory } from "./history";
 import { NEGOTIATION_RULES } from "./investor-policy";
-import { historicalCounterCopy, openingCopy, outcomeCopy, ownershipPresentation, signalCopy } from "./presentation";
+import { historicalCounterCopy, openingCopy, ownershipPresentation, signalCopy } from "./presentation";
+import { PerformanceScorecard } from "./performance-scorecard";
+import { ReplayChallenge } from "./replay-challenge";
 import type { NegotiationSession } from "./session";
 import { percent, TermsDisplay } from "./terms-display";
+import styles from "./deal-conclusion.module.css";
+import { WithdrawalConclusion } from "./withdrawal-conclusion";
 
 export function Debrief({ session, headingRef, onExit }: {
   session: NegotiationSession;
@@ -18,32 +23,30 @@ export function Debrief({ session, headingRef, onExit }: {
     <div className="form-card">
       <h2 ref={headingRef} tabIndex={-1}>Your debrief.</h2>
       <p className="ask-line">{accepted ? "Deal confirmed" : "No deal"}</p>
-      {session.outcome && <p>{outcomeCopy[session.outcome.kind]}</p>}
-      {accepted && <section aria-label="Accepted deal">
+      {session.outcome?.kind === "accepted-deal" && accepted && <section className={styles.deal} aria-label="Accepted deal">
         <h3>Deal with {NEGOTIATION_RULES.investors[accepted.investor].name}</h3>
         <TermsDisplay terms={accepted} currency={session.pitch.currency} />
+        <p>You confirmed these terms. The investment is a simulated result and does not establish the quality of the pitch.</p>
         {opening && <details className="negotiation-details"><summary>Compare opening terms</summary>
           <TermsDisplay terms={opening} currency={session.pitch.currency} />
         </details>}
       </section>}
+      {session.outcome?.kind === "founder-walk-away" && <section aria-label="Founder decision">
+        <h3>You ended the negotiation</h3>
+        <p>No offer was accepted. This session raised no investment and left ownership unchanged.</p>
+        <p>For another practice run, decide how much funding you need and how much ownership you are willing to give up.</p>
+      </section>}
     </div>
 
-    <section className="form-card">
-      <h3>Pitch evidence</h3>
-      <blockquote className="pitch-text">{session.pitch.pitch}</blockquote>
-      <p className="muted">The rubric detects written patterns. Supplied signals are not independently verified facts. A deal does not establish pitch quality.</p>
-      {session.answers.map((answer) => <section key={answer.investor}>
-        <h4>{NEGOTIATION_RULES.investors[answer.investor].name}</h4>
-        <blockquote className="pitch-text">{answer.text}</blockquote>
-        {answer.evidence.repeated && <p>This response repeats an earlier answer.</p>}
-        <ul className="evidence-list">{answer.evidence.signals.map(({ signal, status }) => <li key={signal}>
-          <strong>{status === "supplied" ? "Signal detected" : "Signal not identified"}</strong> · {signalCopy[signal]}
-        </li>)}</ul>
-      </section>)}
-    </section>
+    <PerformanceScorecard session={session} />
 
     <section className="form-card">
       <h3>Investor decisions</h3>
+      {session.outcome?.kind === "no-offers" && <section aria-label="Why there were no opening offers">
+        <h4>Why there were no opening offers</h4>
+        <p>The scripted investors need to recognize specific signals in each answer before they make an offer. A repeated answer can also lead an investor to pass.</p>
+        <p>The simulator can miss valid evidence. These decisions give you feedback about this practice run and do not assess the viability of your business.</p>
+      </section>}
       {session.history.map((event, index) => {
         if (event.kind !== "opening" && event.kind !== "counter") return null;
         return <p key={session.id + index}><strong>{NEGOTIATION_RULES.investors[event.investor].name}</strong> · {
@@ -55,14 +58,28 @@ export function Debrief({ session, headingRef, onExit }: {
     <section className="form-card">
       <h3>Negotiation performance</h3>
       <p>You used {session.roundsUsed} of {NEGOTIATION_RULES.counterBudget} shared counters.</p>
+      <WithdrawalConclusion session={session} />
       <p>{counters.length
         ? "Review how your requested funding and equity changed the investors’ responses."
         : "You made your final decision without countering. Review whether the available funding and ownership matched your limits."}</p>
       <NegotiationHistory session={session} />
+      <DecisionAnalysis session={session} />
     </section>
 
     <section className="form-card">
       <h3>Financial consequences</h3>
+      {accepted && cap && <details className="negotiation-details">
+        <summary>How to read your deal</summary>
+        <dl>
+          <div><dt>Pre-money and post-money valuation</dt>
+            <dd>Pre-money is the implied company value before the new cash. Post-money adds the investment. These values come from the agreed terms.</dd></div>
+          <div><dt>Ownership and dilution</dt>
+            <dd>Your share went from {percent(cap.founderBeforeBps)} to {percent(cap.founderAfterBps)}.
+              Percentage-point dilution subtracts those two percentages. Relative dilution measures the decrease against your original share.</dd></div>
+        </dl>
+        <p>For example, a move from 60% to 54% is a drop of 6 percentage points, or 10% of the original share.</p>
+        {cap.founderRelativeDilutionBps === null && <p>Relative dilution is undefined when your original share is zero.</p>}
+      </details>}
       {accepted && cap ? <>
         <p>Primary equity investment. Existing holders keep a proportional share of the remaining equity.</p>
         <div className="ownership-bar" aria-hidden="true">
@@ -98,6 +115,7 @@ export function Debrief({ session, headingRef, onExit }: {
         : session.outcome?.kind === "no-offers"
           ? "Answer each investor’s specific question with separate, clearly labeled evidence."
           : "Compare the funding you need with the ownership you are willing to give up before choosing your next terms."}</p>
+      <ReplayChallenge session={session} onStart={onExit} />
       <button className="button" type="button" onClick={onExit}>Practice again</button>
     </section>
   </div>;
