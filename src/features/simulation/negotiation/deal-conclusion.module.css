@@ -1,0 +1,15 @@
+.deal {
+  border-inline-start: 4px solid currentColor;
+  padding-inline-start: 1rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .deal {
+    animation: reveal 260ms ease-out;
+  }
+}
+
+@keyframes reveal {
+  from { transform: translateY(0.375rem); }
+  to { transform: translateY(0); }
+}

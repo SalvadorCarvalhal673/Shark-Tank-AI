@@ -4,6 +4,7 @@ import { NEGOTIATION_RULES } from "./investor-policy";
 import { historicalCounterCopy, openingCopy, outcomeCopy, ownershipPresentation, signalCopy } from "./presentation";
 import type { NegotiationSession } from "./session";
 import { percent, TermsDisplay } from "./terms-display";
+import styles from "./deal-conclusion.module.css";
 
 export function Debrief({ session, headingRef, onExit }: {
   session: NegotiationSession;
@@ -19,9 +20,10 @@ export function Debrief({ session, headingRef, onExit }: {
       <h2 ref={headingRef} tabIndex={-1}>Your debrief.</h2>
       <p className="ask-line">{accepted ? "Deal confirmed" : "No deal"}</p>
       {session.outcome && <p>{outcomeCopy[session.outcome.kind]}</p>}
-      {accepted && <section aria-label="Accepted deal">
+      {session.outcome?.kind === "accepted-deal" && accepted && <section className={styles.deal} aria-label="Accepted deal">
         <h3>Deal with {NEGOTIATION_RULES.investors[accepted.investor].name}</h3>
         <TermsDisplay terms={accepted} currency={session.pitch.currency} />
+        <p>You confirmed these terms. The investment is a simulated result and does not establish the quality of the pitch.</p>
         {opening && <details className="negotiation-details"><summary>Compare opening terms</summary>
           <TermsDisplay terms={opening} currency={session.pitch.currency} />
         </details>}
