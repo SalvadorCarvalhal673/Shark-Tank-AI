@@ -1,5 +1,7 @@
 # SE-001 — formal retirement recommendation
 
+> Administrative update, 22 November 2026: **Retired — scoped security assessment approved, 22 November 2026.** The owner approved this scoped recommendation. The dated assessment below and its JSON evidence remain unchanged historical records of the pre-approval review. See [the current exception decision](../security-exceptions.md#administrative-retirement--22-november-2026) for the retirement scope and independent deployment/Live AI requirements. This does not authorize deployment; Issue #79 tracking closes only after integration and successful verification.
+
 Review date: 21 November 2026. Reviewed develop: `d6042e1e85dbf78e707c3517f814b5e8d805a647` (PR #108 integrated). Scope: Issue #79 and the original picomatch exception; no application, dependency, lockfile, workflow, deployment or contributor-workstream changes.
 
 ## Decision for independent approval

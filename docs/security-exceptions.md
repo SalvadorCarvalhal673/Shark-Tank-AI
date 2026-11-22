@@ -1,5 +1,7 @@
 # Temporary security exceptions
 
+> Administrative status: **Retired — scoped security assessment approved, 22 November 2026.** This current status supersedes the open/pending wording in the dated records retained below. Retirement concerns only the reviewed configuration; public deployment still requires separate release verification and explicit project-owner authorization. Issue #79 tracking closes only after integration and successful post-merge verification.
+
 > Current review (21 November 2026): SE-001 remains OPEN pending independent approval. A formal retirement recommendation is available in [the scoped assessment](security/SE-001-assessment-2026-11-21.md). Advisory withdrawal is not a project code fix; the CVE registry still says PUBLISHED. Public deployment remains prohibited. Entries below are preserved historical investigation records; the latest recommendation is appended at the end.
 
 ## SE-001 — picomatch denial of service
@@ -75,3 +77,21 @@ The official GitHub advisory confirms withdrawal at2026-11-18T15:38:56Z because 
 Fresh full and production-only audits each exited0 with zero findings. The fresh production server trace still includes the vendored matcher and metadata. Reviewed application/Next paths use trusted configuration as patterns; synthetic production image requests logged only fixed `**` patterns while treating request URL text as subjects. No current untrusted pattern-authoring path was found. This combination, rather than withdrawal or a zero audit alone, supports the scoped retirement recommendation.
 
 No separate exploitable application vulnerability was confirmed in this focused review. Paid-AI access control/trusted ownership/durable budgets and consent integration, actual release-artifact/hosting verification, ongoing pattern trust and privacy review remain independent requirements. Live inference stays disabled. Closing this exception would not satisfy these requirements or authorize deployment. All original investigation and prior phase evidence above remain historical records, not rewritten claims of a code fix.
+
+### Administrative retirement — 22 November 2026
+
+**Retired — scoped security assessment approved, 22 November 2026.** The project owner explicitly approved the independently reviewed recommendation and authorized integration through PR #109. The 21 November assessment and JSON evidence remain historical review records; their then-open status is not the current administrative decision.
+
+Decision and scope:
+
+- GitHub advisory GHSA-fc5q-39xc-vjpf was withdrawn because the report was not considered a security issue.
+- The official CVE record was still PUBLISHED during the 21 November assessment. This retirement does not assert CVE rejection or agreement among all registries.
+- No application or dependency remediation occurred. No package was patched, upgraded or downgraded; existing installed and vendored matcher behavior was not changed.
+- No requester-controlled pattern path was identified in the reviewed application/configuration at develop `d6042e1e85dbf78e707c3517f814b5e8d805a647`. Trusted configuration supplied the observed matcher patterns. This is a scoped applicability decision, not a guarantee that all security issues have been eliminated.
+- Retirement applies to that reviewed configuration and its documentation-only integration. It does not automatically extend to future versions, new pattern inputs, artifact contents or hosting environments. Reassess those changes independently.
+
+This removes only the original exception-based restriction. **Public deployment remains unauthorized.** Before deployment, independently complete final release-artifact security assessment, approved deployment configuration, current dependency/framework advisory checks, production secrets/network review, appropriate privacy safeguards, final QA/accessibility review and explicit project-owner deployment authorization.
+
+Live AI separately requires trusted user/session ownership, access control, consent integration and durable distributed cost enforcement. Live inference remains disabled; no API credentials, paid calls or deployment are authorized by this decision.
+
+Original investigation, dates, behavior observations and prior assessments are retained. Historical phase records or unchanged CI labels referring to an open exception do not override this administrative retirement or grant deployment permission. Issue #79 may close only after the standard merge and complete post-merge verification; final commit and results are recorded in the issue and PR.
