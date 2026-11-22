@@ -1,9 +1,11 @@
 // Procedural canvas textures painted in code at load time.
 // DECISION: no downloaded textures, so there is nothing to license or host and no extra transfer.
-// Issue #3 (materials and textures) may replace these with documented, licensed texture files.
+// Issue #3 kept this approach: every texture is original, and sizes come from TEXTURE_SPECS so the
+// memory budget in materials.ts is enforced by tests.
 import { CanvasTexture, ClampToEdgeWrapping, LinearMipmapNearestFilter, RepeatWrapping, SRGBColorSpace, type Texture } from "three";
 import { seededRandom } from "./geometry.ts";
 import { PALETTE } from "./layout.ts";
+import { textureSize, type TextureName } from "../materials.ts";
 
 type Painter = (g: CanvasRenderingContext2D, w: number, h: number) => void;
 
@@ -36,11 +38,14 @@ function grain(g: CanvasRenderingContext2D, random: () => number, y0: number, ba
 
 export type StudioTextures = Record<"floor" | "walnut" | "reeded" | "concrete" | "rug" | "contact" | "art", Texture> & { dispose: () => void };
 
-/** Texture sizes are capped at 1024 px (512 px on narrow screens) to bound GPU memory on phones. */
+/** Texture sizes come from TEXTURE_SPECS (materials.ts), which bounds GPU memory per screen class. */
 export function createStudioTextures(compact: boolean): StudioTextures {
   const random = seededRandom(7);
-  const big = compact ? 512 : 1024, small = compact ? 256 : 512;
-  const floor = paint(big, big, (g, w, h) => {
+  const sized = (name: TextureName, painter: Painter, repeat: [number, number] = [1, 1]) => {
+    const [w, h] = textureSize(name, compact);
+    return paint(w, h, painter, repeat);
+  };
+  const floor = sized("floor", (g, w, h) => {
     const planks = 8;
     for (let i = 0; i < planks; i++) {
       const base = 168 + random() * 26, y = i * h / planks;
@@ -51,13 +56,13 @@ export function createStudioTextures(compact: boolean): StudioTextures {
       g.fillRect(0, y, w, 2); g.fillRect(random() * w, y, 2, h / planks);
     }
   }, [3, 3]);
-  const walnut = paint(small, small, (g, w, h) => {
+  const walnut = sized("walnut", (g, w, h) => {
     g.fillStyle = PALETTE.walnut; g.fillRect(0, 0, w, h);
     grain(g, random, 0, h, w, 120, "25,12,5");
   });
   // One reed per texture repeat: a lit crown and shaded valleys over walnut grain, so the curved desk
   // front reads as fluted joinery without modelled flutes.
-  const reeded = paint(64, small, (g, w, h) => {
+  const reeded = sized("reeded", (g, w, h) => {
     g.fillStyle = PALETTE.walnut; g.fillRect(0, 0, w, h);
     const shade = g.createLinearGradient(0, 0, w, 0);
     shade.addColorStop(0, "rgba(20,10,4,.55)"); shade.addColorStop(.18, "rgba(20,10,4,.12)");
@@ -70,7 +75,7 @@ export function createStudioTextures(compact: boolean): StudioTextures {
     }
   });
   reeded.wrapT = ClampToEdgeWrapping;
-  const concrete = paint(small, small, (g, w, h) => {
+  const concrete = sized("concrete", (g, w, h) => {
     g.fillStyle = PALETTE.concrete; g.fillRect(0, 0, w, h);
     for (let i = 0; i < 6000; i++) {
       const light = random() > .5 ? 255 : 0;
@@ -78,18 +83,18 @@ export function createStudioTextures(compact: boolean): StudioTextures {
       g.fillRect(random() * w, random() * h, 1 + random() * 3, 1 + random() * 3);
     }
   }, [2, 1]);
-  const rug = paint(small, small, (g, w, h) => {
+  const rug = sized("rug", (g, w, h) => {
     g.fillStyle = PALETTE.rug; g.fillRect(0, 0, w, h);
     g.strokeStyle = "rgba(201,160,99,.6)"; g.lineWidth = w / 85; g.strokeRect(w * .043, h * .043, w * .914, h * .914);
     g.lineWidth = w / 256; g.strokeRect(w * .078, h * .078, w * .844, h * .844);
   });
-  const contact = paint(128, 128, (g, w, h) => {
+  const contact = sized("contact", (g, w, h) => {
     const shade = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
     shade.addColorStop(0, "rgba(30,20,12,.55)"); shade.addColorStop(1, "rgba(30,20,12,0)");
     g.fillStyle = shade; g.fillRect(0, 0, w, h);
   });
   contact.wrapS = contact.wrapT = ClampToEdgeWrapping;
-  const art = paint(small, small * 1.25, (g, w, h) => {
+  const art = sized("art", (g, w, h) => {
     g.fillStyle = "#efe7da"; g.fillRect(0, 0, w, h);
     [PALETTE.brass, PALETTE.rug, "#a8552f", "#22324c"].forEach((color, i) => {
       g.globalAlpha = .85; g.fillStyle = color;

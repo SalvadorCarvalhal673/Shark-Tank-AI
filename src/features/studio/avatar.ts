@@ -1,7 +1,8 @@
 import { AnimationMixer, MeshStandardMaterial, SkinnedMesh, type Object3D, type Skeleton } from "three";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import type { InvestorId } from "../simulation/negotiation/investor-policy.ts";
-import { belongsToOtherInvestor } from "./rig.ts";
+import { belongsToOtherInvestor, type RigMaterial } from "./rig.ts";
+import { CHARACTER_FINISH } from "./materials.ts";
 
 const colors = {
  maya: {Jacket:"#25362f",Hair:"#171c19",Skin:"#b97957"},
@@ -24,6 +25,12 @@ export function createInvestorInstance(source: Object3D, investor: InvestorId) {
    const material=original.clone() as MeshStandardMaterial;
    const color=colors[investor][material.name as keyof typeof colors.maya];
    if(color) material.color.set(color);
+   const finish=CHARACTER_FINISH[material.name as RigMaterial];
+   if(finish){
+    material.flatShading=false;material.roughness=finish.roughness;material.metalness=finish.metalness;
+    if(finish.emissive){material.emissive.copy(material.color);material.emissiveIntensity=finish.emissive;}
+    material.needsUpdate=true;
+   }
    ownedMaterials.push(material); return material;
   });
   object.material=Array.isArray(object.material)?cloned:cloned[0];
