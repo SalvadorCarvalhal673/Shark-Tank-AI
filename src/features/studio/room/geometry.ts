@@ -5,17 +5,17 @@
 // call per material (about 20) instead of one per object (about 400 in the unmerged concept),
 // which keeps the whole studio inside the 60 draw-call phone budget enforced by the browser suite.
 import {
-  BoxGeometry, BufferGeometry, CircleGeometry, Color, CylinderGeometry, Euler, ExtrudeGeometry,
-  Float32BufferAttribute, Matrix4, PlaneGeometry, QuadraticBezierCurve3, Quaternion, RingGeometry,
-  Shape, SphereGeometry, Vector3,
+  BoxGeometry, BufferGeometry, CapsuleGeometry, CatmullRomCurve3, CircleGeometry, Color, CylinderGeometry, Euler,
+  ExtrudeGeometry, Float32BufferAttribute, Matrix4, PlaneGeometry, QuadraticBezierCurve3, Quaternion, RingGeometry,
+  Shape, SphereGeometry, TubeGeometry, Vector3,
 } from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { FOUNDER, PALETTE, ROOM, SEAT_X, SEAT_Z } from "./layout.ts";
+import { CHAIR, DESK_SURFACE_Y, FOUNDER, PALETTE, ROOM, SEAT_X, SEAT_Z } from "./layout.ts";
 
 export const ROOM_MATERIALS = [
   "floor", "rug", "ceiling", "oak", "walnut", "walnutDark", "concrete", "stone", "leather", "brass",
-  "steel", "glass", "glow", "plant", "dark", "paper", "books", "skyline", "contact", "founderMark", "art",
+  "steel", "glass", "glow", "plant", "dark", "paper", "books", "skyline", "contact", "founderMark", "art", "reeded",
 ] as const;
 export type RoomMaterial = typeof ROOM_MATERIALS[number];
 export type RoomGeometry = { parts: Map<RoomMaterial, BufferGeometry>; triangles: number; dispose: () => void };
@@ -33,6 +33,11 @@ export function seededRandom(seed: number) {
 
 class Builder {
   private groups = new Map<RoomMaterial, BufferGeometry[]>();
+  /** Closed furniture volumes the seated investors must never enter; used by the fit tests. */
+  readonly solids: BufferGeometry[] = [];
+  solid(material: RoomMaterial, source: BufferGeometry, position?: Vec3, rotation?: Vec3, scale?: Vec3) {
+    this.solids.push(this.add(material, source, position, rotation, scale).clone());
+  }
   add(material: RoomMaterial, source: BufferGeometry, position: Vec3 = [0, 0, 0], rotation: Vec3 = [0, 0, 0],
     scale: Vec3 = [1, 1, 1], color?: string) {
     const geometry = source.index ? source.toNonIndexed() : source.clone();
@@ -51,6 +56,7 @@ class Builder {
     const list = this.groups.get(material) ?? [];
     list.push(geometry);
     this.groups.set(material, list);
+    return geometry;
   }
   finish(): RoomGeometry {
     const parts = new Map<RoomMaterial, BufferGeometry>();
@@ -84,22 +90,56 @@ function deskShapes() {
   return { top, inlay };
 }
 
-/** Curved modesty panel that follows the front edge of the desk. */
-function deskSkirt() {
-  const curve = new QuadraticBezierCurve3(new Vector3(-3.9, 0, 1.34), new Vector3(0, 0, 2.38), new Vector3(3.9, 0, 1.34));
-  const points = curve.getPoints(32);
+/** Front edge of the desk at floor level, used by the skirt, plinth and kick rail. */
+function deskFrontCurve(inset = 0, y = 0) {
+  return new QuadraticBezierCurve3(new Vector3(-3.9, y, 1.34 - inset), new Vector3(0, y, 2.38 - inset), new Vector3(3.9, y, 1.34 - inset));
+}
+
+/** Width of one vertical reed on the desk front, in metres. */
+export const REED_WIDTH = .04;
+
+/**
+ * Curved panel that follows the front edge of the desk. The u coordinate counts reeds along the
+ * curve, so the reeded walnut texture keeps a constant 4 cm reed width.
+ * DECISION: the walnut front is reeded (vertical flutes) so the desk reads as joinery rather than
+ * a placeholder board. The reeds are painted in the texture, not modelled: modelled flutes needed
+ * about 2,600 sliver triangles, which slowed the software renderer used by CI by about 15 %.
+ */
+function deskSkirt(bottom: number, top: number, inset = 0) {
+  const curve = deskFrontCurve(inset), columns = 48, reeds = Math.round(curve.getLength() / REED_WIDTH);
   const position: number[] = [], uv: number[] = [], index: number[] = [];
-  points.forEach((p, i) => {
-    position.push(p.x, .12, p.z, p.x, 1.12, p.z);
-    uv.push(i / 32 * 4, 0, i / 32 * 4, 1);
+  const point = new Vector3();
+  for (let i = 0; i <= columns; i++) {
+    const t = i / columns;
+    curve.getPointAt(t, point);
+    position.push(point.x, bottom, point.z, point.x, top, point.z);
+    uv.push(t * reeds, 0, t * reeds, 1);
     if (i) { const a = (i - 1) * 2; index.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
-  });
+  }
   const geometry = new BufferGeometry();
   geometry.setAttribute("position", new Float32BufferAttribute(position, 3));
   geometry.setAttribute("uv", new Float32BufferAttribute(uv, 2));
   geometry.setIndex(index);
   geometry.computeVertexNormals();
   return geometry;
+}
+
+/** Rotates a prop, then lifts it so its lowest point rests exactly on the desk surface. */
+export function restOnDesk(source: BufferGeometry, x: number, z: number, rotation: Vec3 = [0, 0, 0]) {
+  source.applyMatrix4(new Matrix4().makeRotationFromEuler(new Euler(...rotation)));
+  source.computeBoundingBox();
+  source.translate(x, DESK_SURFACE_Y - source.boundingBox!.min.y, z);
+  return source;
+}
+
+/** Per-seat desk dressing. Exported so tests can check every prop rests on the surface. */
+export function deskProps(seatX: number): { material: RoomMaterial; geometry: BufferGeometry }[] {
+  return [
+    { material: "dark", geometry: restOnDesk(new RoundedBoxGeometry(.34, .02, .24, 1, .008), seatX - .12, 1.25, [0, .15, 0]) },
+    { material: "paper", geometry: restOnDesk(new BoxGeometry(.22, .01, .3), seatX + .28, 1.3, [0, -.2, 0]) },
+    { material: "glass", geometry: restOnDesk(new CylinderGeometry(.035, .03, .14, 12), seatX + .5, 1.05) },
+    { material: "brass", geometry: restOnDesk(new RoundedBoxGeometry(.5, .08, .04, 1, .01), seatX, 1.62, [-.35, 0, 0]) },
+  ];
 }
 
 function addShell(b: Builder) {
@@ -125,32 +165,78 @@ function addShell(b: Builder) {
 
 function addDesk(b: Builder) {
   const { top, inlay } = deskShapes();
-  b.add("stone", new ExtrudeGeometry(top, { depth: .07, bevelEnabled: true, bevelThickness: .02, bevelSize: .025, bevelSegments: 2, curveSegments: 32 }),
+  const slabBottom = ROOM.deskTopY - .09;
+  b.solid("stone", new ExtrudeGeometry(top, { depth: .07, bevelEnabled: true, bevelThickness: .02, bevelSize: .025, bevelSegments: 2, curveSegments: 32 }),
     [0, ROOM.deskTopY, 0], [Math.PI / 2, 0, 0]);
-  b.add("brass", new ExtrudeGeometry(inlay, { depth: .08, bevelEnabled: false, curveSegments: 32 }), [0, ROOM.deskTopY + .005, 0], [Math.PI / 2, 0, 0]);
-  b.add("walnut", deskSkirt());
-  for (const x of [-3.4, 3.4]) b.add("walnutDark", new RoundedBoxGeometry(.22, 1.12, .5, 2, .04), [x, .56, 1.05]);
-  // Desk dressing per seat: tablet, notepad, water glass and brass name plate.
-  SEAT_X.forEach(x => {
-    b.add("dark", new RoundedBoxGeometry(.34, .02, .24, 1, .008), [x - .12, 1.285, 1.25], [0, .15, 0]);
-    b.add("paper", new BoxGeometry(.22, .01, .3), [x + .28, 1.28, 1.3], [0, -.2, 0]);
-    b.add("glass", new CylinderGeometry(.035, .03, .14, 12), [x + .5, 1.34, 1.05]);
-    b.add("brass", new RoundedBoxGeometry(.5, .08, .04, 1, .01), [x, 1.3, 1.62], [-.35, 0, 0]);
-  });
+  // Brass edge band, flush with the finished surface and as deep as the slab.
+  b.add("brass", new ExtrudeGeometry(inlay, { depth: .11, bevelEnabled: false, curveSegments: 32 }), [0, DESK_SURFACE_Y, 0], [Math.PI / 2, 0, 0]);
+  // Dark shadow reveal under the slab, so the stone appears to float above the walnut.
+  b.add("dark", deskSkirt(slabBottom - .035, slabBottom, .025));
+  b.add("reeded", deskSkirt(.16, slabBottom - .035));
+  // Recessed dark plinth and a brass kick rail at the foot of the skirt.
+  b.add("dark", deskSkirt(0, .16, .04));
+  b.add("brass", new TubeGeometry(deskFrontCurve(.01, .16), 64, .012, 6, false));
+  for (const x of [-3.4, 3.4]) {
+    b.solid("walnutDark", new RoundedBoxGeometry(.22, slabBottom, .5, 2, .04), [x, slabBottom / 2, 1.05]);
+    b.add("brass", new BoxGeometry(.24, .03, .52), [x, .015, 1.05]);
+  }
+  for (const x of SEAT_X) for (const prop of deskProps(x)) b.add(prop.material, prop.geometry);
+}
+
+/**
+ * Channel-tufted executive chair sized to SEATED_BODY (see layout.ts).
+ * DECISION: the back is built from horizontal leather rolls rather than one flat slab. Rolls read
+ * as sculpted upholstery in the close investor cameras and are closed shapes, so they can be tested
+ * for body intersections. Tessellation is deliberately coarse (about 4,000 triangles for all three
+ * chairs): the desk and investors hide most of each chair, and denser chairs pushed the software
+ * renderer used by CI below the frame rate its camera test needs.
+ */
+function addChair(b: Builder, x: number) {
+  const c = CHAIR, at = (dx: number, y: number, dz: number): Vec3 => [x + dx, y, SEAT_Z + dz];
+  // Seat: cushion, front waterfall roll, dark shell and tilt mechanism.
+  b.solid("leather", new RoundedBoxGeometry(c.cushionWidth, c.cushionThickness, c.cushionDepth - .06, 2, .045),
+    at(0, c.cushionTop - c.cushionThickness / 2, -.03));
+  b.solid("leather", new CapsuleGeometry(.05, c.cushionWidth - .1, 2, 10), at(0, c.cushionTop - .05, c.cushionDepth / 2 - .05), [0, 0, Math.PI / 2]);
+  b.add("dark", new BoxGeometry(c.cushionWidth - .04, .04, c.cushionDepth - .04), at(0, c.cushionTop - c.cushionThickness - .02, 0));
+  b.add("dark", new BoxGeometry(.22, .06, .2), at(0, c.cushionTop - c.cushionThickness - .07, 0));
+  // Back: reclined stack of rolls on a leather shell that stops below the head.
+  const rollZ = (y: number) => c.backFrontAtBottom - c.backRollRadius * .7 - (y - c.backBottomY) * c.recline;
+  for (let i = 0; i < c.backRolls; i++) {
+    const y = c.backBottomY + i * c.backStep;
+    b.solid("leather", new CapsuleGeometry(c.backRollRadius, c.cushionWidth - .16, 2, 10), [x, y, rollZ(y)],
+      [-Math.atan(c.recline), 0, Math.PI / 2], [1, 1, .7]);
+  }
+  const backMid = c.backBottomY + (c.backRolls - 1) * c.backStep / 2, backHeight = (c.backRolls - 1) * c.backStep + .2;
+  b.solid("leather", new RoundedBoxGeometry(c.cushionWidth - .02, backHeight, .06, 1, .025),
+    [x, backMid, rollZ(backMid) - c.backRollRadius * .7 - .02], [-Math.atan(c.recline), 0, 0]);
+  // Arms: polished steel loops from under the seat, topped with padded leather.
+  for (const s of [-1, 1]) {
+    const ax = s * c.armX, low = c.cushionTop - c.cushionThickness - .02, pad = c.armPadTop - .04;
+    const loop = new CatmullRomCurve3([
+      new Vector3(ax * .9, low, .2), new Vector3(ax, pad - .05, .22), new Vector3(ax, pad, .12),
+      new Vector3(ax, pad, -.12), new Vector3(ax, pad - .05, -.2), new Vector3(ax * .9, low, -.18),
+    ]);
+    b.add("steel", new TubeGeometry(loop, 16, .014, 5, false), [x, 0, SEAT_Z]);
+    b.solid("leather", new RoundedBoxGeometry(.075, .04, .36, 1, .018), at(ax, c.armPadTop - .02, 0));
+  }
+  // Base: gas column, five tapered aluminium arms and casters.
+  const columnTop = c.cushionTop - c.cushionThickness - .1;
+  b.add("steel", new CylinderGeometry(.024, .028, columnTop - .1, 8), at(0, (columnTop + .1) / 2, 0));
+  b.add("dark", new CylinderGeometry(.042, .05, .14, 8), at(0, .17, 0));
+  b.add("steel", new CylinderGeometry(.06, .07, .05, 10), at(0, .085, 0));
+  for (let k = 0; k < 5; k++) {
+    const a = k / 5 * Math.PI * 2 + Math.PI / 2, arm = new BoxGeometry(.3, .035, .05, 4, 1, 1);
+    const p = arm.attributes.position;
+    for (let i = 0; i < p.count; i++) { const u = (p.getX(i) + .15) / .3; p.setZ(i, p.getZ(i) * (1 - u * .4)); p.setY(i, p.getY(i) * (1 - u * .3) - u * .02); }
+    arm.computeVertexNormals();
+    b.add("steel", arm, at(Math.cos(a) * .17, .085, Math.sin(a) * .17), [0, -a, 0]);
+    b.add("dark", new CylinderGeometry(.028, .028, .03, 8), at(Math.cos(a) * .32, .03, Math.sin(a) * .32), [Math.PI / 2, -a, 0]);
+    b.add("dark", new BoxGeometry(.035, .04, .03), at(Math.cos(a) * .32, .065, Math.sin(a) * .32), [0, -a, 0]);
+  }
 }
 
 function addChairs(b: Builder) {
-  for (const x of SEAT_X) {
-    const at = (dx: number, y: number, dz: number): Vec3 => [x + dx, y, SEAT_Z + dz];
-    b.add("leather", new RoundedBoxGeometry(.78, .16, .74, 2, .07), at(0, .68, 0));
-    b.add("leather", new RoundedBoxGeometry(.78, 1.05, .14, 2, .06), at(0, 1.22, -.36), [-.1, 0, 0]);
-    for (const s of [-1, 1]) b.add("steel", new RoundedBoxGeometry(.07, .05, .5, 1, .02), at(s * .42, .92, -.02));
-    b.add("steel", new CylinderGeometry(.04, .05, .55, 12), at(0, .36, 0));
-    for (let k = 0; k < 5; k++) {
-      const a = k / 5 * Math.PI * 2;
-      b.add("steel", new BoxGeometry(.42, .04, .06), at(Math.cos(a) * .2, .07, Math.sin(a) * .2), [0, -a, 0]);
-    }
-  }
+  for (const x of SEAT_X) addChair(b, x);
 }
 
 function addFounderMark(b: Builder) {
@@ -213,7 +299,7 @@ function addContactShadows(b: Builder) {
   const decal = (x: number, z: number, w: number, d: number) =>
     b.add("contact", new PlaneGeometry(w, d), [x, .009, z], [-Math.PI / 2, 0, 0]);
   decal(0, 1.2, 9.4, 2.6);
-  SEAT_X.forEach(x => decal(x, SEAT_Z, 1.2, 1.2));
+  SEAT_X.forEach(x => decal(x, SEAT_Z, 1.0, 1.0));
   for (const [x, z] of [[-6.6, -2.6], [6.7, -2.6], [-6.9, 4.5]] as const) decal(x, z, 1.3, 1.3);
   for (const x of [-5.4, 5.4]) decal(x, -2.8, 3.0, .9);
   decal(FOUNDER.lecternX, FOUNDER.lecternZ, .8, .7);
@@ -256,6 +342,16 @@ export function createSkyGeometry() {
   }
   geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
   return geometry;
+}
+
+/** Only the desk and chairs, with their closed volumes, for the seated-fit tests. */
+export function buildInvestorFurniture() {
+  const b = new Builder();
+  addDesk(b);
+  addChairs(b);
+  const { solids } = b;
+  b.finish().dispose();
+  return solids;
 }
 
 export function buildStudioRoom(seed = 42): RoomGeometry {
