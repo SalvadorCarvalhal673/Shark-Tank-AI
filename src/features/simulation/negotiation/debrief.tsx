@@ -1,4 +1,5 @@
 import type { Ref } from "react";
+import { DecisionAnalysis } from "./decision-analysis";
 import { NegotiationHistory } from "./history";
 import { NEGOTIATION_RULES } from "./investor-policy";
 import { historicalCounterCopy, openingCopy, ownershipPresentation, signalCopy } from "./presentation";
@@ -63,6 +64,7 @@ export function Debrief({ session, headingRef, onExit }: {
         ? "Review how your requested funding and equity changed the investors’ responses."
         : "You made your final decision without countering. Review whether the available funding and ownership matched your limits."}</p>
       <NegotiationHistory session={session} />
+      <DecisionAnalysis session={session} />
     </section>
 
     <section className="form-card">
