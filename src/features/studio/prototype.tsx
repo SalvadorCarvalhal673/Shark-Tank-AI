@@ -10,7 +10,7 @@ import { INVESTOR_ORDER, NEGOTIATION_RULES, type InvestorId } from "../simulatio
 import { counterCopy, openingCopy, outcomeCopy } from "../simulation/negotiation/presentation";
 import { money } from "../simulation/pitch";
 import { percent } from "../simulation/negotiation/terms-display";
-import { demoScenarios, financialPreview, sceneCue, type CameraView } from "./model";
+import { activeSpeaker, demoScenarios, financialPreview, sceneCue, type CameraView } from "./model";
 import type { StudioSceneProps } from "./scene";
 import { DialoguePanel } from "./dialogue-panel";
 import { counterBinding } from "./counter-binding";
@@ -48,6 +48,12 @@ export function StudioPrototype(){
   Promise.resolve().then(update);preference.addEventListener("change",update);
   return ()=>preference.removeEventListener("change",update);
  },[]);
+ // Active-speaker camera (Issue #19): when a new moment is committed, frame its speaker once. This is
+ // derived during render from committed state, so no camera callback ever dispatches an action, and a
+ // later manual choice (select / Full panel) interrupts it until the next moment.
+ const speaker=activeSpeaker(session);
+ const [followed,setFollowed]=useState(speaker.key);
+ if(followed!==speaker.key){setFollowed(speaker.key);setView(speaker.view);}
  function select(investor: InvestorId){setSelected(investor);setView(investor);}
  function failed(reason:string){setFailure(reason);setThreeD(false);}
  const preview=financialPreview(amount,equity,session?.pitch.founderOwnershipBps ?? 8000);
@@ -87,7 +93,7 @@ export function StudioPrototype(){
       {threeD ? "Use simplified view" : "Enter 3D studio"}</button>
      <label><input type="checkbox" checked={!motion} onChange={event=>setMotion(!event.target.checked)}/> Reduce motion</label>
     </div>
-    <div className="studio-viewport" data-view={view} data-motion={motion?"animated":"reduced"} data-testid="studio-viewport">
+    <div className="studio-viewport" data-view={view} data-speaker={speaker.view} data-motion={motion?"animated":"reduced"} data-testid="studio-viewport">
      {threeD ? <SceneBoundary onFailure={failed}>
       <Scene view={view} selected={selected} session={session} reducedMotion={!motion}
        fault={fault} onSelect={select} onFailure={failed} onMetrics={setMetrics}/>
@@ -102,7 +108,7 @@ export function StudioPrototype(){
        </button>)}</div><div className="studio-flat-table" aria-hidden="true"/>
       <p className="studio-simplified-label">Simplified view · same session, same controls</p>
      </div>}
-     <div className="studio-scene-caption" aria-hidden="true">FOUNDER CAM / {view.toUpperCase()}</div>
+     <div className="studio-scene-caption" aria-hidden="true">FOUNDER CAM / {view.toUpperCase()}{session && view===speaker.view ? " · FOLLOWING SPEAKER" : ""}</div>
     </div>
     {failure && <p role="status" className="studio-notice">{failure}</p>}
     <div className="studio-investors" aria-label="Select investor">
