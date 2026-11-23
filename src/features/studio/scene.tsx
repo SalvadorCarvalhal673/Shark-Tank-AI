@@ -3,11 +3,12 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { Color, LoopOnce, Vector3 } from "three";
+import { Color, LoopOnce, PerspectiveCamera, Vector3, type Camera } from "three";
 import { createInvestorInstance } from "./avatar";
+import { CAST_URL, REDUCED_MOTION_POSE } from "./rig";
 import { StudioRoom } from "./room/studio-room";
 import { SEAT_X } from "./room/layout";
-import { cameraPresets, cameraStep, sceneCue, type CameraView } from "./model";
+import { cameraEase, cameraFov, cameraPresets, sceneCue, type CameraView } from "./model";
 import { INVESTOR_ORDER, type InvestorId } from "../simulation/negotiation/investor-policy";
 import type { NegotiationSession } from "../simulation/negotiation/session";
 
@@ -18,40 +19,46 @@ export type StudioSceneProps = {
  onSelect:(investor:InvestorId)=>void;onFailure:(reason:string)=>void;onMetrics:(value:Metrics)=>void;
 };
 export function clearFailedAsset(){
- useLoader.clear(GLTFLoader,"/studio/investor-v1.glb");
+ useLoader.clear(GLTFLoader,CAST_URL);
  useLoader.clear(GLTFLoader,"/studio/intentionally-unavailable.glb");
 }
 const positions = SEAT_X;
 function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:StudioSceneProps}){
- const {scene,animations}=useLoader(GLTFLoader,props.fault==="asset"?"/studio/intentionally-unavailable.glb":"/studio/investor-v1.glb");
+ const {scene,animations}=useLoader(GLTFLoader,props.fault==="asset"?"/studio/intentionally-unavailable.glb":CAST_URL);
  const instance=useMemo(()=>createInvestorInstance(scene,investor),[scene,investor]);
  const {invalidate}=useThree();
  const cue=sceneCue(props.session,investor);
  const action=useRef<ReturnType<typeof instance.mixer.clipAction> | null>(null);
  useEffect(()=>{
-  const clip=animations.find(clip=>clip.name===cue.pose);
+  const clip=animations.find(clip=>clip.name===cue.clip);
   if(!clip)return;
   const next=instance.mixer.clipAction(clip);
   action.current?.fadeOut(.16);next.reset().setLoop(LoopOnce,1);
   next.clampWhenFinished=true;next.fadeIn(.16).play();action.current=next;
-  if(props.reducedMotion){instance.mixer.update(cue.pose==="Listening"?0:.8);next.paused=true;}
+  if(props.reducedMotion){instance.mixer.update(REDUCED_MOTION_POSE[cue.clip]);next.paused=true;}
   invalidate();
 
- },[animations,cue.key,cue.pose,instance,props.reducedMotion,invalidate]);
+ },[animations,cue.key,cue.clip,instance,props.reducedMotion,invalidate]);
  useEffect(()=>()=>instance.dispose(),[instance]);
  useFrame((_,delta)=>{if(!props.reducedMotion)instance.mixer.update(Math.min(delta,.05));});
  return <group position={[positions[index],0,0]} onClick={event=>{event.stopPropagation();props.onSelect(investor);}}>
   <primitive object={instance.root} dispose={null}/>
-  {investor==="adrian" && <group position={[0,2.07,.21]}>
-   {[-.088,.088].map(x=><mesh key={x} position={[x,0,0]}><torusGeometry args={[.052,.007,5,14]}/><meshStandardMaterial color="#b59d68" metalness={.5} roughness={.5}/></mesh>)}
-  </group>}
   <mesh position={[0,.03,0]} rotation={[-Math.PI/2,0,0]}>
    <ringGeometry args={[.37,.40,28]}/><meshBasicMaterial color={props.selected===investor?"#d5f27d":"#344735"}/>
   </mesh>
  </group>;
 }
+/** Moves a perspective camera's field of view a fraction of the way to the target and reprojects. */
+function easeFov(camera:Camera,fov:number,step:number){
+ if(!(camera instanceof PerspectiveCamera) || Math.abs(camera.fov-fov)<=.01)return;
+ camera.fov+=(fov-camera.fov)*step;camera.updateProjectionMatrix();
+}
+/** Squared distance (metres) under which a moving camera snaps exactly onto its preset. */
+const SETTLED=1e-6;
+const goal=new Vector3();
 function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;visible:boolean}){
- const {camera,gl,invalidate,scene}=useThree();
+ const {camera,gl,invalidate,scene,size}=useThree();
+ const fov=cameraFov(props.view,size.width/Math.max(size.height,1));
  const target=useRef(new Vector3(0,1.45,.1));
  const settleFrames=useRef(3);
  const onFailure=props.onFailure;
@@ -59,11 +66,14 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
  const pose=cameraPresets[props.view];
  useEffect(()=>{
   wakeUntil.current=performance.now()+3200; samples.current=[];settleFrames.current=3;
-  if(props.reducedMotion){camera.position.fromArray(pose.position);target.current.fromArray(pose.target);camera.lookAt(target.current);}
+  if(props.reducedMotion){
+   camera.position.fromArray(pose.position);target.current.fromArray(pose.target);camera.lookAt(target.current);
+   easeFov(camera,fov,1);
+  }
   invalidate();
   const measurement=setTimeout(()=>invalidate(),900);
   return ()=>clearTimeout(measurement);
- },[pose,props.session?.revision,props.reducedMotion,camera,invalidate,ready,visible]);
+ },[pose,fov,props.session?.revision,props.reducedMotion,camera,invalidate,ready,visible]);
  useEffect(()=>{
   const canvas=gl.domElement;
   const lost=(event:Event)=>{event.preventDefault();onFailure("The graphics context was lost. Simplified view keeps your session, drafts and saved progress.");};
@@ -71,13 +81,25 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
   return ()=>canvas.removeEventListener("webglcontextlost",lost);
  },[gl,onFailure]);
  useFrame((_,delta)=>{
-  const step=cameraStep(delta,props.reducedMotion);
+  // Hidden pages render nothing at once, even before React applies frameloop="never".
+  if(document.hidden)return;
+  const step=cameraEase(delta,props.reducedMotion);
   camera.position.lerp(new Vector3(...pose.position),step);
   target.current.lerp(new Vector3(...pose.target),step);camera.lookAt(target.current);
+  // The field of view eases with the same step, so shot changes and window resizes never jump.
+  easeFov(camera,fov,step);
   const now=performance.now();
   if(delta>0 && delta<.25)samples.current.push(delta*1000);
   if(samples.current.length>180)samples.current.shift();
-  if(now-lastSample.current>750){
+  // Keep rendering until the shot has actually arrived, not only for a fixed time: on a slow device
+  // the eased camera needs more frames, and stopping early would leave it short of its preset.
+  const arriving=!props.reducedMotion && (camera.position.distanceToSquared(goal.fromArray(pose.position))>SETTLED || target.current.distanceToSquared(goal.fromArray(pose.target))>SETTLED);
+  if(!arriving && !props.reducedMotion){camera.position.fromArray(pose.position);target.current.fromArray(pose.target);camera.lookAt(target.current);}
+  const continuing=settleFrames.current-->0 || arriving || (now<wakeUntil.current && !props.reducedMotion);
+  if(continuing)invalidate();
+  // Metrics are sampled every 750 ms, and always on the last frame before rendering stops. Without
+  // that, a slow device that arrives after the wake window would keep reporting a pre-arrival camera.
+  if(now-lastSample.current>750 || !continuing){
    const frames=[...samples.current].sort((a,b)=>a-b);
    const mean=frames.reduce((a,b)=>a+b,0)/(frames.length||1);
    const context=gl.getContext(),extension=context.getExtension("WEBGL_debug_renderer_info");
@@ -96,7 +118,6 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
     camera:camera.position.toArray().map(v=>Math.round(v*100)/100),characters,skeletons:skeletons.size,mixers:mixers.size});
    lastSample.current=now;
   }
-  if(settleFrames.current-->0 || (now<wakeUntil.current && !props.reducedMotion))invalidate();
  });
  return null;
 }

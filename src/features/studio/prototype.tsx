@@ -10,8 +10,13 @@ import { INVESTOR_ORDER, NEGOTIATION_RULES, type InvestorId } from "../simulatio
 import { counterCopy, openingCopy, outcomeCopy } from "../simulation/negotiation/presentation";
 import { money } from "../simulation/pitch";
 import { percent } from "../simulation/negotiation/terms-display";
-import { demoScenarios, financialPreview, sceneCue, type CameraView } from "./model";
+import { activeSpeaker, demoScenarios, financialPreview, sceneCue, type CameraView } from "./model";
 import type { StudioSceneProps } from "./scene";
+import { DialoguePanel } from "./dialogue-panel";
+import { counterBinding } from "./counter-binding";
+import { latestConcession } from "./concession";
+import { ConcessionNote, WithdrawalNote } from "./concession-note";
+import { latestWithdrawal } from "./withdrawal";
 
 const Scene = dynamic(()=>import("./scene").then(module=>module.StudioScene),{
  ssr:false,loading:()=> <p className="studio-loading" role="status">Loading 3D code… HTML controls are ready.</p>,
@@ -46,11 +51,18 @@ export function StudioPrototype(){
   Promise.resolve().then(update);preference.addEventListener("change",update);
   return ()=>preference.removeEventListener("change",update);
  },[]);
+ // Active-speaker camera (Issue #19): when a new moment is committed, frame its speaker once. This is
+ // derived during render from committed state, so no camera callback ever dispatches an action, and a
+ // later manual choice (select / Full panel) interrupts it until the next moment.
+ const speaker=activeSpeaker(session);
+ const [followed,setFollowed]=useState(speaker.key);
+ if(followed!==speaker.key){setFollowed(speaker.key);setView(speaker.view);}
  function select(investor: InvestorId){setSelected(investor);setView(investor);}
  function failed(reason:string){setFailure(reason);setThreeD(false);}
  const preview=financialPreview(amount,equity,session?.pitch.founderOwnershipBps ?? 8000);
  const activeOffer=session?.offers.find(offer=>offer.investor===selected && offer.status==="active");
- const canCounter=Boolean(session?.stage==="negotiation" && activeOffer);
+ const binding=counterBinding(session,selected);
+ const canCounter=binding.ready;
  const latest=session?.history.findLast(event=>
   (event.kind==="counter" || event.kind==="opening") && event.investor===selected);
  const response=latest?.kind==="counter" ? counterCopy[latest.reason] :
@@ -84,7 +96,7 @@ export function StudioPrototype(){
       {threeD ? "Use simplified view" : "Enter 3D studio"}</button>
      <label><input type="checkbox" checked={!motion} onChange={event=>setMotion(!event.target.checked)}/> Reduce motion</label>
     </div>
-    <div className="studio-viewport" data-view={view} data-motion={motion?"animated":"reduced"} data-testid="studio-viewport">
+    <div className="studio-viewport" data-view={view} data-speaker={speaker.view} data-motion={motion?"animated":"reduced"} data-testid="studio-viewport">
      {threeD ? <SceneBoundary onFailure={failed}>
       <Scene view={view} selected={selected} session={session} reducedMotion={!motion}
        fault={fault} onSelect={select} onFailure={failed} onMetrics={setMetrics}/>
@@ -99,7 +111,7 @@ export function StudioPrototype(){
        </button>)}</div><div className="studio-flat-table" aria-hidden="true"/>
       <p className="studio-simplified-label">Simplified view · same session, same controls</p>
      </div>}
-     <div className="studio-scene-caption" aria-hidden="true">FOUNDER CAM / {view.toUpperCase()}</div>
+     <div className="studio-scene-caption" aria-hidden="true">FOUNDER CAM / {view.toUpperCase()}{session && view===speaker.view ? " · FOLLOWING SPEAKER" : ""}</div>
     </div>
     {failure && <p role="status" className="studio-notice">{failure}</p>}
     <div className="studio-investors" aria-label="Select investor">
@@ -110,8 +122,23 @@ export function StudioPrototype(){
     <section className="studio-dialogue" aria-label="Investor response">
      <p className="kicker">{NEGOTIATION_RULES.investors[selected].name}</p>
      <p aria-live="polite">{response}</p>
+     {session && <ConcessionNote concession={latestConcession(session,selected)} currency={session.pitch.currency}/>}
+     {session && <WithdrawalNote withdrawal={latestWithdrawal(session,selected)} currency={session.pitch.currency}/>}
      {activeOffer && <p>Current offer: <strong>{money(activeOffer.amount,session!.pitch.currency)} for {percent(activeOffer.equity)}</strong></p>}
     </section>
+    <DialoguePanel session={session}>
+    {session?.stage==="questions" && currentInvestor && <form className="studio-composer" aria-label="Your reply" onSubmit={event=>{
+     event.preventDefault();if(answer.trim().length<10 || answer.trim().length>1500)return;
+     controller.dispatch({kind:"answer",sessionId:session.id,expectedRevision:session.revision,
+       turn:session.answers.length,text:answer});setAnswer("");setFeedback("Answer submitted to the deterministic engine.");
+    }}>
+     <p className="studio-muted">Replying to {NEGOTIATION_RULES.investors[currentInvestor].name}. Their full question is the last line above.</p>
+     <label htmlFor="studio-answer">Your answer</label>
+     <textarea id="studio-answer" minLength={10} maxLength={1500} required value={answer} onChange={event=>setAnswer(event.target.value)}/>
+     <div className="studio-actions"><button type="button" onClick={()=>setAnswer(scenario.answers[session.answers.length])}>Use sample answer</button>
+      <button className="button" type="submit">Submit answer</button></div>
+    </form>}
+    </DialoguePanel>
     <details className="studio-diagnostics">
      <summary>Rendering measurements</summary>
      <p>Live counters describe this renderer only; they are not physical mobile certification.</p>
@@ -143,21 +170,12 @@ export function StudioPrototype(){
      data-revision={session?.revision ?? 0} data-rounds={session?.roundsUsed ?? 0}>
      <span>Revision <b>{session?.revision ?? 0}</b></span><span>Counters left <b>{remaining}</b></span>
     </div>
-    {session?.stage==="questions" && currentInvestor && <form onSubmit={event=>{
-     event.preventDefault();if(answer.trim().length<10 || answer.trim().length>1500)return;
-     controller.dispatch({kind:"answer",sessionId:session.id,expectedRevision:session.revision,
-       turn:session.answers.length,text:answer});setAnswer("");setFeedback("Answer submitted to the deterministic engine.");
-    }}>
-     <p>{NEGOTIATION_RULES.investors[currentInvestor].question}</p>
-     <label htmlFor="studio-answer">Your answer</label>
-     <textarea id="studio-answer" minLength={10} maxLength={1500} required value={answer} onChange={event=>setAnswer(event.target.value)}/>
-     <div className="studio-actions"><button type="button" onClick={()=>setAnswer(scenario.answers[session.answers.length])}>Use sample answer</button>
-      <button className="button" type="submit">Submit answer</button></div>
-    </form>}
     <form className="studio-financial-form" onSubmit={event=>{
      event.preventDefault();
-     if(!session || !activeOffer || !canCounter || !preview.terms)return;
-     controller.dispatch({kind:"counter",sessionId:session.id,expectedRevision:session.revision,offerId:activeOffer.id,terms:preview.terms});
+     // The action carries the binding shown to the founder. A repeated or stale submit is rejected by
+     // the engine (advanceRun) and adds no journal entry.
+     if(!binding.ready || !preview.terms)return;
+     controller.dispatch({kind:"counter",sessionId:binding.sessionId,expectedRevision:binding.expectedRevision,offerId:binding.offerId,terms:preview.terms});
      setFeedback("Counter submitted. The investor response and animation follow committed engine state.");
     }}>
      <label htmlFor="studio-amount">Investment ({session?.pitch.currency ?? "EUR"})</label>
@@ -180,8 +198,12 @@ export function StudioPrototype(){
       <p className="studio-muted">The investor receives newly issued shares. Existing shareholders dilute proportionally. Values use the approved rounding rules.</p>
      </div>}
      <button className="button" type="submit" disabled={!canCounter || !preview.terms}>Send counter to {NEGOTIATION_RULES.investors[selected].name.split(" ")[0]}</button>
-     {!canCounter && <p className="studio-muted">{!session || session.stage==="questions" ? "Complete the three investor answers to negotiate." :
-      session.stage==="finished" ? "This session is finished." : !activeOffer ? "This investor has no active offer." : "The counter allowance is exhausted."}</p>}
+     <ol className="studio-counter-slots" aria-label={`Shared counters: ${remaining} of ${NEGOTIATION_RULES.counterBudget} left`}>
+      {binding.slots.map((slot,index)=><li key={index} data-slot={slot}>Counter {index+1} · {slot==="used"?"used":slot==="next"?"this one":"left"}</li>)}
+     </ol>
+     {binding.ready ? <p className="studio-muted" data-testid="counter-binding" data-offer-id={binding.offerId} data-expected-revision={binding.expectedRevision}>
+      Bound to {NEGOTIATION_RULES.investors[selected].name}&apos;s current offer at revision {binding.expectedRevision}. Sending uses shared counter {binding.round} of {NEGOTIATION_RULES.counterBudget}, whatever the reply. If the session moves on first, the engine rejects it and nothing is recorded.
+     </p> : <p className="studio-muted">{binding.reason}</p>}
     </form>
     {session?.outcome && <p role="status">{outcomeCopy[session.outcome.kind]}</p>}
     <p role="status">{feedback}</p>

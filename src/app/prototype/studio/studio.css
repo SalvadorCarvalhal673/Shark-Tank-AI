@@ -47,3 +47,23 @@
 @media(max-width:1000px){.studio-page{padding-inline:22px}.studio-layout{grid-template-columns:minmax(0,1.3fr) minmax(300px,1fr)}.studio-viewport{height:420px}.studio-intro h1{font-size:54px}}
 @media(max-width:760px){.studio-page{padding-inline:14px}.studio-header{flex-wrap:wrap;padding-block:16px;font-size:11px}.studio-header>span{order:3;width:100%;font-size:8px}.studio-intro{padding-block:25px;display:block}.studio-intro h1{font-size:47px}.studio-intro>p{margin-top:15px;max-width:100%}.studio-layout{grid-template-columns:minmax(0,1fr);gap:18px}.studio-viewport{height:330px}.studio-controls{padding:20px}.studio-investors button{padding:9px!important}.studio-investors span{font-size:11px}.studio-investors small{font-size:9px}.studio-dialogue{padding:18px}.studio-toolbar{font-size:11px}.studio-portraits{top:20%}.studio-simplified-label{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.studio-page *{scroll-behavior:auto;transition:none!important}}
+/* Dialogue layout (Issue #18): named speaker, scripted label, complete transcript, composer. */
+.studio-conversation{margin-top:18px;padding:22px;background:#17211a;border:1px solid #3b4b3f;border-radius:8px;display:grid;gap:14px;min-width:0}
+.studio-conversation-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px}
+.studio-speaker{font-family:var(--font-instrument-serif),Georgia,serif;font-size:26px;line-height:1.2;margin-top:4px}
+.studio-source-label{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#d5f27d;border:1px solid #52634e;border-radius:999px;padding:5px 10px}
+.studio-dialogue-status{font-size:13px;color:#abb9a8}
+.studio-transcript{list-style:none;margin:0;padding:0 4px 0 0;display:grid;gap:10px;max-height:360px;overflow-y:auto;overflow-wrap:anywhere}
+.studio-line{padding:12px 14px;border-radius:8px;background:#1f2b22;line-height:1.55;font-size:14px;max-width:92%}
+.studio-line-founder{justify-self:end;background:#263325;border:1px solid #445a3e}
+.studio-line-speaker{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;font-size:12px;margin-bottom:4px}
+.studio-line-speaker span{color:#8f9d8c}.studio-line-terms{margin-top:6px;font-size:13px}
+.studio-composer{display:grid;gap:10px;min-width:0}.studio-composer>p{font-size:13px;line-height:1.6}.studio-composer label{font-size:12px}
+.studio-composer textarea{background:#111a14;color:#f2f1e9;border:1px solid #52634e;border-radius:5px;padding:12px;width:100%;font:inherit;font-size:13px;min-height:110px;resize:vertical;min-width:0}
+/* Shared counter allowance (Issue #28). */
+.studio-counter-slots{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.studio-counter-slots li{font-size:11px;text-align:center;padding:7px 4px;border-radius:5px;border:1px solid #3b4b3f;color:#abb9a8}
+.studio-counter-slots li[data-slot=used]{background:#2a3528;color:#8f9d8c;text-decoration:line-through}
+.studio-counter-slots li[data-slot=next]{border-color:#d5f27d;color:#d5f27d}
+.studio-concession{font-size:14px;line-height:1.55;color:#dfe7d0;border-left:3px solid #d5f27d;padding-left:12px}
+.studio-withdrawal{border-left-color:#c98b6b}

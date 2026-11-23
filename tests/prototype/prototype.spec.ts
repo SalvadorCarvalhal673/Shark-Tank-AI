@@ -178,3 +178,93 @@ test("responsive layouts keep complete controls without horizontal overflow",asy
   await expect(page.getByRole("button",{name:/Sofia Mendes Operations/})).toBeVisible();
  }
 });
+
+test("dialogue names the speaker, keeps the complete transcript and labels scripted replies",async({page})=>{
+ await start(page);
+ const dialogue=page.getByRole("region",{name:"Dialogue"});
+ await expect(dialogue.getByText(/Scripted · rules-based replies, no live AI/)).toBeVisible();
+ await expect(page.getByTestId("active-speaker")).toHaveText("Maya Chen · Finance");
+ await expect(dialogue.getByRole("status")).toContainText("Waiting for your answer to Maya Chen");
+ await page.getByRole("button",{name:"Use sample answer",exact:true}).click();
+ const text=await page.getByLabel("Your answer",{exact:true}).inputValue();
+ await page.getByRole("button",{name:"Submit answer",exact:true}).click();
+ const history=page.getByRole("list",{name:"Dialogue history"});
+ await expect(history.getByText(text,{exact:true})).toBeVisible();
+ await expect(history.locator("li")).toHaveCount(3);
+ await expect(page.getByTestId("active-speaker")).toHaveText("Adrian Vale · Growth");
+ await expect(dialogue.getByRole("status")).toContainText("Waiting for your answer to Adrian Vale");
+ await history.focus();await expect(history).toBeFocused();
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","1");
+});
+
+test("counter binding is explicit and a double submit commits exactly one shared counter",async({page})=>{
+ await offers(page,true);
+ const binding=page.getByTestId("counter-binding");
+ await expect(binding).toContainText("Bound to Maya Chen's current offer at revision 3");
+ await expect(binding).toContainText("shared counter 1 of 3");
+ await expect(page.getByRole("list",{name:"Shared counters: 3 of 3 left"})).toBeVisible();
+ const offerId=await binding.getAttribute("data-offer-id");
+ await page.getByLabel("Investor equity (%)",{exact:true}).fill("10");
+ await page.getByRole("button",{name:"Send counter to Maya",exact:true}).dblclick();
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-rounds","1");
+ await expect(page.getByLabel("Save status",{exact:true})).toHaveText("Save status · Saved");
+ expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).actions.length,storageKey)).toBe(4);
+ await expect(page.getByRole("list",{name:"Shared counters: 2 of 3 left"})).toBeVisible();
+ if(await binding.count()) expect(await binding.getAttribute("data-offer-id")).not.toBe(offerId);
+});
+
+test("the camera follows each new speaker, can be interrupted and never changes the session",async({page})=>{
+ const cameraX=async()=>JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}").camera?.[0];
+ await start(page);await enter(page);
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","maya");
+ await expect.poll(cameraX).toBe(-2.5);
+ await page.getByRole("button",{name:"Use sample answer",exact:true}).click();
+ await page.getByRole("button",{name:"Submit answer",exact:true}).click();
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","adrian");
+ await page.getByRole("button",{name:/Sofia Mendes Operations/}).click();
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","sofia");
+ await expect.poll(cameraX).toBe(2.5);
+ await page.waitForTimeout(500);
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","sofia");
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","1");
+});
+test("with reduced motion the camera cuts to the new speaker",async({page})=>{
+ await page.emulateMedia({reducedMotion:"reduce"});await start(page);await enter(page);
+ await page.getByRole("button",{name:"Use sample answer",exact:true}).click();
+ await page.getByRole("button",{name:"Submit answer",exact:true}).click();
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","adrian");
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-motion","reduced");
+ await expect.poll(async()=>JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}").camera?.[0],{timeout:3000}).toBe(0);
+});
+
+test("a committed concession is explained with exact terms and only that investor reacts",async({page})=>{
+ await offers(page);
+ const current=await page.getByLabel("Investor response").locator("p",{hasText:"Current offer"}).textContent();
+ const equity=Number(/for ([\d.]+)%/.exec(current!)![1]);
+ const amount=/€([\d,.]+) for/.exec(current!)![1].replace(/,/g,"");
+ await page.getByLabel("Investment (EUR)",{exact:true}).fill(amount);
+ await page.getByLabel("Investor equity (%)",{exact:true}).fill(String(equity-3));
+ await page.getByRole("button",{name:"Send counter to Maya",exact:true}).click();
+ const note=page.getByTestId("concession-note");
+ await expect(note).toHaveAttribute("data-kind","revise");
+ await expect(note).toContainText(`revised from €${Number(amount).toLocaleString("en",{minimumFractionDigits:2})} for ${equity}%`);
+ await expect(note).toContainText(`You proposed €${Number(amount).toLocaleString("en",{minimumFractionDigits:2})} for ${equity-3}%`);
+ await expect(page.getByRole("button",{name:/Maya Chen Finance/})).toContainText("Considering");
+ await expect(page.getByRole("button",{name:/Adrian Vale Growth/})).toContainText("Offering");
+ await expect(page.getByRole("button",{name:/Sofia Mendes Operations/})).toContainText("Offering");
+});
+
+test("a withdrawal shows its policy reason, its own clip and keeps the last offer in the history",async({page})=>{
+ await offers(page);await enter(page);
+ await page.getByLabel("Investment (EUR)",{exact:true}).fill("100000.01");
+ await page.getByRole("button",{name:"Send counter to Maya",exact:true}).click();
+ const note=page.getByTestId("withdrawal-note");
+ await expect(note).toHaveAttribute("data-reason","above-cash-ceiling");
+ await expect(note).toHaveAttribute("data-clip","WithdrawalCash");
+ await expect(note).toContainText("you asked for €100,000.01, more than this investor can invest");
+ await expect(note).toContainText("stays in the history");
+ await expect(page.getByRole("button",{name:/Maya Chen Finance/})).toContainText("Withdrawal");
+ await page.getByText("Committed negotiation history").click();
+ await expect(page.locator(".studio-history")).toContainText("withdrawn");
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-rounds","1");
+});

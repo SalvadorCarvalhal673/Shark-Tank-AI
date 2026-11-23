@@ -18,6 +18,11 @@ export function ValuationDetails({ terms, currency, founderOwnershipBps }: { ter
       </dl>
       {ownership && <section className="financial-ownership-preview" aria-label="Illustrative ownership if these terms were accepted">
         <p><strong>If accepted · new shares issued</strong></p>
+        <div className="ownership-bar ownership-bar-preview" role="img" aria-label={`Founder ${percent(ownership.founderAfterBps)}, other existing holders ${percent(ownership.otherExistingAfterBps)}, investor ${percent(ownership.investorBps)}`}>
+          <span className="owner-founder" style={{ flexGrow: ownership.founderAfterBps }} />
+          <span className="owner-others" style={{ flexGrow: ownership.otherExistingAfterBps }} />
+          <span className="owner-investor" style={{ flexGrow: ownership.investorBps }} />
+        </div>
         <dl className="offer-ownership">
           <div><dt>Founder</dt><dd>{percent(ownership.founderBeforeBps)} → {percent(ownership.founderAfterBps)}</dd></div>
           <div><dt>Other holders after</dt><dd>{percent(ownership.otherExistingAfterBps)}</dd></div>
@@ -29,9 +34,9 @@ export function ValuationDetails({ terms, currency, founderOwnershipBps }: { ter
   );
 }
 
-export function TermsDisplay({ terms, currency }: { terms: Terms; currency: Currency }) {
+export function TermsDisplay({ terms, currency, founderOwnershipBps }: { terms: Terms; currency: Currency; founderOwnershipBps?: number }) {
   return <>
     <p className="ask-line">{money(terms.amount, currency)} for {percent(terms.equity)}</p>
-    <ValuationDetails terms={terms} currency={currency} />
+    <ValuationDetails terms={terms} currency={currency} founderOwnershipBps={founderOwnershipBps} />
   </>;
 }
