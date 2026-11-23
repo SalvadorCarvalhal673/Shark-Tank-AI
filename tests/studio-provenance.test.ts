@@ -74,3 +74,11 @@ test("the cast file is self-contained and the studio loads nothing from remote h
   for (const path of walk("src/features/studio"))
     assert.ok(!/https?:\/\//.test(readFileSync(path, "utf8")), `${path} references a remote URL`);
 });
+
+test("Issue #84: every production asset is verified and the favicon is reproducible", async () => {
+  for (const asset of manifest.assets) assert.equal(asset.status, "verified", `${asset.id} is verified`);
+  const before = sha256("src/app/favicon.ico");
+  const { execFileSync } = await import("node:child_process");
+  execFileSync(process.execPath, ["scripts/create-favicon.mjs"], { stdio: "ignore" });
+  assert.equal(sha256("src/app/favicon.ico"), before, "the generator reproduces the committed favicon");
+});
