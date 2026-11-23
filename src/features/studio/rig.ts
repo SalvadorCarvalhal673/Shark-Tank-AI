@@ -43,8 +43,14 @@ export type RigBone = typeof RIG_BONES[number]["name"];
  * every investor; a clip may only animate bone rotations, never positions or scale, so seated
  * proportions and the chair fit stay valid in every frame.
  */
-export const RIG_CLIPS = ["Listening", "Offering", "Withdrawal"] as const;
+export const RIG_CLIPS = ["Listening", "Offering", "Withdrawal", "Explaining"] as const;
 export type RigClip = typeof RIG_CLIPS[number];
+
+/**
+ * Clip time shown as a held pose under reduced motion (seconds). Each is the clip's most readable
+ * moment, so reduced motion still communicates the reaction without any movement.
+ */
+export const REDUCED_MOTION_POSE: Record<RigClip, number> = { Listening: 0, Explaining: .8, Offering: .8, Withdrawal: .8 };
 
 /** Mesh names inside the cast file. The body is shared; each investor adds their own features. */
 export const CAST_BODY = "Cast_Body";

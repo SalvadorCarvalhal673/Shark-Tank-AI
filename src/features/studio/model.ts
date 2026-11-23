@@ -1,10 +1,10 @@
 import { readTerms } from "../simulation/pitch.ts";
 import { ownershipAfterInvestment, valuations } from "../simulation/negotiation/financials.ts";
 import type { NegotiationPitch, NegotiationSession } from "../simulation/negotiation/session.ts";
-import type { InvestorId } from "../simulation/negotiation/investor-policy.ts";
+import { INVESTOR_ORDER, type InvestorId } from "../simulation/negotiation/investor-policy.ts";
 
 export type CameraView = "panel" | InvestorId;
-export type Pose = "Listening" | "Offering" | "Withdrawal";
+export type Pose = "Listening" | "Explaining" | "Offering" | "Withdrawal";
 /**
  * Camera presets (Issue #11). The panel shot is the founder's view of all three investors; each
  * investor shot is a medium close-up from just above eye level, so the face, hands and desk read.
@@ -44,8 +44,17 @@ export function cameraFov(view: CameraView, aspect: number) {
 export function cameraStep(deltaSeconds: number, reducedMotion: boolean) {
   return reducedMotion ? 1 : 1-Math.exp(-Math.min(Math.max(deltaSeconds,0),.05)*7);
 }
+/**
+ * The pose an investor shows, derived only from the committed session (never from drafts, cameras
+ * or selection), so presentation can never commit or imply a financial outcome.
+ * During the question round the investor whose question is open is Explaining (Issue #9).
+ */
 export function sceneCue(session: NegotiationSession | null, investor: InvestorId): { pose: Pose; key: string } {
   if (!session) return {pose:"Listening",key:"idle"};
+  if (session.stage === "questions") {
+    const asking = INVESTOR_ORDER[session.answers.length] === investor;
+    return {pose: asking ? "Explaining" : "Listening", key: session.id+":q"+session.answers.length+":"+investor+":"+(asking ? "Explaining" : "Listening")};
+  }
   const event = session.history.findLast(item =>
     (item.kind==="opening" || item.kind==="counter") && item.investor===investor);
   const pose: Pose = !event ? "Listening" :

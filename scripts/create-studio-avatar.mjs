@@ -195,19 +195,38 @@ function rotationTrack(name, times, rotations) {
   const q = rotations.flatMap(([x, y, z]) => new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z)).toArray());
   return new THREE.QuaternionKeyframeTrack(name + ".quaternion", times, q);
 }
+// Seated gestures (Issue #9). Rotation-only; the furniture fit test checks every frame of every clip.
+// Brows: a negative x rotation of the Brows group raises them; a LeftBrow z rotation below zero
+// (RightBrow above zero) lowers the inner ends into a frown.
 const clipTracks = {
+  // Settling in to listen: a small breath, a slight attentive tilt and relaxed brows.
   Listening: [2.8, [
-    rotationTrack("Head", [0, 1.4, 2.8], [[0, 0, 0], [.025, .035, 0], [0, 0, 0]]),
+    rotationTrack("Head", [0, 1.4, 2.8], [[0, 0, 0], [.025, .035, .015], [0, 0, 0]]),
     rotationTrack("Chest", [0, 1.4, 2.8], [[0, 0, 0], [.012, 0, 0], [0, 0, 0]]),
+    rotationTrack("Brows", [0, 1.4, 2.8], [[0, 0, 0], [-.012, 0, 0], [0, 0, 0]]),
   ]],
+  // Asking a question: an open right-hand gesture, a curious head tilt and raised brows.
+  Explaining: [2.4, [
+    rotationTrack("RightArm", [0, .5, 1.4, 2.4], [[0, 0, 0], [-.42, -.18, -.2], [-.36, -.1, -.16], [0, 0, 0]]),
+    rotationTrack("RightForearm", [0, .5, 1.4, 2.4], [[0, 0, 0], [-.55, .2, 0], [-.45, .1, 0], [0, 0, 0]]),
+    rotationTrack("Head", [0, .6, 1.5, 2.4], [[0, 0, 0], [.03, -.06, .08], [.05, .04, .05], [0, 0, 0]]),
+    rotationTrack("Brows", [0, .5, 1.6, 2.4], [[0, 0, 0], [-.06, 0, 0], [-.04, 0, 0], [0, 0, 0]]),
+    rotationTrack("Jaw", [0, .5, .9, 1.3, 1.7, 2.4], [[0, 0, 0], [.08, 0, 0], [.02, 0, 0], [.07, 0, 0], [.01, 0, 0], [0, 0, 0]]),
+  ]],
+  // Making an offer: reaching across the desk with a confident nod and lifted brows.
   Offering: [1.5, [
     rotationTrack("RightArm", [0, .55, 1.5], [[0, 0, 0], [-.38, -.12, -.15], [-.1, 0, -.05]]),
     rotationTrack("RightForearm", [0, .55, 1.5], [[0, 0, 0], [-.28, 0, 0], [0, 0, 0]]),
     rotationTrack("Head", [0, .7, 1.5], [[0, 0, 0], [.09, 0, 0], [0, 0, 0]]),
+    rotationTrack("Brows", [0, .6, 1.5], [[0, 0, 0], [-.05, 0, 0], [-.02, 0, 0]]),
   ]],
+  // Withdrawing: leaning back, a slow head shake and a frown that stays.
   Withdrawal: [1.7, [
     rotationTrack("Chest", [0, .8, 1.7], [[0, 0, 0], [-.14, 0, 0], [-.10, 0, 0]]),
     rotationTrack("Head", [0, .5, 1, 1.7], [[0, 0, 0], [0, .16, 0], [0, -.12, 0], [0, .04, 0]]),
+    rotationTrack("Brows", [0, .6, 1.7], [[0, 0, 0], [.03, 0, 0], [.03, 0, 0]]),
+    rotationTrack("LeftBrow", [0, .6, 1.7], [[0, 0, 0], [0, 0, -.22], [0, 0, -.2]]),
+    rotationTrack("RightBrow", [0, .6, 1.7], [[0, 0, 0], [0, 0, .22], [0, 0, .2]]),
   ]],
 };
 const clips = RIG_CLIPS.map(name => new THREE.AnimationClip(name, ...clipTracks[name]));
