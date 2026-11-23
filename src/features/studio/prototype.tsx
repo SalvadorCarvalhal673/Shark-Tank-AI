@@ -13,6 +13,7 @@ import { percent } from "../simulation/negotiation/terms-display";
 import { demoScenarios, financialPreview, sceneCue, type CameraView } from "./model";
 import type { StudioSceneProps } from "./scene";
 import { DialoguePanel } from "./dialogue-panel";
+import { counterBinding } from "./counter-binding";
 
 const Scene = dynamic(()=>import("./scene").then(module=>module.StudioScene),{
  ssr:false,loading:()=> <p className="studio-loading" role="status">Loading 3D code… HTML controls are ready.</p>,
@@ -51,7 +52,8 @@ export function StudioPrototype(){
  function failed(reason:string){setFailure(reason);setThreeD(false);}
  const preview=financialPreview(amount,equity,session?.pitch.founderOwnershipBps ?? 8000);
  const activeOffer=session?.offers.find(offer=>offer.investor===selected && offer.status==="active");
- const canCounter=Boolean(session?.stage==="negotiation" && activeOffer);
+ const binding=counterBinding(session,selected);
+ const canCounter=binding.ready;
  const latest=session?.history.findLast(event=>
   (event.kind==="counter" || event.kind==="opening") && event.investor===selected);
  const response=latest?.kind==="counter" ? counterCopy[latest.reason] :
@@ -159,8 +161,10 @@ export function StudioPrototype(){
     </div>
     <form className="studio-financial-form" onSubmit={event=>{
      event.preventDefault();
-     if(!session || !activeOffer || !canCounter || !preview.terms)return;
-     controller.dispatch({kind:"counter",sessionId:session.id,expectedRevision:session.revision,offerId:activeOffer.id,terms:preview.terms});
+     // The action carries the binding shown to the founder. A repeated or stale submit is rejected by
+     // the engine (advanceRun) and adds no journal entry.
+     if(!binding.ready || !preview.terms)return;
+     controller.dispatch({kind:"counter",sessionId:binding.sessionId,expectedRevision:binding.expectedRevision,offerId:binding.offerId,terms:preview.terms});
      setFeedback("Counter submitted. The investor response and animation follow committed engine state.");
     }}>
      <label htmlFor="studio-amount">Investment ({session?.pitch.currency ?? "EUR"})</label>
@@ -183,8 +187,12 @@ export function StudioPrototype(){
       <p className="studio-muted">The investor receives newly issued shares. Existing shareholders dilute proportionally. Values use the approved rounding rules.</p>
      </div>}
      <button className="button" type="submit" disabled={!canCounter || !preview.terms}>Send counter to {NEGOTIATION_RULES.investors[selected].name.split(" ")[0]}</button>
-     {!canCounter && <p className="studio-muted">{!session || session.stage==="questions" ? "Complete the three investor answers to negotiate." :
-      session.stage==="finished" ? "This session is finished." : !activeOffer ? "This investor has no active offer." : "The counter allowance is exhausted."}</p>}
+     <ol className="studio-counter-slots" aria-label={`Shared counters: ${remaining} of ${NEGOTIATION_RULES.counterBudget} left`}>
+      {binding.slots.map((slot,index)=><li key={index} data-slot={slot}>Counter {index+1} · {slot==="used"?"used":slot==="next"?"this one":"left"}</li>)}
+     </ol>
+     {binding.ready ? <p className="studio-muted" data-testid="counter-binding" data-offer-id={binding.offerId} data-expected-revision={binding.expectedRevision}>
+      Bound to {NEGOTIATION_RULES.investors[selected].name}&apos;s current offer at revision {binding.expectedRevision}. Sending uses shared counter {binding.round} of {NEGOTIATION_RULES.counterBudget}, whatever the reply. If the session moves on first, the engine rejects it and nothing is recorded.
+     </p> : <p className="studio-muted">{binding.reason}</p>}
     </form>
     {session?.outcome && <p role="status">{outcomeCopy[session.outcome.kind]}</p>}
     <p role="status">{feedback}</p>

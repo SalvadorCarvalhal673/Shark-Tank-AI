@@ -60,3 +60,8 @@
 .studio-line-speaker span{color:#8f9d8c}.studio-line-terms{margin-top:6px;font-size:13px}
 .studio-composer{display:grid;gap:10px;min-width:0}.studio-composer>p{font-size:13px;line-height:1.6}.studio-composer label{font-size:12px}
 .studio-composer textarea{background:#111a14;color:#f2f1e9;border:1px solid #52634e;border-radius:5px;padding:12px;width:100%;font:inherit;font-size:13px;min-height:110px;resize:vertical;min-width:0}
+/* Shared counter allowance (Issue #28). */
+.studio-counter-slots{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.studio-counter-slots li{font-size:11px;text-align:center;padding:7px 4px;border-radius:5px;border:1px solid #3b4b3f;color:#abb9a8}
+.studio-counter-slots li[data-slot=used]{background:#2a3528;color:#8f9d8c;text-decoration:line-through}
+.studio-counter-slots li[data-slot=next]{border-color:#d5f27d;color:#d5f27d}

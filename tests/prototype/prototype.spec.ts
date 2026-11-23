@@ -196,3 +196,19 @@ test("dialogue names the speaker, keeps the complete transcript and labels scrip
  await history.focus();await expect(history).toBeFocused();
  await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","1");
 });
+
+test("counter binding is explicit and a double submit commits exactly one shared counter",async({page})=>{
+ await offers(page,true);
+ const binding=page.getByTestId("counter-binding");
+ await expect(binding).toContainText("Bound to Maya Chen's current offer at revision 3");
+ await expect(binding).toContainText("shared counter 1 of 3");
+ await expect(page.getByRole("list",{name:"Shared counters: 3 of 3 left"})).toBeVisible();
+ const offerId=await binding.getAttribute("data-offer-id");
+ await page.getByLabel("Investor equity (%)",{exact:true}).fill("10");
+ await page.getByRole("button",{name:"Send counter to Maya",exact:true}).dblclick();
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-rounds","1");
+ await expect(page.getByLabel("Save status",{exact:true})).toHaveText("Save status · Saved");
+ expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).actions.length,storageKey)).toBe(4);
+ await expect(page.getByRole("list",{name:"Shared counters: 2 of 3 left"})).toBeVisible();
+ if(await binding.count()) expect(await binding.getAttribute("data-offer-id")).not.toBe(offerId);
+});
