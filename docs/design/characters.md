@@ -95,6 +95,6 @@ Two women and one man, matching the negotiation identities: Maya Chen (seat 1), 
 | Skinning | Every vertex fully weighted to one valid bone | Verified | Verified | Verified |
 | Seat fit | No body vertex inside furniture in any frame | Verified | Verified | Verified |
 
-**Draw calls are the tightest budget.** At 55 of 60, each investor's features cost four draw calls (one per material slot they use). Issue #12 should merge feature slots, or move them to vertex colours like the eyes, before more detail is added.
+**Draw calls are the tightest budget.** At 55 of 60, each investor's features cost four draw calls (one per material slot they use). Issue #12 merged hair, lapels and collars into one vertex-coloured `Features` slot, so the panel view now uses 49 draw calls (docs/design/performance.md).
 
 Unused UV coordinates are dropped from the cast file, because no character uses textures. Captures were made with a software renderer, and physical-phone performance remains unverified.

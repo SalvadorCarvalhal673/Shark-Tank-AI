@@ -10,7 +10,7 @@ import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { mergeGeometries, mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mkdir, writeFile } from "node:fs/promises";
-import { CAST_BODY, castMeshName, RIG_BONES, RIG_CLIPS, RIG_MATERIALS } from "../src/features/studio/rig.ts";
+import { CAST_BODY, castMeshName, INVESTOR_COLORS, MERGED_FEATURE_SLOTS, RIG_BONES, RIG_CLIPS, RIG_MATERIALS, SLOT_DEFAULTS } from "../src/features/studio/rig.ts";
 globalThis.FileReader = class {
   readAsArrayBuffer(blob) { blob.arrayBuffer().then((value) => { this.result = value; this.onloadend?.(); }); }
 };
@@ -28,11 +28,16 @@ skeletonBones[0].updateMatrixWorld(true);
 
 // ---- Rigid-skinned parts grouped by material slot ----
 const material = name => RIG_MATERIALS.indexOf(name);
-function meshBuilder({ colors = false } = {}) {
+function meshBuilder({ colors = false, bake = null } = {}) {
   const groups = RIG_MATERIALS.map(() => []);
   return {
-    /** tint multiplies the slot colour (vertex colour); only meshes built with colors:true keep it. */
+    /**
+     * tint multiplies the slot colour (vertex colour); only meshes built with colors:true keep it.
+     * bake (Issue #12) maps slots to a fixed colour: those parts move into the "Features" slot and
+     * carry their colour per vertex, so several slots render in one draw call.
+     */
     part(geometry, center, scale, bone, slot, rotation = [0, 0, 0], tint = [1, 1, 1]) {
+      if (bake?.[slot]) { tint = bake[slot]; slot = "Features"; }
       geometry.scale(...scale);
       geometry.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(...rotation)));
       geometry.translate(...center);
@@ -44,11 +49,14 @@ function meshBuilder({ colors = false } = {}) {
       geometry.setAttribute("skinWeight", new THREE.Float32BufferAttribute(weights, 4));
       // No textures use UVs, so they are dropped to keep the download small (Issue #5 transfer budget).
       geometry.deleteAttribute("uv");
-      if (colors) geometry.setAttribute("color", new THREE.Float32BufferAttribute(new Array(count).fill(tint).flat(), 3));
+      if (colors || bake) geometry.setAttribute("color", new THREE.Float32BufferAttribute(new Array(count).fill(tint).flat(), 3));
       groups[material(slot)].push(geometry);
     },
     build(name, materials) {
       const used = groups.map((items, i) => ({ items, i })).filter(entry => entry.items.length);
+      // A baked mesh gives every part a colour, so Brass parts get white (no tint) to keep the attribute set equal.
+      if (bake) for (const { items } of used) for (const item of items) if (!item.attributes.color)
+        item.setAttribute("color", new THREE.Float32BufferAttribute(new Array(item.attributes.position.count * 3).fill(1), 3));
       const geometry = mergeGeometries(used.map(entry => mergeGeometries(entry.items)), true);
       const mesh = new THREE.SkinnedMesh(geometry, used.map(entry => materials[entry.i]));
       mesh.name = name;
@@ -167,7 +175,7 @@ const cast = {
 };
 
 // ---- Materials (slot names are the runtime colour keys) ----
-const defaults = { Skin: "#b97957", Jacket: "#283c34", Trousers: "#172321", Hair: "#201b18", Brass: "#b99b60", Shirt: "#e8dfc8", Eyes: "#ffffff" };
+const defaults = SLOT_DEFAULTS;
 const materials = RIG_MATERIALS.map(name => {
   const m = new THREE.MeshStandardMaterial({ color: defaults[name], roughness: .82, metalness: name === "Brass" ? .55 : 0, flatShading: true });
   m.name = name; return m;
@@ -182,7 +190,10 @@ root.add(bodyMesh);
 root.updateMatrixWorld(true);
 bodyMesh.bind(skeleton);
 for (const [investor, build] of Object.entries(cast)) {
-  const features = meshBuilder();
+  // Bake this investor's hair, jacket and shirt colours (linear, as glTF COLOR_0 expects).
+  const bake = Object.fromEntries(MERGED_FEATURE_SLOTS.map(slot =>
+    [slot, new THREE.Color(INVESTOR_COLORS[investor][slot] ?? SLOT_DEFAULTS[slot]).toArray()]));
+  const features = meshBuilder({ bake });
   build(features);
   const mesh = features.build(castMeshName(investor), materials);
   root.add(mesh);

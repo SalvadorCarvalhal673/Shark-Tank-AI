@@ -2,10 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
-import { SkinnedMesh, type Material, type Object3D } from "three";
+import { Color, SkinnedMesh, type Material, type Object3D } from "three";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { createInvestorInstance } from "../src/features/studio/avatar.ts";
-import { CAST_BODY, CAST_BUDGET, CAST_URL, castMeshName } from "../src/features/studio/rig.ts";
+import { CAST_BODY, CAST_BUDGET, CAST_URL, castMeshName, INVESTOR_COLORS, MERGED_FEATURE_SLOTS, SLOT_DEFAULTS } from "../src/features/studio/rig.ts";
 import type { InvestorId } from "../src/features/simulation/negotiation/investor-policy.ts";
 
 // Issues #5-#7: production characters with stable skinning, readable faces and a bounded download.
@@ -71,7 +71,22 @@ for (const [investor, { slots: needed, note }] of Object.entries(expected) as [I
   test(`${investor} has their own production features: ${note}`, () => {
     const own = meshes(createInvestorInstance(gltf.scene, investor).root, castMeshName(investor));
     assert.ok(own.length > 0);
-    for (const slot of needed) assert.ok(slots(own).has(slot), `${investor} features use ${slot}`);
+    // Issue #12: hair, lapels and collars render as one vertex-coloured "Features" primitive, so each
+    // merged slot must appear as its exact investor colour on vertices that primitive draws.
+    const merged = own.find(mesh => [mesh.material].flat()[0].name === "Features");
+    for (const slot of needed) {
+      if (!(MERGED_FEATURE_SLOTS as readonly string[]).includes(slot)) { assert.ok(slots(own).has(slot), `${investor} features use ${slot}`); continue; }
+      assert.ok(merged, `${investor} has a merged Features primitive`);
+      const target = new Color(INVESTOR_COLORS[investor][slot as "Hair"] ?? SLOT_DEFAULTS[slot as "Hair"]);
+      const { index, attributes: { color } } = merged.geometry;
+      let found = false;
+      for (let i = 0; i < index!.count && !found; i++) {
+        const v = index!.getX(i);
+        found = Math.abs(color.getX(v) - target.r) + Math.abs(color.getY(v) - target.g) + Math.abs(color.getZ(v) - target.b) < 3e-3;
+      }
+      assert.ok(found, `${investor} features include ${slot} in the investor's ${slot} colour`);
+    }
+    assert.ok(own.length <= 2, `${investor} features cost at most two draw calls (Features + Brass)`);
     for (const mesh of own) for (const bone of bonesUsed(mesh)) assert.ok(["Head", "Chest"].includes(bone), `${investor} features ride ${bone}`);
   });
 }

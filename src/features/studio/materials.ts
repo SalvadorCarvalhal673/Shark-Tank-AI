@@ -19,6 +19,8 @@ export const CHARACTER_FINISH: Record<RigMaterial, { roughness: number; metalnes
   Brass: { roughness: .32, metalness: .55, emissive: .12 },
   Shirt: { roughness: .7, metalness: 0 },
   Eyes: { roughness: .2, metalness: 0 },
+  // Merged hair, lapels and collars (Issue #12): between the hair and cloth finishes.
+  Features: { roughness: .7, metalness: 0 },
 };
 
 /**
