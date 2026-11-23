@@ -43,3 +43,14 @@ test("landing and pitch form fit a narrow viewport", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Review pitch" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
 });
+
+test("landing introduces the episode without loading the 3D studio", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Take your seat\.\s*Make your case/);
+  await expect(page.getByRole("heading", { name: "Pitch. Defend. Negotiate." })).toBeVisible();
+  await expect(page.getByText("Bring your business")).toBeVisible();
+  await expect(page.getByText("Answer the panel")).toBeVisible();
+  await expect(page.getByText("Choose your terms")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Enter the pitch room" })).toHaveAttribute("href", "/simulate");
+  await expect(page.locator("script[src*='three']")).toHaveCount(0);
+});
