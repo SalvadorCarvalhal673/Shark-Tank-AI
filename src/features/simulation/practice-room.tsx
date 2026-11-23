@@ -10,6 +10,8 @@ import { OfferCard } from "./negotiation/offer-card";
 import { counterCopy, latestCounter, pendingForSession, specialties, type PendingOffer } from "./negotiation/presentation";
 import { type FounderAction, type NegotiationSession } from "./negotiation/session";
 import { percent } from "./negotiation/terms-display";
+import { PracticeStudio } from "../studio/practice-studio";
+import { activeSpeaker, type CameraView } from "../studio/model";
 import { InvestorVoice } from "./negotiation/investor-voice";
 import { OpeningReveal } from "./negotiation/opening-reveal";
 import type { SessionRun } from "./negotiation/session-storage";
@@ -27,6 +29,9 @@ export function PracticeRoom({ session, run, onAction, onExit, persistenceMessag
   const [notice, setNotice] = useState("");
   const [answerDraft, setAnswerDraft] = useState("");
   const [selectedInvestor, setSelectedInvestor] = useState<InvestorId>(INVESTOR_ORDER[0]);
+  const [cameraChoice, setCameraChoice] = useState<{ moment: string; view: CameraView } | null>(null);
+  const speaker = activeSpeaker(session);
+  const cameraView = cameraChoice?.moment === speaker.key ? cameraChoice.view : speaker.view;
   const heading = useRef<HTMLHeadingElement>(null);
   const offerHeadings = useRef<Partial<Record<InvestorId, HTMLHeadingElement | null>>>({});
   const { pitch, stage, answers } = session;
@@ -51,6 +56,11 @@ export function PracticeRoom({ session, run, onAction, onExit, persistenceMessag
     }
     setNotice("");
     onAction(action);
+  }
+
+  function frameInvestor(view: CameraView) {
+    setCameraChoice({ moment: speaker.key, view });
+    if (view !== "panel") setSelectedInvestor(view);
   }
 
   function open(kind: PendingOffer["kind"], offerId: string) {
@@ -84,6 +94,7 @@ export function PracticeRoom({ session, run, onAction, onExit, persistenceMessag
       <p className="muted">{persistenceMessage}</p>
       <p role="status" className="sr-only">{counterAnnouncement}</p>
       {notice && <p role="alert">{notice}</p>}
+      <PracticeStudio session={session} view={cameraView} onViewChange={frameInvestor} />
       <section className="dialogue-transcript" aria-label="Investor conversation">
         <div className="dialogue-heading"><div><p className="kicker">Conversation · scripted</p>
           <h2>Investor conversation</h2></div>
@@ -135,7 +146,7 @@ export function PracticeRoom({ session, run, onAction, onExit, persistenceMessag
         <div className="investor-switcher" role="tablist" aria-label="Select an investor">
           {INVESTOR_ORDER.map((id) => <button key={id} type="button" role="tab" aria-selected={selectedInvestor === id}
             className={selectedInvestor === id ? "button investor-select selected" : "button investor-select secondary"}
-            onClick={() => setSelectedInvestor(id)}>{NEGOTIATION_RULES.investors[id].name} · {specialties[id]}</button>)}
+            onClick={() => frameInvestor(id)}>{NEGOTIATION_RULES.investors[id].name} · {specialties[id]}</button>)}
         </div>
         <div className="negotiation-offers">
           {INVESTOR_ORDER.map((id) => <OfferCard key={id} session={session} investor={id} pending={activePending}

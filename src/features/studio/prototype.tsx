@@ -40,7 +40,7 @@ export function StudioPrototype(){
  const [amount,setAmount]=useState("100000");
  const [equity,setEquity]=useState("20");
  const [fault,setFault]=useState("");
- const [metrics,setMetrics]=useState<Parameters<StudioSceneProps["onMetrics"]>[0] | null>(null);
+ const [metrics,setMetrics]=useState<Parameters<NonNullable<StudioSceneProps["onMetrics"]>>[0] | null>(null);
  const [feedback,setFeedback]=useState("");
  const [scenarioId,setScenarioId]=useState<(typeof demoScenarios)[number]["id"]>(demoScenarios[0].id);
  useEffect(()=>{

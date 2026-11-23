@@ -8,7 +8,7 @@ Shark Tank AI is a university Introduction to Programming group project. Pitch a
 
 - **Practice room (`/simulate`)** — Start from scratch or edit a fictional LunchLoop example. Meet Maya Chen (finance), Adrian Vale (growth), and Sofia Mendes (operations), then submit answers, compare offers and use up to three shared counters.
 - **Negotiation and debrief** — Confirm an exact offer or walk away. The debrief explains the outcome, shows valuation and ownership, and lets you review decisions and choose a replay challenge. Local saving is optional.
-- **3D studio (`/prototype/studio`)** — Start the development server to try the Rooftop VC Boardroom with three original rigged characters, investor reactions and an active-speaker camera. HTML controls and a simplified view support keyboard use and renderer fallback. The production route returns 404.
+- **3D investment studio** — Start practice at `/simulate` and choose **Enter 3D studio** to see the original cast and cameras follow the current pitch. Questions, offers, counters and outcomes use the same HTML controls in both views. The separate renderer prototype remains available in development.
 - **Investor voice** — The optional voice panel adds rules-based feedback, one bounded clarification per investor, and coaching based on the scorecard. Core interview questions are scripted. A development mock exercises the validated AI pipeline. Production live inference is disabled and requires no credentials.
 
 The deterministic engine uses integer minor currency units and basis points. It alone commits offers and deals, computes pre- and post-money valuations, and reconciles the cap table. [Architecture](docs/ARCHITECTURE.md) · [Financial engine](docs/FINANCIAL-ENGINE.md) · [AI behavior](docs/ai/PHASE-4D.md)
@@ -18,7 +18,7 @@ The deterministic engine uses integer minor currency units and basis points. It 
 Install Git and Node.js 24 with npm. The stack is TypeScript, Next.js App Router, React, Tailwind CSS, Three.js and React Three Fiber.
 
 ```sh
-git clone --branch develop https://github.com/SalvadorCarvalhal673/Shark-Tank-AI.git
+git clone --branch main https://github.com/SalvadorCarvalhal673/Shark-Tank-AI.git
 cd Shark-Tank-AI
 npm ci
 npm run dev -- --hostname 127.0.0.1 --port 3000
@@ -48,7 +48,7 @@ The desktop demonstration can run locally. Before public hosting, review the sel
 
 The asset manifest identifies original studio art, the generated icon, locally shipped fonts, and their notices. See [asset provenance](docs/design/asset-provenance.md) and the [manifest](docs/design/asset-manifest.json) for redistribution terms. The asset terms do not grant a blanket licence for the project source.
 
-**Public HTTPS URL:** pending approved deployment.
+**Public HTTPS URL:** [shark-tank-ai.vercel.app](https://shark-tank-ai.vercel.app).
 
 ## Team
 
