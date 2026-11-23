@@ -42,7 +42,7 @@ function meshBuilder() {
       geometry.setAttribute("skinWeight", new THREE.Float32BufferAttribute(weights, 4));
       groups[material(slot)].push(geometry);
     },
-    build(name, materials, skeleton) {
+    build(name, materials) {
       const used = groups.map((items, i) => ({ items, i })).filter(entry => entry.items.length);
       const geometry = mergeGeometries(used.map(entry => mergeGeometries(entry.items)), true);
       const mesh = new THREE.SkinnedMesh(geometry, used.map(entry => materials[entry.i]));
