@@ -49,7 +49,16 @@ test("AI protected UI remains isolated while the authorized server route uses on
     const file=new URL((f.parentPath.replaceAll("\\","/").split("/src/")[1]??"")+"/"+f.name,root);
     if(file.pathname.includes("/features/ai/"))continue;
     if(file.pathname.endsWith("/app/api/investor/route.ts"))continue;
-    assert.doesNotMatch(fs.readFileSync(file,"utf8"),/features\/ai|from\s+["'][^"']*\/ai\//);
+    const source=fs.readFileSync(file,"utf8");
+    // Phase 4D: exactly one reviewed browser adapter may use the AI modules, and never server code,
+    // provider adapters or dispatch. Every other UI file stays isolated.
+    if(file.pathname.endsWith("/features/simulation/negotiation/investor-voice.tsx")){
+      assert.doesNotMatch(source,/\/ai\/server\/|openai|process\.env|onAction|dispatch\(/);
+      for(const [,path] of source.matchAll(/from\s+["']([^"']*\/ai\/[^"']*)["']/g))
+        assert.match(path,/\/ai\/(contracts|context|fallback|lifecycle|clarification|client)$/,path);
+      continue;
+    }
+    assert.doesNotMatch(source,/features\/ai|from\s+["'][^"']*\/ai\//);
   }
   const route=fs.readFileSync(new URL("../src/app/api/investor/route.ts",import.meta.url),"utf8");
   assert.match(route,/import ["']server-only["']/);

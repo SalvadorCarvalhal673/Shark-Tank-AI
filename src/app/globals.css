@@ -204,3 +204,9 @@ h2 { font-size: clamp(35px, 5vw, 64px); line-height: 1.1; letter-spacing: normal
   .investor-switcher { display: grid; grid-template-columns: 1fr; }
   .investor-select { width: 100%; }
 }
+/* Optional investor voice (Phase 4D). */
+.investor-voice{margin:18px 0;padding:18px;border:1px dashed var(--line,#c9c4b5);border-radius:10px;display:grid;gap:10px}
+.investor-voice-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
+.investor-voice-reply{display:grid;gap:6px;line-height:1.55}.investor-voice-facts{font-size:13px;font-weight:600}
+.investor-voice-limits,.investor-voice-observations{margin:0;padding-left:18px;font-size:12px;opacity:.8}
+.investor-voice-clarify{display:grid;gap:8px}.investor-voice-clarify textarea{width:100%;font:inherit;padding:10px}

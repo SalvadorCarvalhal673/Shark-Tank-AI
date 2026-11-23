@@ -1,4 +1,8 @@
-# Phase 4C architecture — integrated offline
+# AI integration
+
+**Phase 4D status (Issues #57–#66):** the practice room now has an optional, off-by-default investor voice wired through `/api/investor`, with browser-side validation, lifecycle stale protection, one founder-confirmed clarification per investor and honest scripted fallback. Production keeps the route disabled; live inference is not activated. See [ai/PHASE-4D.md](ai/PHASE-4D.md). The Phase 4C notes below describe the foundations.
+
+## Phase 4C architecture — integrated offline
 
 No provider SDK, operational endpoint, actual credential, streaming or transcript persistence is implemented. Existing investor responses and evidence patterns are scripted/deterministic.
 

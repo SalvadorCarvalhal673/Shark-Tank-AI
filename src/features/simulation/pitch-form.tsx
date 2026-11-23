@@ -109,7 +109,7 @@ export function PitchForm() {
   if (controller.checking) return <RecoveryPanel controller={controller} active={false} onNew={() => setEditing(true)} />;
   if (session) return <>
     <RecoveryPanel controller={controller} active onNew={() => setEditing(true)} />
-    <PracticeRoom key={controller.viewKey} session={session} onAction={controller.dispatch}
+    <PracticeRoom key={controller.viewKey} session={session} run={controller.run} onAction={controller.dispatch}
       onExit={practiceAgain} persistenceMessage={controller.status === "Not saving"
         ? "Refreshing clears this in-memory run. Saving is off."
         : "Only saved actions can be restored after refresh. Check the save status before closing."} />

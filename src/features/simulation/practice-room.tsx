@@ -10,9 +10,13 @@ import { OfferCard } from "./negotiation/offer-card";
 import { counterCopy, latestCounter, pendingForSession, specialties, type PendingOffer } from "./negotiation/presentation";
 import { type FounderAction, type NegotiationSession } from "./negotiation/session";
 import { percent } from "./negotiation/terms-display";
+import { InvestorVoice } from "./negotiation/investor-voice";
+import type { SessionRun } from "./negotiation/session-storage";
 
-export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: {
+export function PracticeRoom({ session, run, onAction, onExit, persistenceMessage }: {
   session: NegotiationSession;
+  /** Committed journal for the optional investor voice (Phase 4D); never used to change state. */
+  run?: SessionRun | null;
   onAction: (action: FounderAction) => void;
   onExit: () => void;
   persistenceMessage: string;
@@ -92,6 +96,8 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
         </article>)}
         <p className="history-summary" aria-live="polite">{answers.length === 0 ? "No replies yet. Your submitted exchanges will remain here for review." : `${answers.length} of ${INVESTOR_ORDER.length} investor exchanges available above.`}</p>
       </section>
+      {run && run.session === session && <InvestorVoice run={run}
+        onUseInAnswer={(text) => setAnswerDraft((draft) => draft ? draft + "\n\n" + text : text)} />}
       <div className="practice-panel">
         {INVESTOR_ORDER.map((id) => <div key={id} className={stage === "questions" && id === investor ? "active-investor" : ""}>
           <strong>{NEGOTIATION_RULES.investors[id].name}</strong><span>{specialties[id]}</span>
