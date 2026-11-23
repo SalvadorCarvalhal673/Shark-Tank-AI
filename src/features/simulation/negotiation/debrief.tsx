@@ -25,10 +25,10 @@ export function Debrief({ session, headingRef, onExit }: {
       <p className="ask-line">{accepted ? "Deal confirmed" : "No deal"}</p>
       {session.outcome?.kind === "accepted-deal" && accepted && <section className={styles.deal} aria-label="Accepted deal">
         <h3>Deal with {NEGOTIATION_RULES.investors[accepted.investor].name}</h3>
-        <TermsDisplay terms={accepted} currency={session.pitch.currency} />
+        <TermsDisplay terms={accepted} currency={session.pitch.currency} founderOwnershipBps={session.pitch.founderOwnershipBps} />
         <p>You confirmed these terms. The investment is a simulated result and does not establish the quality of the pitch.</p>
         {opening && <details className="negotiation-details"><summary>Compare opening terms</summary>
-          <TermsDisplay terms={opening} currency={session.pitch.currency} />
+          <TermsDisplay terms={opening} currency={session.pitch.currency} founderOwnershipBps={session.pitch.founderOwnershipBps} />
         </details>}
       </section>}
       {session.outcome?.kind === "founder-walk-away" && <section aria-label="Founder decision">
