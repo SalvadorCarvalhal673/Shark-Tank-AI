@@ -48,3 +48,19 @@ Other terminal outcomes (walk-away, all withdrawn, no offers) add no new reactio
 | Cast file | 665,128 bytes | 672,472 bytes (four reaction clips) |
 | Clips | 4 | 8 |
 | Meshes / draw calls | unchanged | unchanged |
+
+## Concession animations (Issue #29)
+
+When a counter keeps an investor in the deal, the studio shows that investor's committed concession in the investor response box, with exact figures from the committed offers (`latestConcession` in `concession.ts`, copy in `concession-note.tsx`):
+
+| Decision | Clip | Copy |
+| --- | --- | --- |
+| Agree (`within-limits`) | Agreeing | "Counter N: agreed to your terms, €X for Y%. Nothing is final until you accept." |
+| Revise (`limited-concession`) | Considering | "Counter N: revised from €A for B% to €C for D%. You proposed €E for F%; this is the most this round allows." |
+| Unchanged (`at-concession-limit`) | Firm | "Counter N: held at €X for Y%. You proposed €E for F%, which is past this investor's last concession." |
+
+- Only committed terms are depicted. Before/after come from the offers that the counter event references, and previews never create a concession.
+- **Independent clips:** each investor has their own skeleton and mixer (Issue #8). A counter changes only that investor's cue key, so only that investor plays a clip, while the others keep theirs.
+- Tests:
+  - `tests/studio-concessions.test.ts` covers before/after/proposed terms for each decision, that the other investors' cues are unchanged, and that a withdrawal is not a concession.
+  - A browser case checks the exact revised figures and that only Maya reacts.

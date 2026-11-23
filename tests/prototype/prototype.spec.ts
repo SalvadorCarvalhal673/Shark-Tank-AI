@@ -236,3 +236,20 @@ test("with reduced motion the camera cuts to the new speaker",async({page})=>{
  await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-motion","reduced");
  await expect.poll(async()=>JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}").camera?.[0],{timeout:3000}).toBe(0);
 });
+
+test("a committed concession is explained with exact terms and only that investor reacts",async({page})=>{
+ await offers(page);
+ const current=await page.getByLabel("Investor response").locator("p",{hasText:"Current offer"}).textContent();
+ const equity=Number(/for ([\d.]+)%/.exec(current!)![1]);
+ const amount=/€([\d,.]+) for/.exec(current!)![1].replace(/,/g,"");
+ await page.getByLabel("Investment (EUR)",{exact:true}).fill(amount);
+ await page.getByLabel("Investor equity (%)",{exact:true}).fill(String(equity-3));
+ await page.getByRole("button",{name:"Send counter to Maya",exact:true}).click();
+ const note=page.getByTestId("concession-note");
+ await expect(note).toHaveAttribute("data-kind","revise");
+ await expect(note).toContainText(`revised from €${Number(amount).toLocaleString("en",{minimumFractionDigits:2})} for ${equity}%`);
+ await expect(note).toContainText(`You proposed €${Number(amount).toLocaleString("en",{minimumFractionDigits:2})} for ${equity-3}%`);
+ await expect(page.getByRole("button",{name:/Maya Chen Finance/})).toContainText("Considering");
+ await expect(page.getByRole("button",{name:/Adrian Vale Growth/})).toContainText("Offering");
+ await expect(page.getByRole("button",{name:/Sofia Mendes Operations/})).toContainText("Offering");
+});
