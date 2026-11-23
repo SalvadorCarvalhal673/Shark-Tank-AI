@@ -50,13 +50,14 @@ test("studio preview and camera selection never consume counters or mutate journ
  for(let i=0;i<100;i++){financialPreview(String(i+1),String((i%99)+1),session.pitch.founderOwnershipBps);sceneCue(session,"maya");}
  assert.equal(JSON.stringify(session),before);assert.equal(session.roundsUsed,0);
 });
-test("original local GLB has embedded geometry and three required gesture clips",async()=>{
+test("original local GLB has embedded geometry and the required gesture clips",async()=>{
  const bytes=await fs.readFile(new URL("../public/studio/investor-v1.glb",import.meta.url));
  const jsonLength=bytes.readUInt32LE(12),json=JSON.parse(bytes.subarray(20,20+jsonLength).toString());
  assert.ok(json.buffers.every((b:{uri?:string})=>!b.uri));
  assert.equal(json.images,undefined);assert.equal(json.extensionsRequired,undefined);
  const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),"");
- assert.deepEqual(gltf.animations.map(c=>c.name),["Listening","Offering","Withdrawal"]);
+ // Issue #9 adds Explaining after the three original clips, which keep their names and order.
+ assert.deepEqual(gltf.animations.map(c=>c.name),["Listening","Offering","Withdrawal","Explaining"]);
 });
 test("three characters have independent bones, mixers and materials but share geometry",async()=>{
  const bytes=await fs.readFile(new URL("../public/studio/investor-v1.glb",import.meta.url));

@@ -5,7 +5,7 @@ import { Canvas, useFrame, useThree, useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { Color, LoopOnce, PerspectiveCamera, Vector3, type Camera } from "three";
 import { createInvestorInstance } from "./avatar";
-import { CAST_URL } from "./rig";
+import { CAST_URL, REDUCED_MOTION_POSE } from "./rig";
 import { StudioRoom } from "./room/studio-room";
 import { SEAT_X } from "./room/layout";
 import { cameraFov, cameraPresets, cameraStep, sceneCue, type CameraView } from "./model";
@@ -35,7 +35,7 @@ function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:S
   const next=instance.mixer.clipAction(clip);
   action.current?.fadeOut(.16);next.reset().setLoop(LoopOnce,1);
   next.clampWhenFinished=true;next.fadeIn(.16).play();action.current=next;
-  if(props.reducedMotion){instance.mixer.update(cue.pose==="Listening"?0:.8);next.paused=true;}
+  if(props.reducedMotion){instance.mixer.update(REDUCED_MOTION_POSE[cue.pose]);next.paused=true;}
   invalidate();
 
  },[animations,cue.key,cue.pose,instance,props.reducedMotion,invalidate]);
