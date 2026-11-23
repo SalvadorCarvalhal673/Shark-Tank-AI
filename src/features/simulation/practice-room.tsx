@@ -118,7 +118,7 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
         <div className="negotiation-heading">
           <h2 ref={heading} tabIndex={-1} data-session-revision={session.revision}>{stage === "final-offers" ? "Final offers." : "Negotiate your terms."}</h2>
           <p className="rounds-remaining">{NEGOTIATION_RULES.counterBudget - session.roundsUsed} shared counters remaining</p>
-          <p className="interaction-state" role="status" aria-live="polite">{committedCounter ? "Reply recorded · " + NEGOTIATION_RULES.investors[committedCounter.investor].name + " responded to counter " + committedCounter.round + "." : "Select an investor to inspect the current terms."}</p>
+          <p className="interaction-state">{committedCounter ? "Reply recorded · " + NEGOTIATION_RULES.investors[committedCounter.investor].name + " responded to counter " + committedCounter.round + "." : "Select an investor to inspect the current terms."}</p>
           <p className="muted">{stage === "final-offers"
             ? "Your counter allowance is used. Accept an active offer or walk away."
             : "Every valid counter uses one shared round, including withdrawals and unchanged offers."}</p>
@@ -131,7 +131,7 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
         </div>
         <div className="negotiation-offers">
           {INVESTOR_ORDER.map((id) => <OfferCard key={id} session={session} investor={id} pending={activePending}
-            selected={selectedInvestor === id} onSelect={() => setSelectedInvestor(id)}
+            selected={selectedInvestor === id}
             headingRef={(element) => { offerHeadings.current[id] = element; }}
             onOpen={open} onClose={() => setPending(null)} onAction={dispatch} />)}
         </div>
