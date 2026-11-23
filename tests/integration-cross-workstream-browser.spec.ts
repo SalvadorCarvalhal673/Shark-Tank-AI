@@ -1,0 +1,28 @@
+import {test,expect} from '@playwright/test';
+import {demoScenarios} from '../src/features/studio/model';
+import {createRun,advanceRun} from '../src/features/simulation/negotiation/session-storage';
+const key='shark-tank-ai.session';
+for(const [index,scenario] of demoScenarios.entries())test('integration: studio-origin '+scenario.id+' journal resumes in gameplay and commits only explicit confirmation',async({page})=>{
+ let run=createRun('handoff-'+index,scenario.pitch)!;
+ for(let turn=0;turn<3;turn++)run=advanceRun(run,{kind:'answer',sessionId:run.session.id,expectedRevision:run.session.revision,turn,text:scenario.answers[turn]});
+ const offer=run.session.offers.find(o=>o.investor==='maya')!;
+ const record=JSON.stringify({schemaVersion:1,rulesVersion:1,sessionId:run.session.id,pitch:run.session.pitch,actions:run.actions,saveId:'handoff-save',generation:1,writerId:'handoff-writer',savedAt:1});
+ await page.goto('/simulate');await expect(page.getByText('Checking saved progress…',{exact:true})).toHaveCount(0);
+ await page.evaluate(({key,record})=>localStorage.setItem(key,record),{key,record});await page.reload();
+ await page.getByRole('button',{name:'Resume saved session',exact:true}).click();
+ await expect(page.locator('.practice-room')).toHaveAttribute('data-session-id',run.session.id);
+ const maya=page.getByRole('article').filter({has:page.getByRole('heading',{name:'Maya Chen',exact:true})});
+ await maya.getByRole('button',{name:'Accept offer',exact:true}).click();
+ const proposed=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),key);
+ expect(proposed.actions).toEqual(run.actions);expect(proposed.sessionId).toBe(run.session.id);
+ await maya.getByRole('button',{name:'Confirm deal',exact:true}).click();
+ await expect(page.getByLabel('Save status',{exact:true})).toHaveText('Save status · Saved');
+ const committed=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),key);
+ expect(committed.actions).toHaveLength(4);expect(committed.actions[3]).toEqual({kind:'accept',sessionId:run.session.id,expectedRevision:3,offerId:offer.id});
+ await expect(page.getByRole('region',{name:'Accepted deal'})).toContainText(index===0?'€434,782.61':'€769,230.77');
+ const founder=page.getByRole('row').filter({has:page.getByRole('rowheader',{name:'Founder',exact:true})});
+ await expect(founder).toContainText(index===0?'61.6%':'52.2%');
+ await page.reload();await page.getByRole('button',{name:'Resume saved session',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Deal with Maya Chen',exact:true})).toBeVisible();
+ expect((await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!),key)).actions).toHaveLength(4);
+});
