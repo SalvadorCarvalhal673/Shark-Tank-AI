@@ -31,6 +31,7 @@ Colours stay per investor (`avatar.ts`, Issues #5–#7). Finish is shared by slo
 | Trousers | 0.85 | 0 | |
 | Hair | 0.50 | 0 | |
 | Brass | 0.32 | 0.55 | Faint warm emissive (0.12) so it reads without reflections |
+| Features | 0.70 | 0 | Merged hair, lapels and collars with baked vertex colours (Issue #12); between the hair and cloth finishes |
 | Shirt | 0.70 | 0 | |
 | Eyes | 0.20 | 0 | |
 

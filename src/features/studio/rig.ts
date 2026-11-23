@@ -59,8 +59,30 @@ export const CAST_BODY = "Cast_Body";
 export const castMeshName = (investor: InvestorId) => `Cast_${investor}`;
 
 /** Material slot names. Per-investor colours are applied to these at runtime (avatar.ts). */
-export const RIG_MATERIALS = ["Skin", "Jacket", "Trousers", "Hair", "Brass", "Shirt", "Eyes"] as const;
+export const RIG_MATERIALS = ["Skin", "Jacket", "Trousers", "Hair", "Brass", "Shirt", "Eyes", "Features"] as const;
 export type RigMaterial = typeof RIG_MATERIALS[number];
+
+/**
+ * Per-investor colours for the slots that differ between investors. Slots not listed use the
+ * generator defaults (Trousers, Shirt, Brass, Eyes). Shared by avatar.ts (runtime material colours)
+ * and the generator, which bakes these colours into each investor's feature mesh (Issue #12).
+ */
+export const INVESTOR_COLORS: Record<InvestorId, Partial<Record<RigMaterial, string>>> = {
+  maya: { Jacket: "#25362f", Hair: "#171c19", Skin: "#b97957" },
+  adrian: { Jacket: "#355985", Hair: "#9c5433", Skin: "#dbac89" },
+  sofia: { Jacket: "#20756e", Hair: "#271e1b", Skin: "#a76e4e" },
+};
+export const SLOT_DEFAULTS: Record<RigMaterial, string> = {
+  Skin: "#b97957", Jacket: "#283c34", Trousers: "#172321", Hair: "#201b18", Brass: "#b99b60", Shirt: "#e8dfc8", Eyes: "#ffffff", Features: "#ffffff",
+};
+
+/**
+ * Feature slots merged into one vertex-coloured "Features" primitive per investor (Issue #12).
+ * DECISION (approved): hair, lapels and collars of each investor share one material, so each
+ * investor's features cost two draw calls (Features + Brass) instead of four. Brass stays separate
+ * so it keeps its metallic shine.
+ */
+export const MERGED_FEATURE_SLOTS = ["Hair", "Jacket", "Shirt"] as const satisfies readonly RigMaterial[];
 
 /** True for any object that belongs to another investor's features and must be removed from this instance. */
 export function belongsToOtherInvestor(name: string, investor: InvestorId) {
