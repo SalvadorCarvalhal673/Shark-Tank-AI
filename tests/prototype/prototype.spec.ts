@@ -178,3 +178,21 @@ test("responsive layouts keep complete controls without horizontal overflow",asy
   await expect(page.getByRole("button",{name:/Sofia Mendes Operations/})).toBeVisible();
  }
 });
+
+test("dialogue names the speaker, keeps the complete transcript and labels scripted replies",async({page})=>{
+ await start(page);
+ const dialogue=page.getByRole("region",{name:"Dialogue"});
+ await expect(dialogue.getByText(/Scripted · rules-based replies, no live AI/)).toBeVisible();
+ await expect(page.getByTestId("active-speaker")).toHaveText("Maya Chen · Finance");
+ await expect(dialogue.getByRole("status")).toContainText("Waiting for your answer to Maya Chen");
+ await page.getByRole("button",{name:"Use sample answer",exact:true}).click();
+ const text=await page.getByLabel("Your answer",{exact:true}).inputValue();
+ await page.getByRole("button",{name:"Submit answer",exact:true}).click();
+ const history=page.getByRole("list",{name:"Dialogue history"});
+ await expect(history.getByText(text,{exact:true})).toBeVisible();
+ await expect(history.locator("li")).toHaveCount(3);
+ await expect(page.getByTestId("active-speaker")).toHaveText("Adrian Vale · Growth");
+ await expect(dialogue.getByRole("status")).toContainText("Waiting for your answer to Adrian Vale");
+ await history.focus();await expect(history).toBeFocused();
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","1");
+});
