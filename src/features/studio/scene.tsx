@@ -53,6 +53,9 @@ function easeFov(camera:Camera,fov:number,step:number){
  if(!(camera instanceof PerspectiveCamera) || Math.abs(camera.fov-fov)<=.01)return;
  camera.fov+=(fov-camera.fov)*step;camera.updateProjectionMatrix();
 }
+/** Squared distance (metres) under which a moving camera snaps exactly onto its preset. */
+const SETTLED=1e-6;
+const goal=new Vector3();
 function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;visible:boolean}){
  const {camera,gl,invalidate,scene,size}=useThree();
  const fov=cameraFov(props.view,size.width/Math.max(size.height,1));
@@ -78,6 +81,8 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
   return ()=>canvas.removeEventListener("webglcontextlost",lost);
  },[gl,onFailure]);
  useFrame((_,delta)=>{
+  // Hidden pages render nothing at once, even before React applies frameloop="never".
+  if(document.hidden)return;
   const step=cameraStep(delta,props.reducedMotion);
   camera.position.lerp(new Vector3(...pose.position),step);
   target.current.lerp(new Vector3(...pose.target),step);camera.lookAt(target.current);
@@ -105,7 +110,11 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
     camera:camera.position.toArray().map(v=>Math.round(v*100)/100),characters,skeletons:skeletons.size,mixers:mixers.size});
    lastSample.current=now;
   }
-  if(settleFrames.current-->0 || (now<wakeUntil.current && !props.reducedMotion))invalidate();
+  // Keep rendering until the shot has actually arrived, not only for a fixed time: on a slow device
+  // the eased camera needs more frames, and stopping early would leave it short of its preset.
+  const arriving=!props.reducedMotion && (camera.position.distanceToSquared(goal.fromArray(pose.position))>SETTLED || target.current.distanceToSquared(goal.fromArray(pose.target))>SETTLED);
+  if(!arriving && !props.reducedMotion){camera.position.fromArray(pose.position);target.current.fromArray(pose.target);camera.lookAt(target.current);}
+  if(settleFrames.current-->0 || arriving || (now<wakeUntil.current && !props.reducedMotion))invalidate();
  });
  return null;
 }
