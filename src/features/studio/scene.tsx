@@ -8,7 +8,7 @@ import { createInvestorInstance } from "./avatar";
 import { CAST_URL, REDUCED_MOTION_POSE } from "./rig";
 import { StudioRoom } from "./room/studio-room";
 import { SEAT_X } from "./room/layout";
-import { cameraFov, cameraPresets, cameraStep, sceneCue, type CameraView } from "./model";
+import { cameraEase, cameraFov, cameraPresets, sceneCue, type CameraView } from "./model";
 import { INVESTOR_ORDER, type InvestorId } from "../simulation/negotiation/investor-policy";
 import type { NegotiationSession } from "../simulation/negotiation/session";
 
@@ -83,7 +83,7 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
  useFrame((_,delta)=>{
   // Hidden pages render nothing at once, even before React applies frameloop="never".
   if(document.hidden)return;
-  const step=cameraStep(delta,props.reducedMotion);
+  const step=cameraEase(delta,props.reducedMotion);
   camera.position.lerp(new Vector3(...pose.position),step);
   target.current.lerp(new Vector3(...pose.target),step);camera.lookAt(target.current);
   // The field of view eases with the same step, so shot changes and window resizes never jump.
@@ -91,7 +91,15 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
   const now=performance.now();
   if(delta>0 && delta<.25)samples.current.push(delta*1000);
   if(samples.current.length>180)samples.current.shift();
-  if(now-lastSample.current>750){
+  // Keep rendering until the shot has actually arrived, not only for a fixed time: on a slow device
+  // the eased camera needs more frames, and stopping early would leave it short of its preset.
+  const arriving=!props.reducedMotion && (camera.position.distanceToSquared(goal.fromArray(pose.position))>SETTLED || target.current.distanceToSquared(goal.fromArray(pose.target))>SETTLED);
+  if(!arriving && !props.reducedMotion){camera.position.fromArray(pose.position);target.current.fromArray(pose.target);camera.lookAt(target.current);}
+  const continuing=settleFrames.current-->0 || arriving || (now<wakeUntil.current && !props.reducedMotion);
+  if(continuing)invalidate();
+  // Metrics are sampled every 750 ms, and always on the last frame before rendering stops. Without
+  // that, a slow device that arrives after the wake window would keep reporting a pre-arrival camera.
+  if(now-lastSample.current>750 || !continuing){
    const frames=[...samples.current].sort((a,b)=>a-b);
    const mean=frames.reduce((a,b)=>a+b,0)/(frames.length||1);
    const context=gl.getContext(),extension=context.getExtension("WEBGL_debug_renderer_info");
@@ -110,11 +118,6 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
     camera:camera.position.toArray().map(v=>Math.round(v*100)/100),characters,skeletons:skeletons.size,mixers:mixers.size});
    lastSample.current=now;
   }
-  // Keep rendering until the shot has actually arrived, not only for a fixed time: on a slow device
-  // the eased camera needs more frames, and stopping early would leave it short of its preset.
-  const arriving=!props.reducedMotion && (camera.position.distanceToSquared(goal.fromArray(pose.position))>SETTLED || target.current.distanceToSquared(goal.fromArray(pose.target))>SETTLED);
-  if(!arriving && !props.reducedMotion){camera.position.fromArray(pose.position);target.current.fromArray(pose.target);camera.lookAt(target.current);}
-  if(settleFrames.current-->0 || arriving || (now<wakeUntil.current && !props.reducedMotion))invalidate();
  });
  return null;
 }
