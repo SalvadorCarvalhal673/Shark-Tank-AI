@@ -11,7 +11,7 @@ Issue #8. This document defines how every investor character is built, animated 
 | Seated skeleton (15 bones) | `Pelvis`, `Chest`, `Head`, `Left/RightArm`, `Left/RightForearm`, `Left/RightThigh`, `Left/RightShin`, plus facial `Brows`, `Left/RightBrow`, `Jaw` (added in Issue #5) | Whole cast |
 | Body mesh | `Cast_Body` | Whole cast: same proportions for every investor |
 | Feature mesh per investor | `Cast_maya`, `Cast_adrian`, `Cast_sofia` | One investor each: hair, accessories, face details |
-| Clips | `Listening`, `Offering`, `Withdrawal` | Whole cast |
+| Clips | `Listening`, `Offering`, `Withdrawal`, plus `Explaining` (Issue #9) and the reactions `Skeptical`, `Agreeing`, `Considering`, `Firm` (Issue #10) | Whole cast |
 
 All meshes are bound to the same bones. At runtime, `createInvestorInstance` (`avatar.ts`) clones the file with SkeletonUtils, removes the other investors' feature meshes, and gives the instance its own skeleton, mixer and materials.
 
