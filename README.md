@@ -6,11 +6,23 @@ University Introduction to Programming group project: pitch a startup to three f
 
 ## Current functionality
 
-Pitch validation; Maya Chen(finance), Adrian Vale(growth), Sofia Mendes(operations); deterministic questions/evidence patterns; competing offers; three shared counters; concessions/withdrawals; explicit acceptance; four outcomes; factual debrief; exact valuation/dilution; optional local saving/replay/recovery and multi-tab coordination.
-The separate development-only 3D studio has independently animated characters, directed cameras, character picking, HTML financial controls and simplified fallback. **Graphics are temporary feasibility assets. Live AI is not implemented.** Scripted text signals do not independently verify business facts. Premium narrative-game visuals, contextual AI and coaching are proposed work.
+- **Practice (`/simulate`).**
+  - Guided pitch preparation with fictional LunchLoop examples, and investor introductions.
+  - Three investors: Maya Chen (finance), Adrian Vale (growth) and Sofia Mendes (operations).
+  - Contextual scripted questions.
+  - Revealed opening offers and an offer comparison with ownership visualisation.
+  - Three shared counters, concessions and policy-specific withdrawals.
+  - Explicit, revision-bound deal confirmation, and four terminal outcomes with cinematic conclusions.
+  - Scorecard, financial explanations, decision analysis, historical review and replay challenges.
+  - Optional local saving, recovery and multi-tab coordination.
+- **Optional investor voice (Phase 4D).** Off by default. It narrates committed moments and offers one founder-confirmed clarification per investor. Every reply is validated and bound to the session, and the scripted fallback is honest. **The production build keeps the AI route disabled, and live AI is not activated** ([details](docs/ai/PHASE-4D.md)).
+- **3D studio (`/prototype/studio`, development only).**
+  - A Rooftop VC Boardroom with three original characters generated in code, on a shared rig.
+  - Gestures, reactions, concessions and withdrawals.
+  - An active-speaker camera, a dialogue transcript and a simplified fallback.
+- **Money.** Always integer cents and basis points, computed by the deterministic engine. Independent oracle tests are in `tests/final-financial-oracle.test.ts`.
 
 ![Current application](docs/design/application.png)
-![Temporary 3D artwork](docs/design/prototype-desktop.png)
 
 ## Install and launch
 
@@ -34,7 +46,9 @@ npm run typecheck
 npx playwright install chromium
 npm run test:e2e
 ```
-See [TESTING](docs/TESTING.md) for the separate prototype suite and browser settings. Current integrated coverage:197 unit tests and100 browser scenarios(82original+6recovery+12prototype). Production intentionally returns404 for the prototype route.
+See [TESTING](docs/TESTING.md) for the prototype suite (`npx playwright test --config playwright.prototype.config.ts`), the CI software-renderer suite and the WebKit suite (`playwright.webkit.config.ts`, on macOS). Release-candidate results are recorded in [RELEASE-READINESS](docs/RELEASE-READINESS.md). Production intentionally returns 404 for the prototype route.
+
+No environment configuration is required. To try the development mock investor voice: `SHARK_AI_BACKEND_MODE=mock npm run dev`. Never put provider keys in `NEXT_PUBLIC_*` variables ([credentials](docs/ai/credentials.md)).
 
 ## Contribute and explore
 
@@ -45,8 +59,17 @@ Read [AGENTS.md](AGENTS.md), [CONTRIBUTING.md](CONTRIBUTING.md) and an available
 - [3D studio](docs/3D-STUDIO.md), [future AI](docs/AI-INTEGRATION.md), [UX](docs/USER-EXPERIENCE.md), [design guidelines](docs/DESIGN-GUIDELINES.md), [design resources](docs/design/README.md)
 - [Testing](docs/TESTING.md), [handover verification](docs/HANDOVER-VERIFICATION.md), [security](docs/security-exceptions.md), [asset provenance](docs/studio-assets.md)
 
-**SE-001 remains unresolved. Public deployment is prohibited pending separate security clearance and approval.** Zero production-audit findings do not clear vendored framework code. Never assume audit fix --force is a remediation.
+**Security:** SE-001 was retired for the reviewed configuration on 22 November 2026 ([record](docs/security-exceptions.md)). **Public deployment is still not authorized:** it needs the release verification in [RELEASE-READINESS](docs/RELEASE-READINESS.md) and the explicit owner approval tracked in Issue #90. Never use `npm audit fix --force` as a remediation.
 Physical Android/iPhone performance, Safari/WebKit, spoken screen readers, production performance certification and final art remain open. Phone viewport emulation is desktop hardware.
 
 
-Phase4C offline architecture and audit corrections are integrated through PR106. Gameplay remains scripted; live AI is absent. [Group synchronization and contracts](docs/PHASE-4C-HANDOVER.md).
+## Team
+
+| Member | Name | Student number | Main workstream |
+| --- | --- | --- | --- |
+| 1 | *to be completed by the group* | | *to be completed* |
+| 2 | Madalena Monteiro | *to be completed* | 3D studio, characters, cameras, reactions |
+| 3 | *to be completed by the group* | | *to be completed* |
+| 4 | *to be completed by the group* | | *to be completed* |
+
+Deployment URL: **none yet.** Public deployment requires the owner approval recorded in Issue #90.
