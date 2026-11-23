@@ -4,7 +4,7 @@ Release-candidate review for Issues #80–#90, with the status of every open iss
 
 ## Verdict
 
-**PROJECT NOT YET RELEASE READY — REMAINING BLOCKERS.** The offline development candidate has passed the recorded checks, with requirements still open below. The issue list below identifies 61 candidates for closure and 13 to keep open at this stage. Confirm each issue against its acceptance criteria before closing it. The release scope is desktop browsers on Windows and macOS. Physical phones are out of scope.
+**PROJECT NOT YET RELEASE READY — REMAINING BLOCKERS.** The offline development candidate has passed the recorded checks, with requirements still open below. The issue list below records the remaining engineering, external verification and approval requirements. The release scope is desktop browsers on Windows and macOS. Physical phones are out of scope.
 
 ## Security review (#80)
 
@@ -64,40 +64,33 @@ The synthetic corpus and suites pass: adversarial sequences, input and race audi
 | Artifact | `next build` production output; the prototype route returns 404; the AI route returns 503 |
 | Credentials | None required; none present |
 | Provider budgets | Not applicable while AI is disabled; durable budgets are an activation blocker |
-| Privacy | Saving is optional and local (browser storage only). No server storage, analytics or AI transmission in production |
+| Privacy | Saving is optional and local (browser storage only). No server storage, analytics or external AI transmission in production. Enabling the optional voice attempts a same-origin request for the committed journal; the production route returns 503. |
 | Monitoring | **None.** Needed before a public release |
 | Hosting | **Not chosen.** Needs the group's decision and professor instructions |
 | Approval (#90) | **Not given.** Deployment is not performed |
 
 ## Issue status
 
-Issues are closed by a maintainer after the PRs are merged into `develop` and re-verified. "Closes" in a PR does not auto-close issues, because `main` is the default branch.
+The [GitHub issues](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues) are the status record. The review used [CI for the integrated application](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/actions/runs/45281883311) and the issue-specific tests and implementation history. Issues #80 and #88 have separate verification and documentation evidence.
 
-**Candidates for closure (61):**
-
-| Area | Issues | Evidence |
-| --- | --- | --- |
-| 3D studio | #1–#13 | PRs #111, #122–#131, #133, #134 |
-| Experience and gameplay | #14–#23, #25, #27–#31, #33–#41 | PRs #110, #112–#120, #132, #135–#140 |
-| Opening reveal, ownership, finance integrity | #24, #26, #32 | Gameplay Completion PR (oracle test, reveal tests) |
-| AI | #58–#60, #62–#66 | Phase 4D: the pipeline runs with a validated development mock and a contextual scripted voice. Live-model quality remains unverified. |
-| Desktop performance and accessibility | #70, #71, #73, #75, #76 | Phase 4E PR |
-| Final verification | #80, #81, #82, #83, #84, #88, #89 | This document; favicon replaced (#84) |
-
-**Remaining (13):**
-
-| Issue | Why it cannot be completed here |
+| Issue | Remaining requirement |
 | --- | --- |
-| #57 | Contextual clarification uses a draft-aware rules-based question, but the production opening question remains fixed; live generation is disabled. |
-| #61 | Exact engine figures appear beside investor narration, but AI-narrated exact financial explanations remain unverified with live inference disabled. |
-| #67, #68 | Physical Android/iPhone performance. Out of the agreed desktop scope; deferred, **not passed** |
-| #72 | Desktop widths, targets and keyboard pass. Phones, the virtual keyboard and touch are out of scope (deferred) |
-| #69 | Windows Playwright WebKit ran with failures listed below. Complete automated verification and a manual pass in real macOS Safari. |
-| #74 | A person must use VoiceOver and NVDA (procedure in `docs/qa/phase-4e.md`) |
-| #77 | Needs five beginner participants (script in `docs/qa/phase-4e.md`) |
-| #78, #86, #87 | Script, preflight (`npm run demo:check`) and an automated timed run are ready. The group must rehearse it out loud |
-| #85 | The deck is ready (12 slides with notes). The group must fill in names, student numbers and the final test counts |
-| #90 | Owner approval for public deployment, after a hosting decision and monitoring |
+| [#57](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/57) | The production opening questions are fixed. Clarifications use local draft signals. Implement and test questions based on confirmed pitch context with the same answer budget. |
+| [#61](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/61) | Exact values are displayed separately from the voice. Add and verify narration tied to engine cents, basis points and relative dilution before closing. |
+| [#65](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/65) | Validation rejects malformed and misbound responses, but the optional voice can still display prior-revision text while a new answer is pending. Verify the render and cancellation behavior under delayed replies before closure. |
+| [#67](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/67) | Deferred for the desktop demonstration. Physical Android performance has not been measured. |
+| [#68](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/68) | Deferred for the desktop demonstration. Physical iPhone and iOS Safari performance has not been measured. |
+| [#69](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/69) | Windows Playwright WebKit passed 106/108 in the last full run. Quota recovery and blocked-storage practice failed. Diagnose the intermittent input issue and verify macOS Safari before claiming support. |
+| [#70](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/70) | Transfer sizes, CPU decoding and time to ready are recorded. Capture distinct cold network transfer and GPU compile stages to meet the full acceptance criteria. |
+| [#72](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/72) | Automated narrow-width and target-size checks passed. Real-phone touch and virtual-keyboard tests are deferred for the desktop demonstration. |
+| [#74](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/74) | Automated roles and focus passed. Record spoken VoiceOver and NVDA/browser journeys with human testers. |
+| [#77](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/77) | Run the prepared tasks with five consenting beginners and record anonymized usability findings. |
+| [#78](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/78) | The scripted demo path is covered by automation. Record a timed team presentation with a tested fallback before closure. |
+| [#85](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/85) | The presentation deck and script are referenced. The group needs to verify the deck, complete member names and IDs, and confirm the final test counts. |
+| [#86](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/86) | The automated LunchLoop sequence checks exact figures. Rehearse the live sequence and verify the counter, acceptance and debrief shown to the class. |
+| [#87](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/87) | The local scripted and simplified paths exist. Rehearse the fallback on the presentation machine with provider/network and GPU failure scenarios. |
+| [#89](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/89) | The local production build is verified. Select hosting and review the exact hosted artifact, HTTPS exposure, privacy and monitoring plan before deployment. |
+| [#90](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/90) | Public deployment requires a separate owner decision after the hosting, security and readiness review. |
 
 ## Verification results
 

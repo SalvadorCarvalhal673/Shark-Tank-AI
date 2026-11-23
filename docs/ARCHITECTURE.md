@@ -14,10 +14,10 @@ flowchart TD
  HTML --> Cues["studio/model.ts: committed-state projection"]
  Cues --> Canvas["scene.tsx + avatar.ts: cameras/rigs/mixers"]
  Canvas --> Fallback["simplified presentation"]
- AI["Future server AI: untrusted narration/evidence proposal"] -.-> Confirmation["Reviewed adapter and founder confirmation"]
- Confirmation -.-> Controller
+ UI --> Voice["Optional investor voice: validated read-only narration"]
+ Voice -.-> Draft["Founder may copy a clarification into the editable draft"]
 ```
-No animation or AI callback is authoritative for financial outcomes.
+No animation or AI callback is authoritative for financial outcomes. Only explicit founder actions reach the controller. The optional voice sends the committed journal to the application route when enabled. The production route returns 503 and the panel uses the local scripted fallback. Draft text is processed locally.
 
 ## Exact source map
 
