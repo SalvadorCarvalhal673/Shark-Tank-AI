@@ -15,8 +15,8 @@ import type { NegotiationSession } from "../simulation/negotiation/session";
 type Metrics = {fps:number;frameP95Ms:number;triangles:number;drawCalls:number;geometries:number;textures:number;
  renderer:string;camera:number[];characters:number;skeletons:number;mixers:number};
 export type StudioSceneProps = {
- view:CameraView;selected:InvestorId;session:NegotiationSession|null;reducedMotion:boolean;fault:string;
- onSelect:(investor:InvestorId)=>void;onFailure:(reason:string)=>void;onMetrics:(value:Metrics)=>void;
+ view:CameraView;selected:InvestorId|null;session:NegotiationSession|null;reducedMotion:boolean;fault:string;
+ onSelect:(investor:InvestorId)=>void;onFailure:(reason:string)=>void;onMetrics?:(value:Metrics)=>void;
 };
 export function clearFailedAsset(){
  useLoader.clear(GLTFLoader,CAST_URL);
@@ -89,7 +89,7 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
   // The field of view eases with the same step, so shot changes and window resizes never jump.
   easeFov(camera,fov,step);
   const now=performance.now();
-  if(delta>0 && delta<.25)samples.current.push(delta*1000);
+  if(props.onMetrics && delta>0 && delta<.25)samples.current.push(delta*1000);
   if(samples.current.length>180)samples.current.shift();
   // Keep rendering until the shot has actually arrived, not only for a fixed time: on a slow device
   // the eased camera needs more frames, and stopping early would leave it short of its preset.
@@ -99,7 +99,7 @@ function Direction({props,ready,visible}:{props:StudioSceneProps;ready:boolean;v
   if(continuing)invalidate();
   // Metrics are sampled every 750 ms, and always on the last frame before rendering stops. Without
   // that, a slow device that arrives after the wake window would keep reporting a pre-arrival camera.
-  if(now-lastSample.current>750 || !continuing){
+  if(props.onMetrics && (now-lastSample.current>750 || !continuing)){
    const frames=[...samples.current].sort((a,b)=>a-b);
    const mean=frames.reduce((a,b)=>a+b,0)/(frames.length||1);
    const context=gl.getContext(),extension=context.getExtension("WEBGL_debug_renderer_info");

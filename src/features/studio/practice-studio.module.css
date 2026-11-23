@@ -1,0 +1,40 @@
+.studio {
+  display: grid;
+  gap: .75rem;
+  min-width: 0;
+  margin-block: 1rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+}
+
+.toolbar button[aria-pressed="true"] {
+  border-color: currentColor;
+}
+
+.toolbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 2rem;
+}
+
+.viewport {
+  position: relative;
+  height: clamp(16rem, 58vw, 30rem);
+  overflow: hidden;
+  border: 1px solid #435745;
+  border-radius: 12px;
+  background: #17271f;
+  color: #f2f1e9;
+}
+
+.viewport p {
+  position: absolute;
+  inset: 1rem 1rem auto;
+  pointer-events: none;
+}
