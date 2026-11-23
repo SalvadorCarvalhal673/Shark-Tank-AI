@@ -12,6 +12,7 @@ import { money } from "../simulation/pitch";
 import { percent } from "../simulation/negotiation/terms-display";
 import { demoScenarios, financialPreview, sceneCue, type CameraView } from "./model";
 import type { StudioSceneProps } from "./scene";
+import { DialoguePanel } from "./dialogue-panel";
 
 const Scene = dynamic(()=>import("./scene").then(module=>module.StudioScene),{
  ssr:false,loading:()=> <p className="studio-loading" role="status">Loading 3D code… HTML controls are ready.</p>,
@@ -112,6 +113,19 @@ export function StudioPrototype(){
      <p aria-live="polite">{response}</p>
      {activeOffer && <p>Current offer: <strong>{money(activeOffer.amount,session!.pitch.currency)} for {percent(activeOffer.equity)}</strong></p>}
     </section>
+    <DialoguePanel session={session}>
+    {session?.stage==="questions" && currentInvestor && <form className="studio-composer" aria-label="Your reply" onSubmit={event=>{
+     event.preventDefault();if(answer.trim().length<10 || answer.trim().length>1500)return;
+     controller.dispatch({kind:"answer",sessionId:session.id,expectedRevision:session.revision,
+       turn:session.answers.length,text:answer});setAnswer("");setFeedback("Answer submitted to the deterministic engine.");
+    }}>
+     <p className="studio-muted">Replying to {NEGOTIATION_RULES.investors[currentInvestor].name}. Their full question is the last line above.</p>
+     <label htmlFor="studio-answer">Your answer</label>
+     <textarea id="studio-answer" minLength={10} maxLength={1500} required value={answer} onChange={event=>setAnswer(event.target.value)}/>
+     <div className="studio-actions"><button type="button" onClick={()=>setAnswer(scenario.answers[session.answers.length])}>Use sample answer</button>
+      <button className="button" type="submit">Submit answer</button></div>
+    </form>}
+    </DialoguePanel>
     <details className="studio-diagnostics">
      <summary>Rendering measurements</summary>
      <p>Live counters describe this renderer only; they are not physical mobile certification.</p>
@@ -143,17 +157,6 @@ export function StudioPrototype(){
      data-revision={session?.revision ?? 0} data-rounds={session?.roundsUsed ?? 0}>
      <span>Revision <b>{session?.revision ?? 0}</b></span><span>Counters left <b>{remaining}</b></span>
     </div>
-    {session?.stage==="questions" && currentInvestor && <form onSubmit={event=>{
-     event.preventDefault();if(answer.trim().length<10 || answer.trim().length>1500)return;
-     controller.dispatch({kind:"answer",sessionId:session.id,expectedRevision:session.revision,
-       turn:session.answers.length,text:answer});setAnswer("");setFeedback("Answer submitted to the deterministic engine.");
-    }}>
-     <p>{NEGOTIATION_RULES.investors[currentInvestor].question}</p>
-     <label htmlFor="studio-answer">Your answer</label>
-     <textarea id="studio-answer" minLength={10} maxLength={1500} required value={answer} onChange={event=>setAnswer(event.target.value)}/>
-     <div className="studio-actions"><button type="button" onClick={()=>setAnswer(scenario.answers[session.answers.length])}>Use sample answer</button>
-      <button className="button" type="submit">Submit answer</button></div>
-    </form>}
     <form className="studio-financial-form" onSubmit={event=>{
      event.preventDefault();
      if(!session || !activeOffer || !canCounter || !preview.terms)return;
