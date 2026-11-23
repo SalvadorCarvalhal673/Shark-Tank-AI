@@ -9,13 +9,16 @@ import { buildContext, type ConversationContext } from "../../ai/context";
 import { scriptedFallback } from "../../ai/fallback";
 import { RequestLifecycle } from "../../ai/lifecycle";
 import { clarify, startClarifications, type ClarificationState } from "../../ai/clarification";
+import { clarificationQuestion, scriptedReply } from "../../ai/scripted-voice";
 import { buildVoiceRequest, clarificationTarget, engineFacts, narrationTarget, recoveryNote, requestInvestorVoice, type VoiceTarget } from "../../ai/client";
 import { money } from "../pitch";
 import { NEGOTIATION_RULES } from "./investor-policy";
 import type { SessionRun } from "./session-storage";
 import { percent } from "./terms-display";
 
-type Shown = Readonly<{ target: VoiceTarget; revision: number; response: AppResponse; context: ConversationContext; note: string | null }>;
+/** Contextual scripted text replaces the generic fallback whenever no validated AI reply is shown. */
+type Scripted = Readonly<{ dialogue: string; suggestions: readonly string[] }>;
+type Shown = Readonly<{ target: VoiceTarget; revision: number; response: AppResponse; context: ConversationContext; note: string | null; scripted: Scripted | null; suggestions: readonly string[] }>;
 type VoiceState = Readonly<{ waiting: VoiceTarget | null; shown: Shown | null }>;
 
 const PURPOSE_LABEL: Record<VoiceTarget["purpose"], string> = {
@@ -42,14 +45,18 @@ function useInvestorVoice(run: SessionRun, enabled: boolean) {
     if (!current.consume(request.binding)) return null;
     current.presentationFinished(request.binding);
     if (result.kind === "reply") {
-      const shown: Shown = { target, revision, response: result.response, context: result.context, note: result.response.provenance === "scripted" ? "The server used the scripted continuation." : null };
+      const scripted = result.response.provenance === "scripted" ? scriptedReply(run.session, target.investorId, target.purpose) : null;
+      const shown: Shown = { target, revision, response: result.response, context: result.context, scripted,
+        suggestions: target.purpose === "outcome" ? scriptedReply(run.session, target.investorId, "outcome").suggestions : scripted?.suggestions ?? [],
+        note: scripted ? "The server used the scripted continuation." : null };
       setState({ waiting: null, shown });
       return shown;
     }
     const recovery = recoveryNote(result);
     const context = buildContext(request);
     if (!recovery || !context) { setState(previous => ({ ...previous, waiting: null })); return null; }
-    const shown: Shown = { target, revision, response: scriptedFallback(context, recovery.reason), context, note: recovery.note };
+    const scripted = scriptedReply(run.session, target.investorId, target.purpose);
+    const shown: Shown = { target, revision, response: scriptedFallback(context, recovery.reason), context, note: recovery.note, scripted, suggestions: scripted.suggestions };
     setState({ waiting: null, shown });
     return shown;
   }
@@ -63,12 +70,13 @@ function useInvestorVoice(run: SessionRun, enabled: boolean) {
   }, [enabled, sessionId, revision]);
 
   useEffect(() => () => lifecycle.current?.dispose(), []);
-  return { state: enabled ? state : { waiting: null, shown: null }, ask };
+  return { state: enabled ? state : { waiting: null, shown: null }, ask, epoch: () => lifecycle.current?.epoch ?? 0 };
 }
 
-export function InvestorVoice({ run, onUseInAnswer }: { run: SessionRun; onUseInAnswer: (text: string) => void }) {
+export function InvestorVoice({ run, draft, onUseInAnswer }: { run: SessionRun; draft: string; onUseInAnswer: (text: string) => void }) {
   const [enabled, setEnabled] = useState(false);
-  const { state, ask } = useInvestorVoice(run, enabled);
+  const { state, ask, epoch } = useInvestorVoice(run, enabled);
+  const [clarifyNote, setClarifyNote] = useState("");
   const [clarifications, setClarifications] = useState<ClarificationState>(() => startClarifications(run.session.id));
   const [reply, setReply] = useState("");
   const shown = state.shown;
@@ -77,9 +85,20 @@ export function InvestorVoice({ run, onUseInAnswer }: { run: SessionRun; onUseIn
 
   async function requestClarification() {
     if (!asking) return;
+    setClarifyNote("");
     const result = await ask(asking);
-    if (!result || !result.response.question || result.response.provenance === "scripted") return;
-    setClarifications(previous => clarify(previous, { kind: "ask", binding: result.response.binding, text: result.response.question }, result.response.binding, true));
+    if (result && result.response.question && result.response.provenance !== "scripted") {
+      const { binding, question } = result.response;
+      setClarifications(previous => clarify(previous, { kind: "ask", binding, text: question }, binding, true));
+      return;
+    }
+    // No validated AI question: ask the scripted, draft-aware question instead (the draft stays here).
+    const local = clarificationQuestion(run.session, draft);
+    if (!local) return;
+    if (!local.question) { setClarifyNote(local.note); return; }
+    const binding = buildVoiceRequest(run, asking, `clarify-${run.session.revision}`, epoch()).binding;
+    setClarifyNote(local.note);
+    setClarifications(previous => clarify(previous, { kind: "ask", binding, text: local.question }, binding, true));
   }
   function finishClarification(kind: "answer" | "skip") {
     if (!entry) return;
@@ -105,8 +124,8 @@ export function InvestorVoice({ run, onUseInAnswer }: { run: SessionRun; onUseIn
         {state.waiting ? `Requesting ${name(state.waiting)}'s voice for revision ${run.session.revision}…` : shown ? `${name(shown.target)} · ${PURPOSE_LABEL[shown.target.purpose]} · revision ${shown.revision}` : "Waiting for the next committed moment."}
       </p>
       {shown && <article className="investor-voice-reply" data-provenance={shown.response.provenance} data-revision={shown.revision}>
-        <p className="dialogue-speaker">{name(shown.target)} · {shown.response.provenance === "scripted" ? "Scripted continuation" : shown.response.provenance === "mock" ? "Development mock voice" : "AI voice"}</p>
-        <p>{shown.response.dialogue}</p>
+        <p className="dialogue-speaker">{name(shown.target)} · {shown.scripted ? "Scripted voice (rules-based)" : shown.response.provenance === "mock" ? "Development mock voice" : "AI voice"}</p>
+        <p>{shown.scripted ? shown.scripted.dialogue : shown.response.dialogue}</p>
         {shown.response.question && <p><strong>Question:</strong> {shown.response.question}</p>}
         {shown.response.observations.length > 0 && <ul className="investor-voice-observations" aria-label="Unverified observations">
           {shown.response.observations.map((observation, index) => <li key={index}>
@@ -114,11 +133,15 @@ export function InvestorVoice({ run, onUseInAnswer }: { run: SessionRun; onUseIn
           </li>)}
         </ul>}
         {engineFacts(shown.context).map(fact => <p key={fact.offerId} className="investor-voice-facts">Engine figures: {money(fact.amountMinor, shown.context.session.pitch.currency)} for {percent(fact.equityBps)}{fact.ownership && <> · founder after {percent(fact.ownership.founderAfterBps)}</>}</p>)}
+        {shown.suggestions.length > 0 && <ul className="investor-voice-observations" aria-label="Suggestions for your next practice (not facts)">
+          {shown.suggestions.map(suggestion => <li key={suggestion}>{suggestion}</li>)}
+        </ul>}
         {shown.note && <p className="muted" role="note">{shown.note}</p>}
         <ul className="investor-voice-limits">{shown.response.limitations.map(limit => <li key={limit}>{limit}</li>)}</ul>
       </article>}
       {asking && !entry && <button className="button secondary" type="button" disabled={Boolean(state.waiting)} onClick={requestClarification}>
         Ask {name(asking)} for one clarification</button>}
+      {clarifyNote && <p className="muted" data-testid="clarification-note">{clarifyNote}</p>}
       {asking && entry?.status === "asked" && <div className="investor-voice-clarify">
         <p><strong>{name(asking)} asks:</strong> {entry.question}</p>
         <label>Your clarification (stays on this page)<textarea rows={3} maxLength={1500} value={reply} onChange={event => setReply(event.target.value)} /></label>

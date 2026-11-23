@@ -77,3 +77,23 @@ test("contradictory and failing replies are discarded with a truthful status", a
   await expect(voice(page).getByRole("note")).toContainText("request limit was reached");
   await expect(page.getByText("Question 2 of 3")).toBeVisible();
 });
+
+test("without any AI service the scripted voice asks a draft-aware clarification and coaches the outcome", async ({ page }) => {
+  await startPractice(page);
+  await voice(page).getByLabel("AI investor voice").check();
+  await expect(voice(page)).toContainText("Scripted voice (rules-based)");
+  await page.getByLabel("Your answer").fill("We help campus cafés reduce packaging waste.");
+  await voice(page).getByRole("button", { name: "Ask Maya Chen for one clarification" }).click();
+  await expect(voice(page)).toContainText("Which financial measure can you put a figure on");
+  await expect(page.getByTestId("clarification-note")).toContainText("cannot yet find");
+  await voice(page).getByLabel("Your clarification (stays on this page)").fill("Revenue: €9000 per month from three cafés.");
+  await voice(page).getByRole("button", { name: "Add to my answer draft" }).click();
+  await expect(page.getByLabel("Your answer")).toHaveValue("We help campus cafés reduce packaging waste.\n\nRevenue: €9000 per month from three cafés.");
+  await expect(page.getByText("Question 1 of 3")).toBeVisible();
+  for (let turn = 0; turn < 3; turn++) {
+    await page.getByLabel("Your answer").fill(`We are excited about our product, part ${turn + 1}.`);
+    await page.getByRole("button", { name: "Submit answer" }).click();
+  }
+  await expect(page.getByRole("heading", { name: "Your debrief." })).toBeVisible();
+  await expect(voice(page).getByRole("list", { name: /Suggestions for your next practice/ })).toContainText("No investor made an opening offer");
+});

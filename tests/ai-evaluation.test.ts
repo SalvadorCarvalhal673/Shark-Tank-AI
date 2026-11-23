@@ -55,7 +55,7 @@ test("AI protected UI remains isolated while the authorized server route uses on
     if(file.pathname.endsWith("/features/simulation/negotiation/investor-voice.tsx")){
       assert.doesNotMatch(source,/\/ai\/server\/|openai|process\.env|onAction|dispatch\(/);
       for(const [,path] of source.matchAll(/from\s+["']([^"']*\/ai\/[^"']*)["']/g))
-        assert.match(path,/\/ai\/(contracts|context|fallback|lifecycle|clarification|client)$/,path);
+        assert.match(path,/\/ai\/(contracts|context|fallback|lifecycle|clarification|client|scripted-voice)$/,path);
       continue;
     }
     assert.doesNotMatch(source,/features\/ai|from\s+["'][^"']*\/ai\//);

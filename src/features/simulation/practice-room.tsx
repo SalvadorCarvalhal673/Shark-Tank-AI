@@ -96,7 +96,7 @@ export function PracticeRoom({ session, run, onAction, onExit, persistenceMessag
         </article>)}
         <p className="history-summary" aria-live="polite">{answers.length === 0 ? "No replies yet. Your submitted exchanges will remain here for review." : `${answers.length} of ${INVESTOR_ORDER.length} investor exchanges available above.`}</p>
       </section>
-      {run && run.session === session && <InvestorVoice run={run}
+      {run && run.session === session && <InvestorVoice run={run} draft={answerDraft}
         onUseInAnswer={(text) => setAnswerDraft((draft) => draft ? draft + "\n\n" + text : text)} />}
       <div className="practice-panel">
         {INVESTOR_ORDER.map((id) => <div key={id} className={stage === "questions" && id === investor ? "active-investor" : ""}>
