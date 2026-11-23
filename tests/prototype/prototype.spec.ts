@@ -212,3 +212,27 @@ test("counter binding is explicit and a double submit commits exactly one shared
  await expect(page.getByRole("list",{name:"Shared counters: 2 of 3 left"})).toBeVisible();
  if(await binding.count()) expect(await binding.getAttribute("data-offer-id")).not.toBe(offerId);
 });
+
+test("the camera follows each new speaker, can be interrupted and never changes the session",async({page})=>{
+ const cameraX=async()=>JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}").camera?.[0];
+ await start(page);await enter(page);
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","maya");
+ await expect.poll(cameraX).toBe(-2.5);
+ await page.getByRole("button",{name:"Use sample answer",exact:true}).click();
+ await page.getByRole("button",{name:"Submit answer",exact:true}).click();
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","adrian");
+ await page.getByRole("button",{name:/Sofia Mendes Operations/}).click();
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","sofia");
+ await expect.poll(cameraX).toBe(2.5);
+ await page.waitForTimeout(500);
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","sofia");
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","1");
+});
+test("with reduced motion the camera cuts to the new speaker",async({page})=>{
+ await page.emulateMedia({reducedMotion:"reduce"});await start(page);await enter(page);
+ await page.getByRole("button",{name:"Use sample answer",exact:true}).click();
+ await page.getByRole("button",{name:"Submit answer",exact:true}).click();
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-view","adrian");
+ await expect(page.getByTestId("studio-viewport")).toHaveAttribute("data-motion","reduced");
+ await expect.poll(async()=>JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}").camera?.[0],{timeout:3000}).toBe(0);
+});

@@ -105,3 +105,26 @@ export const demoScenarios = [
    "Target segment: university campus cafes; Acquisition channel: campus partnerships and cafe demonstrations; CAC: 300 per cafe.",
    "Customer evidence: five pilot cafes renewed after students requested more return points; Milestone: add two return stations and sign five more cafes within three months."]},
 ] as const;
+
+/**
+ * Who the camera should frame for the latest committed moment (Issue #19). The key changes only when a
+ * new moment is committed, so the studio moves the camera once per moment and the founder can
+ * interrupt it at any time by choosing another view.
+ * DECISION (approved): follow every new speaker; a manual choice holds until the next moment.
+ * Openings are simultaneous, so they frame the whole panel; so do outcomes without a deal.
+ */
+export function activeSpeaker(session: NegotiationSession | null): { view: CameraView; key: string } {
+  if (!session) return { view: "panel", key: "idle" };
+  if (session.stage === "questions") {
+    const asking = INVESTOR_ORDER[session.answers.length];
+    return { view: asking, key: `${session.id}:q${session.answers.length}` };
+  }
+  const outcome = session.outcome;
+  if (outcome) {
+    const investor = outcome.kind === "accepted-deal" ? session.offers.find(offer => offer.id === outcome.offerId)?.investor : undefined;
+    return { view: investor ?? "panel", key: `${session.id}:end:${session.revision}` };
+  }
+  const last = session.history.findLast(event => event.kind === "counter" || event.kind === "opening");
+  if (last?.kind === "counter") return { view: last.investor, key: `${session.id}:c:${last.revision}` };
+  return { view: "panel", key: `${session.id}:open` };
+}

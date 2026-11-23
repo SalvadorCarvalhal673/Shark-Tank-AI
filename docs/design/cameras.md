@@ -64,3 +64,20 @@ The prototype's studio viewport on a 390 × 844 phone is about 362 × 331 px (as
 - The field of view never grows as the screen widens, stays within 43–74°, and is unchanged on landscape screens.
 - Every camera is inside the room, above the desk and in front of the investors.
 - No orbit, fly, pointer-lock or similar free-camera control exists in the studio.
+
+## Active-speaker transitions (Issue #19)
+
+`activeSpeaker(session)` in `model.ts` names who the camera should frame for the latest committed moment, and gives that moment a key:
+
+| Moment | Camera |
+| --- | --- |
+| A question is open | The investor asking it |
+| Opening decisions (all three at once) | Full panel |
+| A counter is answered | The investor who replied |
+| Deal accepted | The investor in the deal |
+| Walk-away, all withdrawn, no offers | Full panel |
+
+- **Once per moment.** The studio moves the camera only when the key changes, by deriving it during render. No effect or camera callback dispatches anything, and rejected or repeated actions keep the same key, so they move nothing.
+- **Interruptible.** **DECISION (approved):** the camera follows every new speaker, but the founder can pick another investor or Full panel at any time, even mid-move. That choice holds until the next committed moment. The caption shows "· FOLLOWING SPEAKER" while the camera is on the speaker.
+- **Reduced motion.** The existing reduced-motion rule applies: the camera cuts to the speaker instead of gliding.
+- **Tests.** `tests/studio-speaker-camera.test.ts` checks the speaker for each moment and that keys change once per moment. The browser tests in `tests/prototype/prototype.spec.ts` check that the camera follows a new question, that a mid-move click on another investor wins and holds, that the revision only changes on submit, and that the reduced-motion transition is a cut.
