@@ -165,6 +165,7 @@ test("quota failure preserves memory and deliberate retry succeeds", async ({ pa
   await expect(page.getByLabel("Save status")).toContainText("Saving unavailable");
   await page.getByLabel("Your answer").fill(investorAnswers[0]);
   await page.getByRole("button", { name: "Submit answer" }).click();
+  await expect(page.getByRole("heading", { name: "Adrian Vale", exact: true })).toBeFocused();
   await page.evaluate(() => { (window as unknown as { qaAllowSave: boolean }).qaAllowSave = true; });
   await page.getByRole("button", { name: "Retry saving" }).click();
   await saved(page);
@@ -374,10 +375,13 @@ test("a rejected lock request is recoverable without unsafe writes", async ({ pa
   await page.addInitScript(() => {
     const real = navigator.locks.request.bind(navigator.locks);
     Object.defineProperty(window, "qaRejectLock", { value: true, writable: true });
-    navigator.locks.request = ((...args: unknown[]) => {
+    const mocked = Object.create(navigator.locks) as LockManager;
+    mocked.request = ((...args: unknown[]) => {
       if ((window as unknown as { qaRejectLock: boolean }).qaRejectLock) return Promise.reject(new Error("unavailable"));
       return (real as (...args: unknown[]) => Promise<unknown>)(...args);
     }) as typeof navigator.locks.request;
+    // WebKit can replace the native LockManager after navigation; keep the injected manager stable.
+    Object.defineProperty(navigator, "locks", { configurable: true, value: mocked });
   });
   await prepare(page);
   await expect(page.getByLabel("Save status")).toContainText("Saving unavailable");

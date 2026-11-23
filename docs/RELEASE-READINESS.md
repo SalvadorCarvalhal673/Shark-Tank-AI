@@ -4,7 +4,7 @@ Release-candidate review for Issues #80–#90, with the status of every open iss
 
 ## Verdict
 
-**PROJECT NOT YET RELEASE READY — REMAINING BLOCKERS.** All engineering work that can be done and verified without devices, people or approvals is complete and green. **63 of the 74 open issues are resolved.** The 11 that remain need a person, a Mac or an approval (see [Issue status](#issue-status)). The release scope is desktop browsers on Windows and macOS. Physical phones are out of scope.
+**PROJECT NOT YET RELEASE READY — REMAINING BLOCKERS.** The offline development candidate has passed the recorded checks, with requirements still open below. The issue list below identifies 61 candidates for closure and 13 to keep open at this stage. Confirm each issue against its acceptance criteria before closing it. The release scope is desktop browsers on Windows and macOS. Physical phones are out of scope.
 
 ## Security review (#80)
 
@@ -73,24 +73,26 @@ The synthetic corpus and suites pass: adversarial sequences, input and race audi
 
 Issues are closed by a maintainer after the PRs are merged into `develop` and re-verified. "Closes" in a PR does not auto-close issues, because `main` is the default branch.
 
-**Resolved (63):**
+**Candidates for closure (61):**
 
 | Area | Issues | Evidence |
 | --- | --- | --- |
 | 3D studio | #1–#13 | PRs #111, #122–#131, #133, #134 |
 | Experience and gameplay | #14–#23, #25, #27–#31, #33–#41 | PRs #110, #112–#120, #132, #135–#140 |
 | Opening reveal, ownership, finance integrity | #24, #26, #32 | Gameplay Completion PR (oracle test, reveal tests) |
-| AI | #57–#66 | Phase 4D PR: the pipeline runs with a validated development mock and a contextual scripted voice. **Live-model quality is unverified, because no provider is active.** |
+| AI | #58–#60, #62–#66 | Phase 4D: the pipeline runs with a validated development mock and a contextual scripted voice. Live-model quality remains unverified. |
 | Desktop performance and accessibility | #70, #71, #73, #75, #76 | Phase 4E PR |
 | Final verification | #80, #81, #82, #83, #84, #88, #89 | This document; favicon replaced (#84) |
 
-**Remaining (11):**
+**Remaining (13):**
 
 | Issue | Why it cannot be completed here |
 | --- | --- |
+| #57 | Contextual clarification uses a draft-aware rules-based question, but the production opening question remains fixed; live generation is disabled. |
+| #61 | Exact engine figures appear beside investor narration, but AI-narrated exact financial explanations remain unverified with live inference disabled. |
 | #67, #68 | Physical Android/iPhone performance. Out of the agreed desktop scope; deferred, **not passed** |
 | #72 | Desktop widths, targets and keyboard pass. Phones, the virtual keyboard and touch are out of scope (deferred) |
-| #69 | Needs a Mac: `playwright.desktop.config.ts --project=webkit`, then a manual pass in real Safari. WebKit cannot be installed in this container |
+| #69 | Windows Playwright WebKit ran with failures listed below. Complete automated verification and a manual pass in real macOS Safari. |
 | #74 | A person must use VoiceOver and NVDA (procedure in `docs/qa/phase-4e.md`) |
 | #77 | Needs five beginner participants (script in `docs/qa/phase-4e.md`) |
 | #78, #86, #87 | Script, preflight (`npm run demo:check`) and an automated timed run are ready. The group must rehearse it out loud |
@@ -115,3 +117,11 @@ Final run on 23 November 2026, starting from a clean `npm ci`, on code at `10224
 | Chrome, Edge, WebKit projects (`playwright.desktop.config.ts`) | **Not run here**: those browsers are not installed in the container. Commands are in `docs/qa/phase-4e.md` |
 
 No test was skipped or deleted.
+
+### Integration verification
+
+On Windows, a fresh install, lint, TypeScript, the production build, both dependency audits, and all 342 unit tests passed. Chrome passed all 108 application scenarios. Each of the two full Edge application runs passed 106 scenarios, with different interaction timeouts. Each of the four scenarios passed all three isolated repeats.
+
+The initial Windows WebKit run passed 106 of 108 scenarios. One browser launch failed, and a native Web Locks object replaced the lock rejection override during the test. The keyboard case passed in isolation, and the stable lock fixture passed three repeats. A subsequent full WebKit run passed 106 of 108, with failures in quota recovery and the blocked-storage journey. A follow-up probe observed an empty answer field after Playwright filled it in four of eight attempts. The cause of those intermittent input failures remains unverified. Real Safari remains unverified.
+
+In the isolated software WebGL suite, 19 of 20 scenarios passed initially. The GPU comparison read an empty geometry count during the final remount. The test now waits for the cast and geometry before comparing the same resource counts. Its focused software WebGL rerun passed all 18 switches.

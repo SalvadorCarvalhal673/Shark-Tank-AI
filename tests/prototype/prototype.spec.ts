@@ -276,7 +276,9 @@ test("repeated 3D and simplified switches release GPU contexts and keep resource
  // Uploads follow what has been drawn, so measure the whole room from the settled Full panel shot.
  const fullPanel=async()=>{
   await page.getByRole("button",{name:"Full panel",exact:true}).click();
-  await expect.poll(cameraX,{timeout:20000}).toBe(0);await page.waitForTimeout(1500);
+  await expect.poll(cameraX,{timeout:20000}).toBe(0);
+  await expect.poll(async()=>{const metrics=JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}");return metrics.geometries>0&&metrics.characters===3;},{timeout:45000}).toBe(true);
+  await page.waitForTimeout(1500);
   return JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}");
  };
  await start(page);await enter(page);
