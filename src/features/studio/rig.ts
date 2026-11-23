@@ -1,0 +1,90 @@
+// Shared character rig contract (Issue #8). Pure data used by the GLB generator, the runtime
+// (avatar.ts / scene.tsx) and the tests, so all three agree on one skeleton, one clip set and one
+// way of telling which meshes belong to which investor.
+import type { InvestorId } from "../simulation/negotiation/investor-policy.ts";
+
+/** One local file holds the whole cast. The name is kept from Phase 4A so existing fault tests apply. */
+export const CAST_URL = "/studio/investor-v1.glb";
+
+/**
+ * Approved transfer budget for the whole cast file (Issue #5).
+ * DECISION: 1 MB raw and 300 KB gzip for all three production characters together. The studio loads
+ * the cast once, so this bounds the extra download before the investors appear.
+ */
+export const CAST_BUDGET = { bytes: 1024 * 1024, gzipBytes: 300 * 1024 } as const;
+
+/**
+ * The single seated skeleton every investor uses: bone name, parent and rest offset from the parent
+ * (metres). Bone names are the animation binding keys, so they must never be renamed per character.
+ */
+export const RIG_BONES = [
+  { name: "Pelvis", parent: null, position: [0, .78, 0] },
+  { name: "Chest", parent: "Pelvis", position: [0, .58, 0] },
+  { name: "Head", parent: "Chest", position: [0, .49, 0] },
+  // Facial bones (Issue #5): the brow group pivots at the head centre so a small x rotation raises or
+  // lowers both brows; each brow pivots at its own centre so a z rotation tilts it; the jaw opens.
+  { name: "Brows", parent: "Head", position: [0, .18, 0] },
+  { name: "LeftBrow", parent: "Brows", position: [-.087, .1, .2] },
+  { name: "RightBrow", parent: "Brows", position: [.087, .1, .2] },
+  { name: "Jaw", parent: "Head", position: [0, .05, .02] },
+  { name: "LeftArm", parent: "Chest", position: [-.34, .2, 0] },
+  { name: "LeftForearm", parent: "LeftArm", position: [-.03, -.31, .07] },
+  { name: "RightArm", parent: "Chest", position: [.34, .2, 0] },
+  { name: "RightForearm", parent: "RightArm", position: [.03, -.31, .07] },
+  { name: "LeftThigh", parent: "Pelvis", position: [-.16, -.04, .05] },
+  { name: "LeftShin", parent: "LeftThigh", position: [0, -.04, .49] },
+  { name: "RightThigh", parent: "Pelvis", position: [.16, -.04, .05] },
+  { name: "RightShin", parent: "RightThigh", position: [0, -.04, .49] },
+] as const satisfies readonly { name: string; parent: string | null; position: readonly [number, number, number] }[];
+export type RigBone = typeof RIG_BONES[number]["name"];
+
+/**
+ * Clip names shared by the whole cast. Every clip is authored once against RIG_BONES and works on
+ * every investor; a clip may only animate bone rotations, never positions or scale, so seated
+ * proportions and the chair fit stay valid in every frame.
+ */
+export const RIG_CLIPS = ["Listening", "Offering", "Withdrawal", "Explaining", "Skeptical", "Agreeing", "Considering", "Firm", "WithdrawalCash", "WithdrawalEquity"] as const;
+export type RigClip = typeof RIG_CLIPS[number];
+
+/**
+ * Clip time shown as a held pose under reduced motion (seconds). Each is the clip's most readable
+ * moment, so reduced motion still communicates the reaction without any movement.
+ */
+export const REDUCED_MOTION_POSE: Record<RigClip, number> = {
+  Listening: 0, Explaining: .8, Offering: .8, Withdrawal: .8, Skeptical: .7, Agreeing: .45, Considering: .9, Firm: .7, WithdrawalCash: .8, WithdrawalEquity: .9,
+};
+
+/** Mesh names inside the cast file. The body is shared; each investor adds their own features. */
+export const CAST_BODY = "Cast_Body";
+export const castMeshName = (investor: InvestorId) => `Cast_${investor}`;
+
+/** Material slot names. Per-investor colours are applied to these at runtime (avatar.ts). */
+export const RIG_MATERIALS = ["Skin", "Jacket", "Trousers", "Hair", "Brass", "Shirt", "Eyes", "Features"] as const;
+export type RigMaterial = typeof RIG_MATERIALS[number];
+
+/**
+ * Per-investor colours for the slots that differ between investors. Slots not listed use the
+ * generator defaults (Trousers, Shirt, Brass, Eyes). Shared by avatar.ts (runtime material colours)
+ * and the generator, which bakes these colours into each investor's feature mesh (Issue #12).
+ */
+export const INVESTOR_COLORS: Record<InvestorId, Partial<Record<RigMaterial, string>>> = {
+  maya: { Jacket: "#25362f", Hair: "#171c19", Skin: "#b97957" },
+  adrian: { Jacket: "#355985", Hair: "#9c5433", Skin: "#dbac89" },
+  sofia: { Jacket: "#20756e", Hair: "#271e1b", Skin: "#a76e4e" },
+};
+export const SLOT_DEFAULTS: Record<RigMaterial, string> = {
+  Skin: "#b97957", Jacket: "#283c34", Trousers: "#172321", Hair: "#201b18", Brass: "#b99b60", Shirt: "#e8dfc8", Eyes: "#ffffff", Features: "#ffffff",
+};
+
+/**
+ * Feature slots merged into one vertex-coloured "Features" primitive per investor (Issue #12).
+ * DECISION (approved): hair, lapels and collars of each investor share one material, so each
+ * investor's features cost two draw calls (Features + Brass) instead of four. Brass stays separate
+ * so it keeps its metallic shine.
+ */
+export const MERGED_FEATURE_SLOTS = ["Hair", "Jacket", "Shirt"] as const satisfies readonly RigMaterial[];
+
+/** True for any object that belongs to another investor's features and must be removed from this instance. */
+export function belongsToOtherInvestor(name: string, investor: InvestorId) {
+  return name.startsWith("Cast_") && !name.startsWith(CAST_BODY) && !name.startsWith(castMeshName(investor));
+}

@@ -1,0 +1,22 @@
+{
+  "default": "memory-only",
+  "cases": [
+    {
+      "input": "unknown version",
+      "expected": "incompatible"
+    },
+    {
+      "input": "different journal digest",
+      "expected": "checkpoint-mismatch"
+    },
+    {
+      "input": "malformed/oversized/unknown properties",
+      "expected": "invalid"
+    },
+    {
+      "input": "duplicate request identity",
+      "expected": "invalid"
+    }
+  ],
+  "migration": "none; retain old record until explicit user decision"
+}

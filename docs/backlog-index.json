@@ -1,0 +1,1370 @@
+{
+  "repository": "SalvadorCarvalhal673/Shark-Tank-AI",
+  "project": null,
+  "projectLimitation": "Existing authorization lacks Projects scopes",
+  "milestones": {
+    "A": {
+      "number": 1,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestone/1",
+      "title": "Phase 4B.1 — Production-quality 3D studio and characters"
+    },
+    "B": {
+      "number": 2,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestone/2",
+      "title": "Phase 4B.2 — Cinematic onboarding and investor conversations"
+    },
+    "C": {
+      "number": 3,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestone/3",
+      "title": "Phase 4B.3 — Interactive negotiation experience"
+    },
+    "D": {
+      "number": 4,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestone/4",
+      "title": "Phase 4B.4 — Animated outcomes and performance scorecard"
+    },
+    "E": {
+      "number": 5,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestone/5",
+      "title": "Phase 4C — AI conversation architecture"
+    },
+    "F": {
+      "number": 6,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestone/6",
+      "title": "Phase 4D — Live AI integration"
+    },
+    "G": {
+      "number": 7,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestone/7",
+      "title": "Phase 4E — Performance, accessibility and usability"
+    },
+    "H": {
+      "number": 8,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/milestone/8",
+      "title": "Phase 5 — Final security, testing and university presentation"
+    }
+  },
+  "issues": [
+    {
+      "key": "A1",
+      "number": 1,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/1",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAIWg",
+      "title": "Redesign the investment studio",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "large",
+      "dependencies": []
+    },
+    {
+      "key": "A2",
+      "number": 2,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/2",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAL3w",
+      "title": "Improve architectural geometry",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "key": "A3",
+      "number": 3,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/3",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAO6A",
+      "title": "Upgrade studio materials and textures",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "key": "A4",
+      "number": 4,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/4",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAR2w",
+      "title": "Improve cinematic lighting",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "key": "A5",
+      "number": 5,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/5",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAUjA",
+      "title": "Develop Maya Chen's production-quality character",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        8
+      ]
+    },
+    {
+      "key": "A6",
+      "number": 6,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/6",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAYAQ",
+      "title": "Develop Adrian Vale's production-quality character",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        8
+      ]
+    },
+    {
+      "key": "A7",
+      "number": 7,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/7",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAbHw",
+      "title": "Develop Sofia Mendes's production-quality character",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        8
+      ]
+    },
+    {
+      "key": "A8",
+      "number": 8,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/8",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAeRA",
+      "title": "Define and implement a consistent character rigging strategy",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "large",
+      "dependencies": []
+    },
+    {
+      "key": "A9",
+      "number": 9,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/9",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAhTg",
+      "title": "Improve seated posture and gesture animation",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        8
+      ]
+    },
+    {
+      "key": "A10",
+      "number": 10,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/10",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAkYg",
+      "title": "Implement expressive investor reactions",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        8
+      ]
+    },
+    {
+      "key": "A11",
+      "number": 11,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/11",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAnjw",
+      "title": "Improve cinematic camera composition",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "key": "A12",
+      "number": 12,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/12",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAqow",
+      "title": "Optimize 3D models, textures and rendering",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "A13",
+      "number": 13,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/13",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAthg",
+      "title": "Verify asset licensing and provenance",
+      "group": "A",
+      "workstream": "A",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "B1",
+      "number": 14,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/14",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAw_w",
+      "title": "Design the cinematic landing experience",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        1
+      ]
+    },
+    {
+      "key": "B2",
+      "number": 15,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/15",
+      "nodeId": "I_kwDOVhT9O88AAAABgcAz0A",
+      "title": "Implement interactive investor introductions",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "B3",
+      "number": 16,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/16",
+      "nodeId": "I_kwDOVhT9O88AAAABgcA3HA",
+      "title": "Implement beginner-friendly guided pitch preparation",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "B4",
+      "number": 17,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/17",
+      "nodeId": "I_kwDOVhT9O88AAAABgcA5zg",
+      "title": "Improve the LunchLoop quick-start experience",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "B5",
+      "number": 18,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/18",
+      "nodeId": "I_kwDOVhT9O88AAAABgcA8pw",
+      "title": "Develop immersive investor dialogue presentation",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "B6",
+      "number": 19,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/19",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBAGQ",
+      "title": "Implement active-speaker camera transitions",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        18,
+        11
+      ]
+    },
+    {
+      "key": "B7",
+      "number": 20,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/20",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBDZw",
+      "title": "Improve dialogue history presentation",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        18
+      ]
+    },
+    {
+      "key": "B8",
+      "number": 21,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/21",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBGdQ",
+      "title": "Implement visual feedback during investor interactions",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        18
+      ]
+    },
+    {
+      "key": "B9",
+      "number": 22,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/22",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBJTQ",
+      "title": "Preserve accessibility and session state throughout onboarding",
+      "group": "B",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        15,
+        16
+      ]
+    },
+    {
+      "key": "C1",
+      "number": 23,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/23",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBMhA",
+      "title": "Redesign the offer comparison interface",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "C2",
+      "number": 24,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/24",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBPsg",
+      "title": "Implement cinematic opening-offer reveals",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        23
+      ]
+    },
+    {
+      "key": "C3",
+      "number": 25,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/25",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBTEQ",
+      "title": "Improve interactive investment and equity controls",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "C4",
+      "number": 26,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/26",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBWGQ",
+      "title": "Improve live ownership visualization",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        25
+      ]
+    },
+    {
+      "key": "C5",
+      "number": 27,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/27",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBZCQ",
+      "title": "Integrate interactive investor selection across negotiation",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        23
+      ]
+    },
+    {
+      "key": "C6",
+      "number": 28,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/28",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBcVw",
+      "title": "Improve counteroffer management",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        23
+      ]
+    },
+    {
+      "key": "C7",
+      "number": 29,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/29",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBfZA",
+      "title": "Implement investor concession animations",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        28,
+        9
+      ]
+    },
+    {
+      "key": "C8",
+      "number": 30,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/30",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBiDw",
+      "title": "Implement investor withdrawal reactions",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        28,
+        10
+      ]
+    },
+    {
+      "key": "C9",
+      "number": 31,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/31",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBk5w",
+      "title": "Improve explicit deal confirmation",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        23
+      ]
+    },
+    {
+      "key": "C10",
+      "number": 32,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/32",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBoAA",
+      "title": "Preserve deterministic financial calculations during UX integration",
+      "group": "C",
+      "workstream": "C",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "D1",
+      "number": 33,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/33",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBq0w",
+      "title": "Implement a cinematic successful-deal conclusion",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        31
+      ]
+    },
+    {
+      "key": "D2",
+      "number": 34,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/34",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBtzQ",
+      "title": "Implement an investor-withdrawal conclusion",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        30
+      ]
+    },
+    {
+      "key": "D3",
+      "number": 35,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/35",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBwpg",
+      "title": "Implement a founder-walk-away conclusion",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "D4",
+      "number": 36,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/36",
+      "nodeId": "I_kwDOVhT9O88AAAABgcBzjg",
+      "title": "Implement a no-opening-offers conclusion",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "D5",
+      "number": 37,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/37",
+      "nodeId": "I_kwDOVhT9O88AAAABgcB2Bw",
+      "title": "Build an interactive performance scorecard",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "D6",
+      "number": 38,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/38",
+      "nodeId": "I_kwDOVhT9O88AAAABgcB5OA",
+      "title": "Improve financial outcome explanations",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        37
+      ]
+    },
+    {
+      "key": "D7",
+      "number": 39,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/39",
+      "nodeId": "I_kwDOVhT9O88AAAABgcB8Zg",
+      "title": "Implement negotiation decision analysis",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        37
+      ]
+    },
+    {
+      "key": "D8",
+      "number": 40,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/40",
+      "nodeId": "I_kwDOVhT9O88AAAABgcB_AA",
+      "title": "Implement interactive historical decision review",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": [
+        37
+      ]
+    },
+    {
+      "key": "D9",
+      "number": 41,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/41",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCB7A",
+      "title": "Design and implement personalized replay challenges",
+      "group": "D",
+      "workstream": "D",
+      "linked": true,
+      "priority": "low",
+      "complexity": "medium",
+      "dependencies": [
+        39
+      ]
+    },
+    {
+      "key": "E1",
+      "number": 42,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/42",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCE0g",
+      "title": "Evaluate appropriate AI providers",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "E2",
+      "number": 43,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/43",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCHew",
+      "title": "Define AI conversation contracts",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "critical",
+      "complexity": "large",
+      "dependencies": [
+        42
+      ]
+    },
+    {
+      "key": "E3",
+      "number": 44,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/44",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCKvg",
+      "title": "Define individual investor personality prompts",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        43
+      ]
+    },
+    {
+      "key": "E4",
+      "number": 45,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/45",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCNxQ",
+      "title": "Define structured AI response validation",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "critical",
+      "complexity": "medium",
+      "dependencies": [
+        43
+      ]
+    },
+    {
+      "key": "E5",
+      "number": 46,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/46",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCQag",
+      "title": "Design evidence confirmation and extraction",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        43
+      ]
+    },
+    {
+      "key": "E6",
+      "number": 47,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/47",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCTUg",
+      "title": "Define bounded clarification exchanges",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        43,
+        46
+      ]
+    },
+    {
+      "key": "E7",
+      "number": 48,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/48",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCWWA",
+      "title": "Design server-side AI API architecture",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        43
+      ]
+    },
+    {
+      "key": "E8",
+      "number": 49,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/49",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCZZA",
+      "title": "Implement secure future AI configuration and credential handling",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "critical",
+      "complexity": "medium",
+      "dependencies": [
+        48
+      ]
+    },
+    {
+      "key": "E9",
+      "number": 50,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/50",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCccA",
+      "title": "Design AI timeout, cancellation and stale-response protection",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        43
+      ]
+    },
+    {
+      "key": "E10",
+      "number": 51,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/51",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCfVA",
+      "title": "Design scripted fallback behavior",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        43
+      ]
+    },
+    {
+      "key": "E11",
+      "number": 52,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/52",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCigw",
+      "title": "Define transcript persistence and version compatibility",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        43,
+        53
+      ]
+    },
+    {
+      "key": "E12",
+      "number": 53,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/53",
+      "nodeId": "I_kwDOVhT9O88AAAABgcClLg",
+      "title": "Define AI privacy and consent requirements",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "E13",
+      "number": 54,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/54",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCoCw",
+      "title": "Define token, cost and request limits",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        42,
+        48
+      ]
+    },
+    {
+      "key": "E14",
+      "number": 55,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/55",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCqqQ",
+      "title": "Establish AI testing and evaluation standards",
+      "group": "E",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        43
+      ]
+    },
+    {
+      "key": "F1",
+      "number": 56,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/56",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCuKQ",
+      "title": "Implement the approved server-side AI integration",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "large",
+      "dependencies": [
+        45,
+        48,
+        49,
+        50,
+        53,
+        54,
+        55
+      ]
+    },
+    {
+      "key": "F2",
+      "number": 57,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/57",
+      "nodeId": "I_kwDOVhT9O88AAAABgcCxNA",
+      "title": "Implement contextual investor questions",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        56,
+        47
+      ]
+    },
+    {
+      "key": "F3",
+      "number": 58,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/58",
+      "nodeId": "I_kwDOVhT9O88AAAABgcC0nA",
+      "title": "Implement personalized investor responses",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        56
+      ]
+    },
+    {
+      "key": "F4",
+      "number": 59,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/59",
+      "nodeId": "I_kwDOVhT9O88AAAABgcC3zA",
+      "title": "Implement investor-specific conversational behavior",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        56,
+        44
+      ]
+    },
+    {
+      "key": "F5",
+      "number": 60,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/60",
+      "nodeId": "I_kwDOVhT9O88AAAABgcC6wg",
+      "title": "Implement approved clarification exchanges",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        56,
+        47,
+        52
+      ]
+    },
+    {
+      "key": "F6",
+      "number": 61,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/61",
+      "nodeId": "I_kwDOVhT9O88AAAABgcC99w",
+      "title": "Implement AI-assisted financial explanations",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        56,
+        32
+      ]
+    },
+    {
+      "key": "F7",
+      "number": 62,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/62",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDAqg",
+      "title": "Implement personalized coaching",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        56,
+        37
+      ]
+    },
+    {
+      "key": "F8",
+      "number": 63,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/63",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDDSw",
+      "title": "Connect AI narration with committed engine outcomes",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        56
+      ]
+    },
+    {
+      "key": "F9",
+      "number": 64,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/64",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDGdQ",
+      "title": "Implement provider-failure recovery",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        56,
+        51
+      ]
+    },
+    {
+      "key": "F10",
+      "number": 65,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/65",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDJhQ",
+      "title": "Implement safeguards against contradictory AI responses",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "critical",
+      "complexity": "medium",
+      "dependencies": [
+        56,
+        45
+      ]
+    },
+    {
+      "key": "F11",
+      "number": 66,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/66",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDMhg",
+      "title": "Test adversarial and unreliable AI outputs",
+      "group": "F",
+      "workstream": "B",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65
+      ]
+    },
+    {
+      "key": "G1",
+      "number": 67,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/67",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDPJQ",
+      "title": "Measure physical Android performance",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G2",
+      "number": 68,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/68",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDSAw",
+      "title": "Measure physical iPhone performance",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G3",
+      "number": 69,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/69",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDU2w",
+      "title": "Verify Safari and WebKit compatibility",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G4",
+      "number": 70,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/70",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDYIA",
+      "title": "Optimize 3D loading",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        12
+      ]
+    },
+    {
+      "key": "G5",
+      "number": 71,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/71",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDbNw",
+      "title": "Optimize GPU resources",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G6",
+      "number": 72,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/72",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDd5Q",
+      "title": "Improve the mobile responsive experience",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G7",
+      "number": 73,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/73",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDg3Q",
+      "title": "Verify keyboard accessibility",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G8",
+      "number": 74,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/74",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDjvQ",
+      "title": "Perform spoken screen-reader verification",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G9",
+      "number": 75,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/75",
+      "nodeId": "I_kwDOVhT9O88AAAABgcDmgg",
+      "title": "Improve reduced-motion behavior",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G10",
+      "number": 76,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/76",
+      "nodeId": "I_kwDOVhT9O88AAAABgcGRRg",
+      "title": "Harden renderer failure recovery",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G11",
+      "number": 77,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/77",
+      "nodeId": "I_kwDOVhT9O88AAAABgcGUaw",
+      "title": "Run beginner usability testing",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "G12",
+      "number": 78,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/78",
+      "nodeId": "I_kwDOVhT9O88AAAABgcGXSw",
+      "title": "Validate the five-minute university demonstration",
+      "group": "G",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        17,
+        37
+      ]
+    },
+    {
+      "key": "H1",
+      "number": 79,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/79",
+      "nodeId": "I_kwDOVhT9O88AAAABgcGacA",
+      "title": "Resolve or formally reassess security exception SE-001",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "critical",
+      "complexity": "large",
+      "dependencies": []
+    },
+    {
+      "key": "H2",
+      "number": 80,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/80",
+      "nodeId": "I_kwDOVhT9O88AAAABgcGd3A",
+      "title": "Complete final dependency security review",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "critical",
+      "complexity": "large",
+      "dependencies": []
+    },
+    {
+      "key": "H3",
+      "number": 81,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/81",
+      "nodeId": "I_kwDOVhT9O88AAAABgcGhRw",
+      "title": "Complete final regression testing",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "large",
+      "dependencies": []
+    },
+    {
+      "key": "H4",
+      "number": 82,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/82",
+      "nodeId": "I_kwDOVhT9O88AAAABgcGwKg",
+      "title": "Conduct final financial accuracy verification",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        32
+      ]
+    },
+    {
+      "key": "H5",
+      "number": 83,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/83",
+      "nodeId": "I_kwDOVhT9O88AAAABgcGzeA",
+      "title": "Conduct final AI reliability verification",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        66
+      ]
+    },
+    {
+      "key": "H6",
+      "number": 84,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/84",
+      "nodeId": "I_kwDOVhT9O88AAAABgcG29A",
+      "title": "Conduct final asset licensing verification",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        13
+      ]
+    },
+    {
+      "key": "H7",
+      "number": 85,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/85",
+      "nodeId": "I_kwDOVhT9O88AAAABgcG6FQ",
+      "title": "Prepare the final university presentation",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "H8",
+      "number": 86,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/86",
+      "nodeId": "I_kwDOVhT9O88AAAABgcG9NA",
+      "title": "Prepare the live demonstration scenario",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": [
+        78
+      ]
+    },
+    {
+      "key": "H9",
+      "number": 87,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/87",
+      "nodeId": "I_kwDOVhT9O88AAAABgcHAww",
+      "title": "Prepare a demonstration fallback",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "high",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "H10",
+      "number": 88,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/88",
+      "nodeId": "I_kwDOVhT9O88AAAABgcHENA",
+      "title": "Finalize project documentation",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "medium",
+      "complexity": "medium",
+      "dependencies": []
+    },
+    {
+      "key": "H11",
+      "number": 89,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/89",
+      "nodeId": "I_kwDOVhT9O88AAAABgcHHoA",
+      "title": "Evaluate deployment readiness",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "critical",
+      "complexity": "medium",
+      "dependencies": [
+        79,
+        80,
+        81,
+        82,
+        83,
+        84
+      ]
+    },
+    {
+      "key": "H12",
+      "number": 90,
+      "url": "https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/90",
+      "nodeId": "I_kwDOVhT9O88AAAABgcHKrQ",
+      "title": "Obtain explicit public deployment approval",
+      "group": "H",
+      "workstream": "D",
+      "linked": true,
+      "priority": "critical",
+      "complexity": "medium",
+      "dependencies": [
+        89
+      ]
+    }
+  ]
+}

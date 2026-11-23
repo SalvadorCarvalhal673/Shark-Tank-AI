@@ -1,0 +1,23 @@
+.disclosure {
+  border-block-start: 1px solid currentColor;
+}
+
+.disclosure:last-child {
+  border-block-end: 1px solid currentColor;
+}
+
+.disclosure summary {
+  cursor: pointer;
+  padding: 0.75rem 0.5rem;
+  min-block-size: 44px;
+  overflow-wrap: anywhere;
+}
+
+.disclosure summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.count {
+  display: block;
+}

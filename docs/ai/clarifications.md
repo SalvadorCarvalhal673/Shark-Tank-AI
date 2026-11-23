@@ -1,0 +1,8 @@
+# Optional clarification — #47
+Recommendation: at most ONE optional clarification per investor per run, only before that investor's existing binding answer, only when needed (missing unit/period, ambiguous or conflicting testimony). No clarification when complete, after binding submission, during counter negotiation or after closure. It is not a fourth binding answer or counter.
+
+clarification.ts is an isolated immutable mock transition model. Runtime guards reject stale/wrong-run/investor bindings, invalid fields, duplicate asks, concurrent open clarification, overlong text and late replies. Ask requires founder opt-in and a gameplay adapter's current-stage eligibility check; this flag is NOT a server authorization credential. Answer/skip/cancel consume no engine actions. Once asked, cancellation/skip does not reset the one-per-investor allowance. Restart uses a new run identity; ordinary view changes must retain the ledger.
+
+Founder can skip without penalty beyond missing evidence under unchanged rules. Original draft is never overwritten. Reply becomes a separate source for #46 proposal/confirmation. Founder reviews all testimony before explicit binding submission. Mapping a combined natural answer into current policy is still the separate evidence-integration approval gate; no automatic labelled rewrite.
+
+Cancellation, provider failure or refusal keeps original draft and uses the existing required scripted prompt. The module never imports a dispatch controller, browser storage, canvas or UI. Gameplay integration and optional transcript persistence remain later issues. These fixtures do not enable extra exchanges in the current application. SE-001 open; no deployment.

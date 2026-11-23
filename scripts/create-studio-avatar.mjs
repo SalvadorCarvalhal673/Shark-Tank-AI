@@ -1,0 +1,295 @@
+// Original procedural artwork for Shark Tank AI, 2026. No downloaded models/textures.
+// Regenerate with: node scripts/create-studio-avatar.mjs
+//
+// Builds the whole investor cast into one GLB following the rig contract in
+// src/features/studio/rig.ts (Issue #8): one shared seated skeleton and clip set, one shared body
+// mesh, and one feature mesh per investor (hair, accessories, face details) skinned to the same
+// bones, so accessories follow every animation.
+import * as THREE from "three";
+import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
+import { mergeGeometries, mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { mkdir, writeFile } from "node:fs/promises";
+import { CAST_BODY, castMeshName, INVESTOR_COLORS, MERGED_FEATURE_SLOTS, RIG_BONES, RIG_CLIPS, RIG_MATERIALS, SLOT_DEFAULTS } from "../src/features/studio/rig.ts";
+globalThis.FileReader = class {
+  readAsArrayBuffer(blob) { blob.arrayBuffer().then((value) => { this.result = value; this.onloadend?.(); }); }
+};
+
+// ---- Skeleton (from the contract) ----
+const bones = new Map();
+for (const { name, parent, position } of RIG_BONES) {
+  const bone = new THREE.Bone(); bone.name = name; bone.position.set(...position);
+  if (parent) bones.get(parent).add(bone);
+  bones.set(name, bone);
+}
+const skeletonBones = RIG_BONES.map(({ name }) => bones.get(name));
+const boneIndex = name => RIG_BONES.findIndex(bone => bone.name === name);
+skeletonBones[0].updateMatrixWorld(true);
+
+// ---- Rigid-skinned parts grouped by material slot ----
+const material = name => RIG_MATERIALS.indexOf(name);
+function meshBuilder({ colors = false, bake = null } = {}) {
+  const groups = RIG_MATERIALS.map(() => []);
+  return {
+    /**
+     * tint multiplies the slot colour (vertex colour); only meshes built with colors:true keep it.
+     * bake (Issue #12) maps slots to a fixed colour: those parts move into the "Features" slot and
+     * carry their colour per vertex, so several slots render in one draw call.
+     */
+    part(geometry, center, scale, bone, slot, rotation = [0, 0, 0], tint = [1, 1, 1]) {
+      if (bake?.[slot]) { tint = bake[slot]; slot = "Features"; }
+      geometry.scale(...scale);
+      geometry.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(...rotation)));
+      geometry.translate(...center);
+      const count = geometry.attributes.position.count, joint = boneIndex(bone);
+      if (joint < 0) throw new Error("Unknown bone " + bone);
+      const indices = new Uint16Array(count * 4), weights = new Float32Array(count * 4);
+      for (let i = 0; i < count; i++) { indices[i * 4] = joint; weights[i * 4] = 1; }
+      geometry.setAttribute("skinIndex", new THREE.Uint16BufferAttribute(indices, 4));
+      geometry.setAttribute("skinWeight", new THREE.Float32BufferAttribute(weights, 4));
+      // No textures use UVs, so they are dropped to keep the download small (Issue #5 transfer budget).
+      geometry.deleteAttribute("uv");
+      if (colors || bake) geometry.setAttribute("color", new THREE.Float32BufferAttribute(new Array(count).fill(tint).flat(), 3));
+      groups[material(slot)].push(geometry);
+    },
+    build(name, materials) {
+      const used = groups.map((items, i) => ({ items, i })).filter(entry => entry.items.length);
+      // A baked mesh gives every part a colour, so Brass parts get white (no tint) to keep the attribute set equal.
+      if (bake) for (const { items } of used) for (const item of items) if (!item.attributes.color)
+        item.setAttribute("color", new THREE.Float32BufferAttribute(new Array(item.attributes.position.count * 3).fill(1), 3));
+      const geometry = mergeGeometries(used.map(entry => mergeGeometries(entry.items)), true);
+      const mesh = new THREE.SkinnedMesh(geometry, used.map(entry => materials[entry.i]));
+      mesh.name = name;
+      return mesh;
+    },
+  };
+}
+const box = () => new THREE.BoxGeometry(1, 1, 1);
+/** Tessellation by visibility: faces get the most detail, limbs the least (Issue #5 triangle budget). */
+const sphere = (w = 12, h = 8) => new THREE.SphereGeometry(1, w, h);
+const fine = () => sphere(20, 14), medium = () => sphere(14, 10), small = () => sphere(10, 7);
+const rounded = (w, h, d, r = .3) => mergeVertices(new RoundedBoxGeometry(w, h, d, 2, r * Math.min(w, h, d)));
+
+// ---- Shared body: same proportions for the whole cast (Issues #5-#7) ----
+// Every part keeps the Phase 4A silhouette, so the measured seated envelope and chair fit hold.
+const body = meshBuilder({ colors: true });
+const lips = [.86, .64, .6], white = [.97, .96, .93], iris = [.24, .16, .11], pupil = [.05, .04, .04];
+// Torso, collarbones and a soft shirt front.
+body.part(sphere(16, 10), [0, 1.32, 0], [.34, .47, .21], "Chest", "Jacket");
+body.part(rounded(.22, .27, .06), [0, 1.55, .17], [1, 1, 1], "Chest", "Shirt");
+// Neck and head: egg-shaped cranium, jaw, cheeks, ears and nose.
+body.part(small(), [0, 1.80, 0], [.098, .16, .098], "Head", "Skin");
+body.part(fine(), [0, 2.04, 0], [.215, .265, .212], "Head", "Skin");
+for (const x of [-.212, .212]) body.part(small(), [x, 2.03, -.01], [.03, .058, .042], "Head", "Skin");
+body.part(medium(), [0, 1.995, .205], [.026, .05, .04], "Head", "Skin", [-.25, 0, 0]);
+body.part(small(), [0, 1.972, .214], [.02, .012, .016], "Head", "Skin");
+// Eyes: white, iris and pupil share the Eyes slot through vertex colours (no extra draw calls).
+for (const x of [-.083, .083]) {
+  body.part(small(), [x, 2.07, .18], [.033, .023, .027], "Head", "Eyes", [0, 0, 0], white);
+  body.part(small(), [x, 2.07, .199], [.016, .016, .01], "Head", "Eyes", [0, 0, 0], iris);
+  body.part(sphere(), [x, 2.07, .206], [.008, .008, .005], "Head", "Eyes", [0, 0, 0], pupil);
+}
+// Brows and mouth ride the facial bones so reactions can move them (Issue #10).
+for (const [x, bone, tilt] of [[-.087, "LeftBrow", .08], [.087, "RightBrow", -.08]]) body.part(rounded(.075, .016, .016, .45), [x, 2.13, .2], [1, 1, 1], bone, "Hair", [0, 0, tilt]);
+body.part(small(), [0, 1.918, .2], [.044, .012, .018], "Jaw", "Skin", [0, 0, 0], lips);
+body.part(small(), [0, 1.903, .197], [.038, .012, .017], "Jaw", "Skin", [0, 0, 0], lips);
+// Arms, hands and legs.
+for (const side of [-1, 1]) {
+  const s = side < 0 ? "Left" : "Right";
+  body.part(sphere(), [side * .35, 1.43, .025], [.12, .23, .12], s + "Arm", "Jacket");
+  body.part(sphere(), [side * .37, 1.28, .24], [.095, .09, .23], s + "Forearm", "Jacket");
+  body.part(sphere(), [side * .37, 1.28, .37], [.07, .065, .03], s + "Forearm", "Shirt");
+  body.part(small(), [side * .37, 1.272, .44], [.07, .045, .095], s + "Forearm", "Skin");
+  body.part(sphere(), [side * .335, 1.275, .47], [.024, .022, .045], s + "Forearm", "Skin", [0, side * .5, 0]);
+  body.part(sphere(), [side * .16, .75, .28], [.14, .14, .31], s + "Thigh", "Trousers");
+  body.part(sphere(), [side * .16, .41, .56], [.10, .31, .10], s + "Shin", "Trousers");
+  body.part(sphere(), [side * .16, .10, .65], [.115, .075, .20], s + "Shin", "Trousers", [0, 0, 0], [.55, .5, .48]);
+}
+body.part(sphere(), [0, .80, 0], [.29, .20, .19], "Pelvis", "Trousers");
+
+/** Crown fill under the hair shell, so no scalp shows where the tilted shell leaves the top open. */
+const crown = (features) => features.part(sphere(16, 8), [0, 2.17, -.01], [.226, .16, .216], "Head", "Hair");
+
+/** Hair shell: a partial sphere just outside the cranium, open at the face so the hairline sits on the forehead. */
+const hairCap = (opening = .5) => {
+  const shell = new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI * opening);
+  shell.scale(.232, .285, .232);
+  return shell;
+};
+
+// ---- Per-investor features: the production characters (Issues #5-#7). ----
+const cast = {
+  /**
+   * Maya Chen, finance (Issue #5): composed and precise. Sleek dark shoulder-length hair with a side
+   * part, a structured forest-green blazer with sharp lapels, a high cream collar and brass hoops.
+   */
+  maya(features) {
+    features.part(hairCap(), [0, 2.04, 0], [1, 1, 1], "Head", "Hair", [-.55, 0, -.06]);
+    crown(features);
+    features.part(rounded(.44, .4, .1, .5), [0, 1.9, -.165], [1, 1, 1], "Head", "Hair");
+    for (const side of [-1, 1]) {
+      features.part(rounded(.07, .3, .2, .5), [side * .2, 1.94, -.02], [1, 1, 1], "Head", "Hair", [0, 0, side * .06]);
+      features.part(new THREE.TorusGeometry(.024, .0045, 4, 12), [side * .222, 1.95, .005], [1, 1, 1], "Head", "Brass", [0, Math.PI / 2, 0]);
+      // Peaked lapels over the shared jacket.
+      features.part(rounded(.09, .3, .03, .4), [side * .095, 1.49, .2], [1, 1, 1], "Chest", "Jacket", [-.08, 0, side * .32]);
+    }
+    features.part(medium(), [-.06, 2.25, .1], [.12, .04, .1], "Head", "Hair", [.35, 0, .35]);
+    features.part(new THREE.TorusGeometry(.105, .026, 6, 18), [0, 1.75, .015], [1, 1, .85], "Chest", "Shirt", [Math.PI / 2 - .2, 0, 0]);
+  },
+  /**
+   * Adrian Vale, growth (Issue #6): energetic and approachable. Short textured copper hair swept up
+   * at the front, brass-rimmed glasses with temples to the ears, an unstructured cobalt blazer with
+   * narrow lapels and an open-collar shirt.
+   */
+  adrian(features) {
+    features.part(hairCap(.46), [0, 2.05, 0], [1, .95, 1], "Head", "Hair", [-.4, 0, 0]);
+    crown(features);
+    for (const [x, y, z, sx, rz] of [[-.1, 2.27, .1, .07, .5], [-.02, 2.3, .13, .08, .2], [.07, 2.29, .12, .075, -.3], [.14, 2.24, .07, .06, -.6], [0, 2.31, .03, .09, 0]]) {
+      features.part(medium(), [x, y, z], [sx, .045, .06], "Head", "Hair", [.6, 0, rz]);
+    }
+    for (const side of [-1, 1]) {
+      features.part(rounded(.022, .07, .04, .5), [side * .198, 2.06, .09], [1, 1, 1], "Head", "Hair", [0, side * .4, 0]);
+      // Glasses: rims, temple arms to the ears, all skinned to the Head bone.
+      features.part(new THREE.TorusGeometry(.046, .0055, 5, 16), [side * .083, 2.07, .222], [1, .85, 1], "Head", "Brass");
+      features.part(box(), [side * .17, 2.075, .11], [.006, .006, .2], "Head", "Brass", [0, side * -.25, 0]);
+      features.part(rounded(.065, .26, .025, .4), [side * .085, 1.5, .205], [1, 1, 1], "Chest", "Jacket", [-.1, 0, side * .22]);
+      features.part(rounded(.075, .045, .02, .4), [side * .075, 1.69, .175], [1, 1, 1], "Chest", "Shirt", [.35, 0, side * .95]);
+    }
+    features.part(box(), [0, 2.075, .225], [.04, .006, .006], "Head", "Brass");
+  },
+  /**
+   * Sofia Mendes, operations (Issue #7): practical warmth. Dark hair pulled back into a high bun with
+   * a brass clip, small brass studs, a teal jacket with a soft shawl collar over a cream top.
+   */
+  sofia(features) {
+    features.part(hairCap(.5), [0, 2.04, 0], [.99, .98, .99], "Head", "Hair", [-.5, 0, 0]);
+    crown(features);
+    features.part(medium(), [0, 2.36, -.09], [.115, .105, .11], "Head", "Hair");
+    features.part(new THREE.TorusGeometry(.085, .013, 6, 18), [0, 2.3, -.08], [1, 1, 1], "Head", "Brass", [1.35, 0, 0]);
+    for (const side of [-1, 1]) {
+      features.part(sphere(), [side * .222, 1.99, .02], [.011, .011, .011], "Head", "Brass");
+      features.part(rounded(.07, .36, .045, .5), [side * .1, 1.5, .19], [1, 1, 1], "Chest", "Jacket", [-.06, 0, side * .28]);
+    }
+    features.part(rounded(.16, .1, .03, .5), [0, 1.66, .19], [1, 1, 1], "Chest", "Shirt", [-.2, 0, 0]);
+  },
+};
+
+// ---- Materials (slot names are the runtime colour keys) ----
+const defaults = SLOT_DEFAULTS;
+const materials = RIG_MATERIALS.map(name => {
+  const m = new THREE.MeshStandardMaterial({ color: defaults[name], roughness: .82, metalness: name === "Brass" ? .55 : 0, flatShading: true });
+  m.name = name; return m;
+});
+
+// ---- Assemble: every mesh binds to the one skeleton ----
+const skeleton = new THREE.Skeleton(skeletonBones);
+const root = new THREE.Group(); root.name = "OriginalSeatedCast";
+const bodyMesh = body.build(CAST_BODY, materials);
+bodyMesh.add(skeletonBones[0]);
+root.add(bodyMesh);
+root.updateMatrixWorld(true);
+bodyMesh.bind(skeleton);
+for (const [investor, build] of Object.entries(cast)) {
+  // Bake this investor's hair, jacket and shirt colours (linear, as glTF COLOR_0 expects).
+  const bake = Object.fromEntries(MERGED_FEATURE_SLOTS.map(slot =>
+    [slot, new THREE.Color(INVESTOR_COLORS[investor][slot] ?? SLOT_DEFAULTS[slot]).toArray()]));
+  const features = meshBuilder({ bake });
+  build(features);
+  const mesh = features.build(castMeshName(investor), materials);
+  root.add(mesh);
+  root.updateMatrixWorld(true);
+  mesh.bind(skeleton);
+}
+
+// ---- Shared clips: rotation tracks only, authored once for the whole cast ----
+function rotationTrack(name, times, rotations) {
+  const q = rotations.flatMap(([x, y, z]) => new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z)).toArray());
+  return new THREE.QuaternionKeyframeTrack(name + ".quaternion", times, q);
+}
+// Seated gestures (Issue #9). Rotation-only; the furniture fit test checks every frame of every clip.
+// Brows: a negative x rotation of the Brows group raises them; a LeftBrow z rotation below zero
+// (RightBrow above zero) lowers the inner ends into a frown.
+const clipTracks = {
+  // Settling in to listen: a small breath, a slight attentive tilt and relaxed brows.
+  Listening: [2.8, [
+    rotationTrack("Head", [0, 1.4, 2.8], [[0, 0, 0], [.025, .035, .015], [0, 0, 0]]),
+    rotationTrack("Chest", [0, 1.4, 2.8], [[0, 0, 0], [.012, 0, 0], [0, 0, 0]]),
+    rotationTrack("Brows", [0, 1.4, 2.8], [[0, 0, 0], [-.012, 0, 0], [0, 0, 0]]),
+  ]],
+  // Asking a question: an open right-hand gesture, a curious head tilt and raised brows.
+  Explaining: [2.4, [
+    rotationTrack("RightArm", [0, .5, 1.4, 2.4], [[0, 0, 0], [-.42, -.18, -.2], [-.36, -.1, -.16], [0, 0, 0]]),
+    rotationTrack("RightForearm", [0, .5, 1.4, 2.4], [[0, 0, 0], [-.55, .2, 0], [-.45, .1, 0], [0, 0, 0]]),
+    rotationTrack("Head", [0, .6, 1.5, 2.4], [[0, 0, 0], [.03, -.06, .08], [.05, .04, .05], [0, 0, 0]]),
+    rotationTrack("Brows", [0, .5, 1.6, 2.4], [[0, 0, 0], [-.06, 0, 0], [-.04, 0, 0], [0, 0, 0]]),
+    rotationTrack("Jaw", [0, .5, .9, 1.3, 1.7, 2.4], [[0, 0, 0], [.08, 0, 0], [.02, 0, 0], [.07, 0, 0], [.01, 0, 0], [0, 0, 0]]),
+  ]],
+  // Making an offer: reaching across the desk with a confident nod and lifted brows.
+  Offering: [1.5, [
+    rotationTrack("RightArm", [0, .55, 1.5], [[0, 0, 0], [-.38, -.12, -.15], [-.1, 0, -.05]]),
+    rotationTrack("RightForearm", [0, .55, 1.5], [[0, 0, 0], [-.28, 0, 0], [0, 0, 0]]),
+    rotationTrack("Head", [0, .7, 1.5], [[0, 0, 0], [.09, 0, 0], [0, 0, 0]]),
+    rotationTrack("Brows", [0, .6, 1.5], [[0, 0, 0], [-.05, 0, 0], [-.02, 0, 0]]),
+  ]],
+  // Withdrawing: leaning back, a slow head shake and a frown that stays.
+  Withdrawal: [1.7, [
+    rotationTrack("Chest", [0, .8, 1.7], [[0, 0, 0], [-.14, 0, 0], [-.10, 0, 0]]),
+    rotationTrack("Head", [0, .5, 1, 1.7], [[0, 0, 0], [0, .16, 0], [0, -.12, 0], [0, .04, 0]]),
+    rotationTrack("Brows", [0, .6, 1.7], [[0, 0, 0], [.03, 0, 0], [.03, 0, 0]]),
+    rotationTrack("LeftBrow", [0, .6, 1.7], [[0, 0, 0], [0, 0, -.22], [0, 0, -.2]]),
+    rotationTrack("RightBrow", [0, .6, 1.7], [[0, 0, 0], [0, 0, .22], [0, 0, .2]]),
+  ]],
+  // Reactions to committed decision reasons (Issue #10).
+  // Passing on a repeated answer: a quizzical tilt, one brow cocked, a slight lean away.
+  Skeptical: [1.8, [
+    rotationTrack("Head", [0, .7, 1.8], [[0, 0, 0], [-.02, -.1, .12], [-.01, -.06, .09]]),
+    rotationTrack("Chest", [0, .7, 1.8], [[0, 0, 0], [-.05, 0, 0], [-.04, 0, 0]]),
+    rotationTrack("RightBrow", [0, .6, 1.8], [[0, 0, 0], [0, 0, -.25], [0, 0, -.2]]),
+    rotationTrack("LeftBrow", [0, .6, 1.8], [[0, 0, 0], [0, 0, -.12], [0, 0, -.1]]),
+  ]],
+  // Agreeing within limits or closing a deal: two warm nods, lifted brows, a parted smile.
+  Agreeing: [1.6, [
+    rotationTrack("Head", [0, .3, .6, .9, 1.2, 1.6], [[0, 0, 0], [.12, 0, 0], [.01, 0, 0], [.1, 0, 0], [.02, 0, 0], [.03, 0, 0]]),
+    rotationTrack("Brows", [0, .4, 1.6], [[0, 0, 0], [-.06, 0, 0], [-.04, 0, 0]]),
+    rotationTrack("Jaw", [0, .4, 1.6], [[0, 0, 0], [.05, 0, 0], [.03, 0, 0]]),
+  ]],
+  // Revising with a limited concession: a thoughtful tilt and a hand rising toward the chin.
+  Considering: [2.2, [
+    rotationTrack("Head", [0, .9, 2.2], [[0, 0, 0], [.06, .05, -.1], [.04, .03, -.08]]),
+    rotationTrack("RightArm", [0, .9, 2.2], [[0, 0, 0], [-.32, -.22, -.28], [-.28, -.18, -.24]]),
+    rotationTrack("RightForearm", [0, .9, 2.2], [[0, 0, 0], [-.62, .3, 0], [-.55, .25, 0]]),
+    rotationTrack("LeftBrow", [0, .8, 2.2], [[0, 0, 0], [0, 0, .12], [0, 0, .1]]),
+  ]],
+  // Policy-specific withdrawals (Issue #30). Both stay "Withdrawal" in the cue, but play their own clip.
+  // Above the cash ceiling: sits back and raises an open palm, brows up: "that is more than I can put in".
+  WithdrawalCash: [1.8, [
+    rotationTrack("Chest", [0, .7, 1.8], [[0, 0, 0], [-.12, 0, 0], [-.09, 0, 0]]),
+    rotationTrack("Head", [0, .7, 1.8], [[0, 0, 0], [-.07, -.08, 0], [-.05, -.06, 0]]),
+    rotationTrack("RightArm", [0, .6, 1.8], [[0, 0, 0], [-.42, -.12, -.2], [-.38, -.1, -.18]]),
+    rotationTrack("RightForearm", [0, .6, 1.8], [[0, 0, 0], [-1.05, .15, 0], [-.98, .12, 0]]),
+    rotationTrack("Brows", [0, .5, 1.8], [[0, 0, 0], [-.06, 0, 0], [-.05, 0, 0]]),
+  ]],
+  // Below the negotiable equity range: a slow head shake, a frown and the left hand drawing back off the desk.
+  WithdrawalEquity: [2, [
+    rotationTrack("Chest", [0, .9, 2], [[0, 0, 0], [-.1, 0, 0], [-.08, 0, 0]]),
+    rotationTrack("Head", [0, .4, .8, 1.2, 2], [[0, 0, 0], [.03, .12, 0], [.03, -.12, 0], [.02, .05, 0], [.02, 0, 0]]),
+    rotationTrack("LeftBrow", [0, .6, 2], [[0, 0, 0], [0, 0, -.24], [0, 0, -.2]]),
+    rotationTrack("RightBrow", [0, .6, 2], [[0, 0, 0], [0, 0, .24], [0, 0, .2]]),
+    rotationTrack("LeftArm", [0, .9, 2], [[0, 0, 0], [-.06, 0, .1], [-.05, 0, .08]]),
+    rotationTrack("LeftForearm", [0, .9, 2], [[0, 0, 0], [-.22, 0, 0], [-.18, 0, 0]]),
+  ]],
+  // Holding at the concession limit: one short shake, level lowered brows, settling back.
+  Firm: [1.6, [
+    rotationTrack("Head", [0, .35, .7, 1.05, 1.6], [[0, 0, 0], [0, .08, 0], [0, -.08, 0], [0, .02, 0], [0, 0, 0]]),
+    rotationTrack("Chest", [0, .7, 1.6], [[0, 0, 0], [-.04, 0, 0], [-.03, 0, 0]]),
+    rotationTrack("Brows", [0, .5, 1.6], [[0, 0, 0], [.03, 0, 0], [.025, 0, 0]]),
+  ]],
+};
+const clips = RIG_CLIPS.map(name => new THREE.AnimationClip(name, ...clipTracks[name]));
+
+const result = await new GLTFExporter().parseAsync(root, { binary: true, animations: clips });
+await mkdir(new URL("../public/studio/", import.meta.url), { recursive: true });
+await writeFile(new URL("../public/studio/investor-v1.glb", import.meta.url), Buffer.from(result));
+let triangles = 0;
+root.traverse(object => { if (object.isMesh) triangles += (object.geometry.index?.count ?? object.geometry.attributes.position.count) / 3; });
+console.log("Original cast GLB written:", result.byteLength, "bytes;", skeletonBones.length, "bones;", clips.length, "clips; 1 body + 3 feature meshes;", triangles, "triangles in the file.");

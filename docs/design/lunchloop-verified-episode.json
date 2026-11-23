@@ -1,0 +1,218 @@
+{
+  "baseline": "41d9b8dd74fe551c3007a70f6163193e3adb3dc1",
+  "rulesVersion": 1,
+  "units": {
+    "cash": "integer minor units (EUR cents)",
+    "equity": "basis points (10000 = 100%)"
+  },
+  "pitch": {
+    "startup": "LunchLoop",
+    "pitch": "LunchLoop supplies reusable lunch containers to campus cafes. Students borrow a box with their meal and return it to any partner cafe. We collect, wash and redistribute the containers. Cafes pay a service fee to reduce disposable packaging.",
+    "currency": "EUR",
+    "amount": 10000000,
+    "equity": 1000,
+    "founderOwnershipBps": 6000
+  },
+  "answers": [
+    "Revenue: 9000 per month; Monthly costs: 12000; Cash balance: 24000; Runway: 8 months; Use of funds: washing equipment, reusable containers and partner cafe launches.",
+    "Target segment: university campus cafes; Acquisition channel: campus partnerships and cafe demonstrations; CAC: 300 per cafe.",
+    "Customer evidence: five pilot cafes renewed after students requested more return points; Milestone: add two return stations and sign five more cafes within three months."
+  ],
+  "ask": {
+    "investor": "founder-ask",
+    "amount": 10000000,
+    "equity": 1000,
+    "preMoney": 90000000,
+    "postMoney": 100000000,
+    "founderBeforeBps": 6000,
+    "founderAfterBps": 5400,
+    "investorBps": 1000,
+    "otherExistingAfterBps": 3600,
+    "founderDilutionBps": 600,
+    "founderRelativeDilutionBps": 1000
+  },
+  "opening": [
+    {
+      "investor": "maya",
+      "amount": 10000000,
+      "equity": 1300,
+      "preMoney": 66923077,
+      "postMoney": 76923077,
+      "founderBeforeBps": 6000,
+      "founderAfterBps": 5220,
+      "investorBps": 1300,
+      "otherExistingAfterBps": 3480,
+      "founderDilutionBps": 780,
+      "founderRelativeDilutionBps": 1300
+    },
+    {
+      "investor": "adrian",
+      "amount": 9000000,
+      "equity": 1500,
+      "preMoney": 51000000,
+      "postMoney": 60000000,
+      "founderBeforeBps": 6000,
+      "founderAfterBps": 5100,
+      "investorBps": 1500,
+      "otherExistingAfterBps": 3400,
+      "founderDilutionBps": 900,
+      "founderRelativeDilutionBps": 1500
+    },
+    {
+      "investor": "sofia",
+      "amount": 8000000,
+      "equity": 1200,
+      "preMoney": 58666667,
+      "postMoney": 66666667,
+      "founderBeforeBps": 6000,
+      "founderAfterBps": 5280,
+      "investorBps": 1200,
+      "otherExistingAfterBps": 3520,
+      "founderDilutionBps": 720,
+      "founderRelativeDilutionBps": 1200
+    }
+  ],
+  "exchanges": [
+    {
+      "round": 1,
+      "investor": "sofia",
+      "proposed": {
+        "amount": 10000000,
+        "equity": 1000,
+        "preMoney": 90000000,
+        "postMoney": 100000000
+      },
+      "decision": "withdraw",
+      "reason": "above-cash-ceiling",
+      "result": null,
+      "stage": "negotiation"
+    },
+    {
+      "round": 2,
+      "investor": "maya",
+      "proposed": {
+        "amount": 10000000,
+        "equity": 1000,
+        "preMoney": 90000000,
+        "postMoney": 100000000
+      },
+      "decision": "revise",
+      "reason": "limited-concession",
+      "result": {
+        "investor": "maya",
+        "amount": 10000000,
+        "equity": 1200,
+        "preMoney": 73333333,
+        "postMoney": 83333333,
+        "founderBeforeBps": 6000,
+        "founderAfterBps": 5280,
+        "investorBps": 1200,
+        "otherExistingAfterBps": 3520,
+        "founderDilutionBps": 720,
+        "founderRelativeDilutionBps": 1200
+      },
+      "stage": "negotiation"
+    },
+    {
+      "round": 3,
+      "investor": "maya",
+      "proposed": {
+        "amount": 10000000,
+        "equity": 1100,
+        "preMoney": 80909091,
+        "postMoney": 90909091
+      },
+      "decision": "agree",
+      "reason": "within-limits",
+      "result": {
+        "investor": "maya",
+        "amount": 10000000,
+        "equity": 1100,
+        "preMoney": 80909091,
+        "postMoney": 90909091,
+        "founderBeforeBps": 6000,
+        "founderAfterBps": 5340,
+        "investorBps": 1100,
+        "otherExistingAfterBps": 3560,
+        "founderDilutionBps": 660,
+        "founderRelativeDilutionBps": 1100
+      },
+      "stage": "final-offers"
+    }
+  ],
+  "outcome": {
+    "kind": "accepted-deal",
+    "offerId": "phase4a-demo:maya:6"
+  },
+  "final": {
+    "investor": "maya",
+    "amount": 10000000,
+    "equity": 1100,
+    "preMoney": 80909091,
+    "postMoney": 90909091,
+    "founderBeforeBps": 6000,
+    "founderAfterBps": 5340,
+    "investorBps": 1100,
+    "otherExistingAfterBps": 3560,
+    "founderDilutionBps": 660,
+    "founderRelativeDilutionBps": 1100
+  },
+  "finalStatuses": [
+    {
+      "investor": "maya",
+      "equity": 1300,
+      "status": "superseded"
+    },
+    {
+      "investor": "adrian",
+      "equity": 1500,
+      "status": "closed"
+    },
+    {
+      "investor": "sofia",
+      "equity": 1200,
+      "status": "withdrawn"
+    },
+    {
+      "investor": "maya",
+      "equity": 1200,
+      "status": "superseded"
+    },
+    {
+      "investor": "maya",
+      "equity": 1100,
+      "status": "accepted"
+    }
+  ],
+  "revision": 7,
+  "additionalVerification": {
+    "oneCounterChallenge": {
+      "counters": 1,
+      "acceptedTerms": {
+        "amount": 10000000,
+        "equity": 1100
+      },
+      "sofiaActiveBeforeAcceptance": true
+    },
+    "alternateOutcomes": [
+      {
+        "kind": "founder-walk-away",
+        "acceptedOffers": 0,
+        "founderBeforeBps": 6000,
+        "revision": 4
+      },
+      {
+        "kind": "no-offers",
+        "acceptedOffers": 0,
+        "founderBeforeBps": 6000,
+        "revision": 3
+      },
+      {
+        "kind": "all-withdrawn",
+        "acceptedOffers": 0,
+        "founderBeforeBps": 6000,
+        "revision": 6
+      }
+    ]
+  }
+}
