@@ -109,11 +109,7 @@ const hairCap = (opening = .5) => {
   return shell;
 };
 
-// ---- Per-investor features. Issues #5-#7 replace these with the production characters. ----
-function sharedPlaceholderHair(features) {
-  features.part(sphere(), [0, 2.17, -.045], [.245, .20, .20], "Head", "Hair");
-  features.part(box(), [0, 2.02, -.19], [.40, .34, .07], "Head", "Hair");
-}
+// ---- Per-investor features: the production characters (Issues #5-#7). ----
 const cast = {
   /**
    * Maya Chen, finance (Issue #5): composed and precise. Sleek dark shoulder-length hair with a side
@@ -153,7 +149,21 @@ const cast = {
     }
     features.part(box(), [0, 2.075, .225], [.04, .006, .006], "Head", "Brass");
   },
-  sofia(features) { sharedPlaceholderHair(features); },
+  /**
+   * Sofia Mendes, operations (Issue #7): practical warmth. Dark hair pulled back into a high bun with
+   * a brass clip, small brass studs, a teal jacket with a soft shawl collar over a cream top.
+   */
+  sofia(features) {
+    features.part(hairCap(.5), [0, 2.04, 0], [.99, .98, .99], "Head", "Hair", [-.5, 0, 0]);
+    crown(features);
+    features.part(medium(), [0, 2.36, -.09], [.115, .105, .11], "Head", "Hair");
+    features.part(new THREE.TorusGeometry(.085, .013, 6, 18), [0, 2.3, -.08], [1, 1, 1], "Head", "Brass", [1.35, 0, 0]);
+    for (const side of [-1, 1]) {
+      features.part(sphere(), [side * .222, 1.99, .02], [.011, .011, .011], "Head", "Brass");
+      features.part(rounded(.07, .36, .045, .5), [side * .1, 1.5, .19], [1, 1, 1], "Chest", "Jacket", [-.06, 0, side * .28]);
+    }
+    features.part(rounded(.16, .1, .03, .5), [0, 1.66, .19], [1, 1, 1], "Chest", "Shirt", [-.2, 0, 0]);
+  },
 };
 
 // ---- Materials (slot names are the runtime colour keys) ----
