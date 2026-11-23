@@ -55,3 +55,24 @@ test("offer cards compare ownership and retain historical state", async ({ page 
   await expect(maya.getByText("Other holders after")).toBeVisible();
   await expect(page.getByText("Pre-money valuation").first()).toBeVisible();
 });
+
+test("conversation feedback and investor selection preserve exact offer previews", async ({ page }) => {
+  await page.goto("/simulate");
+  await page.getByRole("button", { name: "Use LunchLoop · reusable containers" }).click();
+  await page.getByRole("button", { name: "Review pitch" }).click();
+  await page.getByRole("button", { name: "Skip introductions" }).click();
+  await page.getByRole("button", { name: "Start practice" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Listening" })).toBeVisible();
+  await page.getByLabel("Your answer").fill(investorAnswers[0]);
+  await expect(page.getByRole("status").filter({ hasText: "ready to submit" })).toBeVisible();
+  await page.getByRole("button", { name: "Submit answer" }).click();
+  await expect(page.getByText(investorAnswers[0])).toBeVisible();
+  for (const answer of investorAnswers.slice(1)) {
+    await page.getByLabel("Your answer").fill(answer);
+    await page.getByRole("button", { name: "Submit answer" }).click();
+  }
+  await page.getByRole("tab", { name: "Adrian Vale · Growth" }).click();
+  await expect(page.getByRole("tab", { name: "Adrian Vale · Growth" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("img", { name: /Founder .* other existing holders .* investor/ }).first()).toBeVisible();
+  await expect(page.getByText(/shared counters remaining/)).toBeVisible();
+});
