@@ -36,6 +36,16 @@ When the founder switches it on:
 
 **No action is ever dispatched by the voice.** It receives only a callback that appends confirmed clarification text to the local draft.
 
+## Scripted voice: no provider needed
+
+`src/features/ai/scripted-voice.ts` is used whenever no validated AI reply is shown, including in the production build. It is deterministic, rules-based and labelled "Scripted voice (rules-based)". It provides:
+
+- **#57, #60:** a draft-aware clarification question. It asks about the first signal the rules cannot yet detect in the founder's current draft, and the draft never leaves the page. It asks nothing when nothing is missing, and it names repeated answers.
+- **#58, #59:** feedback on committed answers in each investor's persona. Counter and outcome text restate committed engine reasons only.
+- **#62:** coaching suggestions drawn from the same evidence rubric as the scorecard and from the outcome. They are suggestions for the next practice, never grades.
+
+Tests: `tests/ai-scripted-voice.test.ts`, plus an offline case in `tests/ai-voice-browser.spec.ts`.
+
 ## What is sent
 
 Only the committed pitch and action journal, with no drafts. Consent is `null`, because no external provider is wired. The server already refuses to send founder text to a named provider without matching consent.

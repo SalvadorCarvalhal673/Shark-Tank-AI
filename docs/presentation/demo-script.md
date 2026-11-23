@@ -48,6 +48,9 @@ Verified values (engine, revision 5):
 
 ## Presentation outline (#85)
 
+The slide deck is a Claude Slides deck: "Shark Tank AI — Final Presentation" (https://claude.ai/artifact/2ipHPyXYSJUknWEpgFDEAz), 12 slides with speaker notes. It is private until the owner shares it, and it can be exported to PowerPoint or PDF. Before presenting, fill the `[Member …]` placeholders, the course details and the final test counts.
+
+
 1. **Course objective.** An interactive simulation that teaches valuation and dilution.
 2. **Architecture.** Next.js; a deterministic negotiation engine; integer cents and basis points with BigInt rounding; optional local saving; a 3D studio as a view adapter; an optional AI layer that can never change money.
 3. **Interactivity.** Questions, competing offers, counters, explicit acceptance, four outcomes, scorecard, history and replay challenges.
