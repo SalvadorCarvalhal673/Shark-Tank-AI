@@ -210,3 +210,7 @@ h2 { font-size: clamp(35px, 5vw, 64px); line-height: 1.1; letter-spacing: normal
 .investor-voice-reply{display:grid;gap:6px;line-height:1.55}.investor-voice-facts{font-size:13px;font-weight:600}
 .investor-voice-limits,.investor-voice-observations{margin:0;padding-left:18px;font-size:12px;opacity:.8}
 .investor-voice-clarify{display:grid;gap:8px}.investor-voice-clarify textarea{width:100%;font:inherit;padding:10px}
+/* WCAG 2.2 AA target size (2.5.8): header links and checkboxes are at least 24 px (Issue #72). */
+.site-header nav a, .brand { min-height: 24px; display: inline-flex; align-items: center; }
+input[type="checkbox"] { width: 18px; height: 18px; }
+label:has(> input[type="checkbox"]) { min-height: 24px; display: inline-flex; align-items: center; gap: 8px; }

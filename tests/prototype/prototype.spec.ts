@@ -268,3 +268,28 @@ test("a withdrawal shows its policy reason, its own clip and keeps the last offe
  await expect(page.locator(".studio-history")).toContainText("withdrawn");
  await expect(page.getByTestId("session-meta")).toHaveAttribute("data-rounds","1");
 });
+
+test("repeated 3D and simplified switches release GPU contexts and keep resource counts stable",async({page})=>{
+ test.setTimeout(240000);
+ const warnings:string[]=[];page.on("console",message=>{if(/too many active webgl contexts|context lost/i.test(message.text()))warnings.push(message.text());});
+ const cameraX=async()=>JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}").camera?.[0];
+ // Uploads follow what has been drawn, so measure the whole room from the settled Full panel shot.
+ const fullPanel=async()=>{
+  await page.getByRole("button",{name:"Full panel",exact:true}).click();
+  await expect.poll(cameraX,{timeout:20000}).toBe(0);await page.waitForTimeout(1500);
+  return JSON.parse(await page.getByTestId("render-metrics").textContent()||"{}");
+ };
+ await start(page);await enter(page);
+ const baseline=await fullPanel();
+ for(let i=0;i<17;i++){
+  await page.getByRole("button",{name:"Use simplified view",exact:true}).click();
+  await expect(page.locator("canvas")).toHaveCount(0);
+  await enter(page);
+ }
+ // Chrome allows about 16 live WebGL contexts; 18 mounts without a warning means each is released.
+ expect(warnings).toEqual([]);
+ const final=await fullPanel();
+ for(const key of ["geometries","textures","characters","skeletons","mixers","drawCalls"])expect(final[key],key).toBe(baseline[key]);
+ await expect(page.locator("canvas")).toHaveCount(1);
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-revision","0");
+});
