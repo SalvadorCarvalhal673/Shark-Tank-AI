@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { PerspectiveCamera, Vector3 } from "three";
-import { BASE_FOV, cameraFov, cameraPresets, MAX_FOV, type CameraView } from "../src/features/studio/model.ts";
+import { BASE_FOV, cameraEase, cameraFov, cameraPresets, cameraStep, MAX_FOV, type CameraView } from "../src/features/studio/model.ts";
 import { ROOM, SEAT_X } from "../src/features/studio/room/layout.ts";
 import { INVESTOR_ORDER } from "../src/features/simulation/negotiation/investor-policy.ts";
 
@@ -66,4 +66,15 @@ test("the studio has no free-roaming camera controls", () => {
   for (const name of readdirSync(dir, { recursive: true }).map(String).filter(file => /\.tsx?$/.test(file))) {
     assert.ok(!/OrbitControls|PointerLockControls|FlyControls|FirstPersonControls|TrackballControls|CameraControls/.test(readFileSync(new URL(name, dir), "utf8")), name);
   }
+});
+
+test("slow frames move the camera in real time, without jumping after a stall", () => {
+  // Ten 50 ms frames and two 250 ms frames cover the same half second and the same distance.
+  const remaining = (deltas: number[]) => deltas.reduce((left, delta) => left * (1 - cameraEase(delta, false)), 1);
+  assert.ok(Math.abs(remaining(Array(10).fill(.05)) - remaining([.25, .25])) < 1e-12);
+  assert.ok(Math.abs(remaining([1 / 60]) - (1 - cameraStep(1 / 60, false))) < 1e-12, "fast frames are unchanged");
+  assert.equal(cameraEase(10, false), cameraEase(.25, false), "a stall counts as a quarter second at most");
+  assert.ok(cameraEase(10, false) < 1, "so the camera never jumps to the end");
+  assert.equal(cameraEase(.2, true), 1);
+  assert.equal(cameraEase(-1, false), 0);
 });
