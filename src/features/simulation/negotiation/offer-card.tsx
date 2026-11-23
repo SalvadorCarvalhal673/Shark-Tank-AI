@@ -42,8 +42,8 @@ function OfferPanel({ pending, session, offer, onCancel, onAction }: {
   if (pending.kind === "confirm") {
     return <div className="inline-offer-panel" role="group" aria-labelledby={label}>
       <h4 id={label}>Confirm deal with {name}</h4>
-      <TermsDisplay terms={offer} currency={currency} />
-      <p className="muted">Confirming closes all other offers.</p>
+      <TermsDisplay terms={offer} currency={currency} founderOwnershipBps={session.pitch.founderOwnershipBps} />
+      <p className="muted">These are the current active terms at revision {session.revision}. Confirming closes all other offers; a stale revision is rejected by the engine.</p>
       <div className="preview-actions">
         <button ref={confirmButton} className="button" type="button"
           onClick={() => {
@@ -58,10 +58,10 @@ function OfferPanel({ pending, session, offer, onCancel, onAction }: {
   return <form className="inline-offer-panel counter-form" onSubmit={submit} aria-label={`Counteroffer to ${name}`}>
     <p id={label} className="muted">Use plain decimals with up to two decimal places. Every valid counter uses one shared round, even if terms stay the same.</p>
     <label>Investment ({currency})
-      <input ref={firstField} name="amount" aria-describedby={label} type="number" step=".01" min=".01" max="999999999.99" required defaultValue={offer.amount / 100} />
+      <input ref={firstField} name="amount" aria-describedby={label} inputMode="decimal" type="number" step=".01" min=".01" max="999999999.99" required defaultValue={offer.amount / 100} />
     </label>
     <label>Equity (%)
-      <input name="equity" aria-describedby={label} type="number" step=".01" min=".01" max="100" required defaultValue={offer.equity / 100} />
+      <input name="equity" aria-describedby={label} inputMode="decimal" type="number" step=".01" min=".01" max="100" required defaultValue={offer.equity / 100} />
     </label>
     {error && <p className="error" role="alert">{error}</p>}
     <div className="preview-actions">
@@ -71,10 +71,11 @@ function OfferPanel({ pending, session, offer, onCancel, onAction }: {
   </form>;
 }
 
-export function OfferCard({ session, investor, pending, headingRef, onOpen, onClose, onAction }: {
+export function OfferCard({ session, investor, pending, selected, headingRef, onOpen, onClose, onAction }: {
   session: NegotiationSession;
   investor: InvestorId;
   pending: PendingOffer | null;
+  selected: boolean;
   headingRef: Ref<HTMLHeadingElement>;
   onOpen: (kind: Mode, offerId: string) => void;
   onClose: () => void;
@@ -102,7 +103,7 @@ export function OfferCard({ session, investor, pending, headingRef, onOpen, onCl
     (panel?.kind === "counter" ? counterButton.current : acceptButton.current)?.focus();
   }
 
-  return <article className="offer-card negotiation-card">
+  return <article className={selected ? "offer-card negotiation-card selected-offer" : "offer-card negotiation-card"}>
     <div className="investor-card-heading">
       <h3 ref={headingRef} tabIndex={-1}>{name}</h3>
       <p className="muted">{specialties[investor]} · {status}</p>
@@ -111,6 +112,11 @@ export function OfferCard({ session, investor, pending, headingRef, onOpen, onCl
       {current
         ? <><p className="muted">{offer ? "Current comparable terms" : "Last historical terms"}</p><TermsDisplay terms={comparedOffer} currency={session.pitch.currency} /></>
         : <p role="alert" className="error">These terms are unavailable. This offer cannot be confirmed.</p>}
+      {ownership && <div className="ownership-bar ownership-bar-preview" role="img" aria-label={`Founder ${percent(ownership.founderAfterBps)}, other existing holders ${percent(ownership.otherExistingAfterBps)}, investor ${percent(ownership.investorBps)}`}>
+        <span className="owner-founder" style={{ flexGrow: ownership.founderAfterBps }} />
+        <span className="owner-others" style={{ flexGrow: ownership.otherExistingAfterBps }} />
+        <span className="owner-investor" style={{ flexGrow: ownership.investorBps }} />
+      </div>}
       {ownership && <dl className="offer-ownership" aria-label={`Ownership at ${name} terms`}>
         <div><dt>Founder before → after</dt><dd>{percent(ownership.founderBeforeBps)} → {percent(ownership.founderAfterBps)}</dd></div>
         <div><dt>Other holders after</dt><dd>{percent(ownership.otherExistingAfterBps)}</dd></div>
