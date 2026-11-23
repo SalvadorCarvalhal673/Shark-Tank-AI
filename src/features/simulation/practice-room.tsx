@@ -11,6 +11,7 @@ import { counterCopy, latestCounter, pendingForSession, specialties, type Pendin
 import { type FounderAction, type NegotiationSession } from "./negotiation/session";
 import { percent } from "./negotiation/terms-display";
 import { InvestorVoice } from "./negotiation/investor-voice";
+import { OpeningReveal } from "./negotiation/opening-reveal";
 import type { SessionRun } from "./negotiation/session-storage";
 
 export function PracticeRoom({ session, run, onAction, onExit, persistenceMessage }: {
@@ -130,6 +131,7 @@ export function PracticeRoom({ session, run, onAction, onExit, persistenceMessag
             : "Every valid counter uses one shared round, including withdrawals and unchanged offers."}</p>
           <p className="muted">Compare funding and dilution alongside valuation. The highest valuation may not meet your funding needs.</p>
         </div>
+        <OpeningReveal session={session} />
         <div className="investor-switcher" role="tablist" aria-label="Select an investor">
           {INVESTOR_ORDER.map((id) => <button key={id} type="button" role="tab" aria-selected={selectedInvestor === id}
             className={selectedInvestor === id ? "button investor-select selected" : "button investor-select secondary"}
