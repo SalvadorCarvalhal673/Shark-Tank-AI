@@ -71,12 +71,11 @@ function OfferPanel({ pending, session, offer, onCancel, onAction }: {
   </form>;
 }
 
-export function OfferCard({ session, investor, pending, selected, onSelect, headingRef, onOpen, onClose, onAction }: {
+export function OfferCard({ session, investor, pending, selected, headingRef, onOpen, onClose, onAction }: {
   session: NegotiationSession;
   investor: InvestorId;
   pending: PendingOffer | null;
   selected: boolean;
-  onSelect: () => void;
   headingRef: Ref<HTMLHeadingElement>;
   onOpen: (kind: Mode, offerId: string) => void;
   onClose: () => void;
@@ -106,15 +105,18 @@ export function OfferCard({ session, investor, pending, selected, onSelect, head
 
   return <article className={selected ? "offer-card negotiation-card selected-offer" : "offer-card negotiation-card"}>
     <div className="investor-card-heading">
-      <button type="button" className="investor-card-heading-button" aria-pressed={selected} onClick={onSelect}>
-        <h3 ref={headingRef} tabIndex={-1}>{name}</h3>
-      </button>
+      <h3 ref={headingRef} tabIndex={-1}>{name}</h3>
       <p className="muted">{specialties[investor]} · {status}</p>
     </div>
     {comparedOffer && <div className="current-terms">
       {current
-        ? <><p className="muted">{offer ? "Current comparable terms" : "Last historical terms"}</p><TermsDisplay terms={comparedOffer} currency={session.pitch.currency} founderOwnershipBps={session.pitch.founderOwnershipBps} /></>
+        ? <><p className="muted">{offer ? "Current comparable terms" : "Last historical terms"}</p><TermsDisplay terms={comparedOffer} currency={session.pitch.currency} /></>
         : <p role="alert" className="error">These terms are unavailable. This offer cannot be confirmed.</p>}
+      {ownership && <div className="ownership-bar ownership-bar-preview" role="img" aria-label={`Founder ${percent(ownership.founderAfterBps)}, other existing holders ${percent(ownership.otherExistingAfterBps)}, investor ${percent(ownership.investorBps)}`}>
+        <span className="owner-founder" style={{ flexGrow: ownership.founderAfterBps }} />
+        <span className="owner-others" style={{ flexGrow: ownership.otherExistingAfterBps }} />
+        <span className="owner-investor" style={{ flexGrow: ownership.investorBps }} />
+      </div>}
       {ownership && <dl className="offer-ownership" aria-label={`Ownership at ${name} terms`}>
         <div><dt>Founder before → after</dt><dd>{percent(ownership.founderBeforeBps)} → {percent(ownership.founderAfterBps)}</dd></div>
         <div><dt>Other holders after</dt><dd>{percent(ownership.otherExistingAfterBps)}</dd></div>

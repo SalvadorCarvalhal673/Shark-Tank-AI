@@ -59,6 +59,7 @@ test("offer cards compare ownership and retain historical state", async ({ page 
 test("conversation feedback and investor selection preserve exact offer previews", async ({ page }) => {
   await page.goto("/simulate");
   await page.getByRole("button", { name: "Use LunchLoop · reusable containers" }).click();
+  await page.getByRole("button", { name: "Review pitch" }).click();
   await page.getByRole("button", { name: "Skip introductions" }).click();
   await page.getByRole("button", { name: "Start practice" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Listening" })).toBeVisible();

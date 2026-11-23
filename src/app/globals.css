@@ -136,8 +136,6 @@ h2 { font-size: clamp(35px, 5vw, 64px); line-height: 1.1; letter-spacing: normal
 .investor-select { font-size: 13px; }
 .investor-select[aria-selected="true"], .investor-select.selected { border-color: var(--lime); }
 .selected-offer { border-color: #798c65; box-shadow: 0 0 0 1px #798c6533; }
-.investor-card-heading-button { appearance: none; border: 0; padding: 0; background: transparent; color: inherit; text-align: left; }
-.investor-card-heading-button h3 { cursor: pointer; }
 .negotiation-card > *, .current-terms > * { min-width: 0; overflow-wrap: anywhere; }
 .current-terms { display: grid; gap: 12px; }
 .inline-offer-panel { padding: 14px 0 0; border-top: 1px solid var(--line); display: grid; gap: 14px; }
