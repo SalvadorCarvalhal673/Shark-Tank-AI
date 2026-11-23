@@ -18,7 +18,7 @@ const manifest = JSON.parse(readFileSync("docs/design/asset-manifest.json", "utf
 const listed = new Map(manifest.assets.flatMap(asset => asset.files.map(file => [file.path, file] as const)));
 const walk = (dir: string): string[] => readdirSync(dir).flatMap(name => {
   const path = join(dir, name);
-  return statSync(path).isDirectory() ? walk(path) : [path];
+  return statSync(path).isDirectory() ? walk(path) : [path.replaceAll("\\", "/")];
 });
 const sha256 = (path: string) => createHash("sha256").update(readFileSync(path)).digest("hex");
 

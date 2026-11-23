@@ -40,7 +40,7 @@ function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:S
 
  },[animations,cue.key,cue.clip,instance,props.reducedMotion,invalidate]);
  useEffect(()=>()=>instance.dispose(),[instance]);
- useFrame((_,delta)=>{if(!props.reducedMotion)instance.mixer.update(Math.min(delta,.05));});
+ useFrame((_,delta)=>{if(!document.hidden && !props.reducedMotion)instance.mixer.update(Math.min(delta,.05));});
  return <group position={[positions[index],0,0]} onClick={event=>{event.stopPropagation();props.onSelect(investor);}}>
   <primitive object={instance.root} dispose={null}/>
   <mesh position={[0,.03,0]} rotation={[-Math.PI/2,0,0]}>

@@ -111,3 +111,11 @@ Four focused repetitions of the exact unchanged visibility test on the clean ini
 Required owner investigation: reproduce on Linux Chromium/software WebGL under fresh initialization; observe actual R3F suspension and pending frame/metrics settlement; distinguish one pending render/React commit from continuing hidden animation. Preserve exact financial session/revision/drafts, assert settled hidden camera/mixers stop, then verify visible resumption and repeated hide/show. If a synchronization defect is established, replace timing assumptions with an observable acknowledgement without weakening the suspension invariant; if animation continues after acknowledged suspension, M2 owns the implementation correction. No fix outside M1 is authorized in this audit.
 
 Full final CI log and focused repetition log persist outside source in C:/Users/salva/AppData/Local/Temp/shark-cross-audit/final-ci-45077351879.log and visibility-focused.log. This documentation-only addendum does not change the tested production/test tree. Independent review is requested with XQA-004 explicitly unresolved; this PR must remain unmerged.
+
+## Completion review, 23 November 2026: XQA-004 disposition
+
+Current contributor baseline90ff970d3f42942e38fb17574b71d1873284704b includes3cf4bfe (PR126), which checks document.hidden synchronously before Direction changes camera/metrics. This fixes the original pending-camera-frame path; rerun success alone was not accepted as a fix.
+
+A remaining real Avatar callback defect was independently reproduced:120 hidden pending frames advanced mixer time from0 to1.92seconds. studio-hidden-frame.test.ts executes that production callback and failed before correction. The minimal document.hidden guard now preserves time while hidden, visible clamping and reduced motion. No character/camera redesign or financial change was made. The original browser visibility assertion remains intact.
+
+Two QA compatibility fixes: Windows paths now normalize separators before exact asset-manifest lookup; the independent cue test asserts the approved clip/key/pose contract added upstream. Baseline Windows311/312 failed provenance; cumulative327/328 failed the older cue assertion. Neither invariant was weakened. Full test evidence is retained outside source and on PR121.

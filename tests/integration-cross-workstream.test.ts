@@ -24,7 +24,7 @@ test('integration: scene projections are stable for rejected commands, unique fo
  assert.equal(invalid,run);assert.deepEqual(sceneCue(invalid.session,'maya'),cue);
  const next=advanceRun(run,{kind:'counter',sessionId:run.session.id,expectedRevision:3,offerId:offer.id,terms:{amount:offer.amount,equity:offer.equity}});
  assert.notEqual(sceneCue(next.session,'maya').key,cue.key);assert.equal(sceneCue(next.session,'adrian').key,sceneCue(run.session,'adrian').key);
- assert.deepEqual(Object.keys(sceneCue(next.session,'maya')).sort(),['key','pose']);
+ assert.deepEqual(Object.keys(sceneCue(next.session,'maya')).sort(),['clip','key','pose']);
  const ended=advanceRun(next,{kind:'walk-away',sessionId:next.session.id,expectedRevision:4});
  sceneCue(ended.session,'maya');assert.equal(JSON.stringify(run),before);assert.equal(ended.actions.length,5);
 });
