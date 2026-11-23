@@ -62,6 +62,19 @@ export function cameraFov(view: CameraView, aspect: number) {
 export function cameraStep(deltaSeconds: number, reducedMotion: boolean) {
   return reducedMotion ? 1 : 1-Math.exp(-Math.min(Math.max(deltaSeconds,0),.05)*7);
 }
+
+/**
+ * Camera ease for one rendered frame. A slow frame is split into cameraStep-sized slices, so a
+ * device rendering at 5 fps moves the camera in the same wall-clock time as one at 60 fps instead of
+ * in slow motion. Frames longer than a quarter second (a stall or a background tab) still count as a
+ * quarter second, so the camera never jumps.
+ */
+export function cameraEase(deltaSeconds: number, reducedMotion: boolean) {
+  if (reducedMotion) return 1;
+  const elapsed = Math.min(Math.max(deltaSeconds, 0), .25);
+  const slices = Math.max(1, Math.ceil(elapsed / .05));
+  return 1 - (1 - cameraStep(elapsed / slices, false)) ** slices;
+}
 /**
  * The pose an investor shows, derived only from the committed session (never from drafts, cameras
  * or selection), so presentation can never commit or imply a financial outcome.
