@@ -8,10 +8,11 @@ import { validTerms } from "../src/features/simulation/pitch.ts";
 // helpers. It uses exact rational arithmetic (numerator/denominator BigInt pairs) and its own
 // half-up rounding, then compares the engine over exhaustive edges and a deterministic random sweep.
 
-const BP = 10000n;
+const BP = BigInt(10000);
+const TWO = BigInt(2);
 function halfUp(numerator: bigint, denominator: bigint) {
   // round(n/d) with ties away from zero for non-negative values: floor((2n + d) / 2d)
-  return (2n * numerator + denominator) / (2n * denominator);
+  return (TWO * numerator + denominator) / (TWO * denominator);
 }
 function oracleValuation(amount: number, equityBps: number) {
   // post-money = investment / equity share = amount * 10000 / bps (rounded half up to one minor unit)
