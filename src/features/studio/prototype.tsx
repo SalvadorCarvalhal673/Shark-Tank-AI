@@ -14,6 +14,8 @@ import { activeSpeaker, demoScenarios, financialPreview, sceneCue, type CameraVi
 import type { StudioSceneProps } from "./scene";
 import { DialoguePanel } from "./dialogue-panel";
 import { counterBinding } from "./counter-binding";
+import { latestConcession } from "./concession";
+import { ConcessionNote } from "./concession-note";
 
 const Scene = dynamic(()=>import("./scene").then(module=>module.StudioScene),{
  ssr:false,loading:()=> <p className="studio-loading" role="status">Loading 3D code… HTML controls are ready.</p>,
@@ -119,6 +121,7 @@ export function StudioPrototype(){
     <section className="studio-dialogue" aria-label="Investor response">
      <p className="kicker">{NEGOTIATION_RULES.investors[selected].name}</p>
      <p aria-live="polite">{response}</p>
+     {session && <ConcessionNote concession={latestConcession(session,selected)} currency={session.pitch.currency}/>}
      {activeOffer && <p>Current offer: <strong>{money(activeOffer.amount,session!.pitch.currency)} for {percent(activeOffer.equity)}</strong></p>}
     </section>
     <DialoguePanel session={session}>
