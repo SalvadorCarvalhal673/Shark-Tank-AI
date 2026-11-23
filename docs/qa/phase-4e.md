@@ -2,11 +2,22 @@
 
 Issues #67–#78. The table separates what was verified automatically in a Linux container from what needs a physical device or a human tester. **Automated widths and emulated devices are not physical-device evidence.**
 
+**Release scope (agreed 23 November 2026):** desktop browsers on Windows and macOS, namely Chrome, Edge and Safari. Physical Android and iPhone testing is **out of scope** for this release. Issues #67 and #68, and the real-phone part of #72, are deferred. They have **not** passed.
+
+**Desktop browser matrix:** `playwright.desktop.config.ts` runs the full browser suite (108 tests) per browser against the production build:
+
+| Machine | Command (after `npm ci` and `npm run build`) |
+| --- | --- |
+| Windows | `npx playwright test --config playwright.desktop.config.ts --project=chrome --project=msedge` |
+| macOS | `npx playwright install webkit` then `npx playwright test --config playwright.desktop.config.ts --project=chrome --project=webkit` |
+
+Minimum browser versions, from the features the app uses (CSS `:has()`, `Array.prototype.findLast`, Web Locks, WebGL2): Chrome/Edge 105+, Safari 16.4+. Playwright WebKit is close to Safari but is not Safari, so do one manual pass in real Safari as well.
+
 | Issue | Status | Evidence | What is still needed |
 | --- | --- | --- | --- |
-| #67 Android performance | **Blocked: needs a device** | Software-renderer measurements only (`docs/design/performance.md`) | A run on a real Android phone using the procedure below |
-| #68 iPhone performance | **Blocked: needs a device** | As above | A run on a real iPhone using the procedure below |
-| #69 Safari/WebKit | **Prepared; not yet run** | `playwright.webkit.config.ts` runs the full browser suite in WebKit (desktop + emulated iPhone 13). WebKit cannot be downloaded in the CI container used for this work | Run on a Mac and record the result here; then a manual check in real Safari (macOS and iOS) |
+| #67 Android performance | **Out of scope (deferred)** | Software-renderer measurements only (`docs/design/performance.md`) | A run on a real Android phone using the procedure below |
+| #68 iPhone performance | **Out of scope (deferred)** | As above | A run on a real iPhone using the procedure below |
+| #69 Safari/WebKit | **Prepared; not yet run** | `playwright.desktop.config.ts` (webkit project) and `playwright.webkit.config.ts` run the full suite in WebKit. WebKit cannot be downloaded in the container used for this work | Run on a Mac and record the result here; then a manual check in real Safari (macOS and iOS) |
 | #70 3D loading | Verified (automated) | The scene loads only on "Enter 3D studio" (dynamic import), so the HTML controls work before and without it. The cast is the only 3D download: 743 KB, 171 KB gzip. There are no external decoders, buffers or remote URLs (`tests/studio-provenance.test.ts`). Decode and time-to-ready figures are in `scripts/measure-studio.mjs` / `docs/design/performance.md` | Cold-load timings on real phones |
 | #71 GPU resources | Verified (automated) | `prototype.spec.ts` "repeated 3D and simplified switches…": 18 mounts with no "too many WebGL contexts" warning, and identical geometry/texture/skeleton/mixer/draw-call counts before and after; stable over 30 view changes plus a hidden/visible cycle (`measure-studio.mjs`) | Long sessions on real devices |
 | #72 Mobile responsive | Verified at automated widths | `accessibility-browser.spec.ts`: every practice stage at 320 and 375 px has no horizontal scroll, and all targets are at least 24×24 px (WCAG 2.2 AA 2.5.8; header links and checkboxes were enlarged for this). The studio fits 320–1440 px (`prototype.spec.ts`) | Virtual keyboard and touch on real phones |

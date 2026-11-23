@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "demo:check": "node scripts/demo-preflight.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.2",
