@@ -57,7 +57,16 @@ test("the shared face has eye whites, irises, brows and a mouth on the facial bo
 const expected: Partial<Record<InvestorId, { slots: string[]; note: string }>> = {
   maya: { slots: ["Hair", "Brass", "Shirt", "Jacket"], note: "sleek hair, brass hoops, high collar and lapels" },
   adrian: { slots: ["Hair", "Brass", "Shirt", "Jacket"], note: "textured copper hair, glasses with temples, open collar and narrow lapels" },
+  sofia: { slots: ["Hair", "Brass", "Shirt", "Jacket"], note: "high bun with a brass clip, brass studs, shawl collar and cream top" },
 };
+test("the three investors are distinct: no two feature meshes share a silhouette", () => {
+  const silhouettes = (["maya", "adrian", "sofia"] as const).map(investor => {
+    const own = meshes(gltf.scene, castMeshName(investor));
+    return own.map(mesh => mesh.geometry.index?.count ?? 0).join("/");
+  });
+  assert.equal(new Set(silhouettes).size, 3, silhouettes.join(" | "));
+});
+
 for (const [investor, { slots: needed, note }] of Object.entries(expected) as [InvestorId, { slots: string[]; note: string }][]) {
   test(`${investor} has their own production features: ${note}`, () => {
     const own = meshes(createInvestorInstance(gltf.scene, investor).root, castMeshName(investor));

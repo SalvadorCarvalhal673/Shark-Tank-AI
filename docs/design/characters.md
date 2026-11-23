@@ -60,13 +60,41 @@ Energetic and approachable. The growth investor is the most casual of the three.
 
 **Test fix.** The Issue #8 glasses test sampled vertex 0 of the brass primitive. glTF primitives share one vertex buffer, so once Adrian gained lapels, vertex 0 belonged to a lapel on the chest bone. The test now samples a vertex the glasses primitive actually draws. This makes it stricter, not weaker.
 
+## Sofia Mendes, operations (Issue #7)
+
+Practical warmth. The operations investor is grounded and approachable.
+
+| Feature | Design |
+| --- | --- |
+| Hair | Dark hair pulled back into a high bun: hair shell, crown fill and bun |
+| Accessories | Brass hair clip around the bun, small brass stud earrings, skinned to the head |
+| Clothing | Teal jacket with a soft shawl collar, cream top |
+| Colours | Jacket #20756e, hair #271e1b, skin #a76e4e |
+
+| View | Image |
+| --- | --- |
+| Portrait, front | [sofia-portrait.jpg](studio-concept/sofia-portrait.jpg) |
+| Portrait, three-quarter | [sofia-three-quarter.jpg](studio-concept/sofia-three-quarter.jpg) |
+| In the studio, Sofia camera | [sofia-in-studio.jpg](studio-concept/sofia-in-studio.jpg) |
+
+## The cast together
+
+Two women and one man, matching the negotiation identities: Maya Chen (seat 1), Adrian Vale (seat 2) and Sofia Mendes (seat 3). They share one body, so their proportions are identical. They are told apart by silhouette (sleek shoulder-length hair, textured copper hair with glasses, a high bun), by colour (forest green, cobalt, teal) and by accessories (hoops, glasses, studs and a hair clip). A test checks that no two feature meshes share a silhouette.
+
+| View | Image |
+| --- | --- |
+| Line-up, front | [cast-lineup.jpg](studio-concept/cast-lineup.jpg) |
+| Panel camera | [cast-panel.jpg](studio-concept/cast-panel.jpg) |
+
 ## Budgets
 
-| Measure | Budget | After Issue #5 | After Issue #6 |
-| --- | --- | --- | --- |
-| Cast file | 1 MB raw, 300 KB gzip | 446,928 bytes; 80,323 gzip | 582,044 bytes; 120,641 gzip |
-| Panel view | 90,000 triangles, 60 draw calls | 40,802 triangles, 50 draw calls | 44,350 triangles, 52 draw calls |
-| Skinning | Every vertex fully weighted to one valid bone | Verified | Verified |
-| Seat fit | No body vertex inside furniture in any frame | Verified | Verified |
+| Measure | Budget | After Issue #5 | After Issue #6 | After Issue #7 |
+| --- | --- | --- | --- | --- |
+| Cast file | 1 MB raw, 300 KB gzip | 446,928 bytes; 80,323 gzip | 582,044 bytes; 120,641 gzip | 659,888 bytes; 140,785 gzip |
+| Panel view | 90,000 triangles, 60 draw calls | 40,802 triangles, 50 draw calls | 44,350 triangles, 52 draw calls | 46,478 triangles, 55 draw calls |
+| Skinning | Every vertex fully weighted to one valid bone | Verified | Verified | Verified |
+| Seat fit | No body vertex inside furniture in any frame | Verified | Verified | Verified |
+
+**Draw calls are the tightest budget.** At 55 of 60, each investor's features cost four draw calls (one per material slot they use). Issue #12 should merge feature slots, or move them to vertex colours like the eyes, before more detail is added.
 
 Unused UV coordinates are dropped from the cast file, because no character uses textures. Captures were made with a software renderer, and physical-phone performance remains unverified.
