@@ -20,6 +20,8 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
   const [pending, setPending] = useState<PendingOffer | null>(null);
   const [answerError, setAnswerError] = useState("");
   const [notice, setNotice] = useState("");
+  const [answerDraft, setAnswerDraft] = useState("");
+  const [selectedInvestor, setSelectedInvestor] = useState<InvestorId>(INVESTOR_ORDER[0]);
   const heading = useRef<HTMLHeadingElement>(null);
   const offerHeadings = useRef<Partial<Record<InvestorId, HTMLHeadingElement | null>>>({});
   const { pitch, stage, answers } = session;
@@ -59,6 +61,7 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
       return;
     }
     setAnswerError("");
+    setAnswerDraft("");
     dispatch({ kind: "answer", sessionId: session.id, expectedRevision: session.revision, turn, text });
   }
 
@@ -87,6 +90,7 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
           <p className="dialogue-speaker founder-speaker">Founder · submitted answer</p>
           <blockquote>{entry.text}</blockquote>
         </article>)}
+        <p className="history-summary" aria-live="polite">{answers.length === 0 ? "No replies yet. Your submitted exchanges will remain here for review." : `${answers.length} of ${INVESTOR_ORDER.length} investor exchanges available above.`}</p>
       </section>
       <div className="practice-panel">
         {INVESTOR_ORDER.map((id) => <div key={id} className={stage === "questions" && id === investor ? "active-investor" : ""}>
@@ -100,7 +104,11 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
           <p>{profile.question}</p>
           <p className="muted">Submit your answer when it is ready. The scripted rules respond immediately; there is no simulated waiting or live AI. Detected text signals are not independently verified.</p>
           <form className="counter-form" key={turn} onSubmit={submitAnswer}>
-            <label>Your answer<textarea name="answer" rows={4} minLength={10} maxLength={1500} required /></label>
+            <label>Your answer<textarea name="answer" rows={4} minLength={10} maxLength={1500} required value={answerDraft}
+              onChange={(event) => setAnswerDraft(event.target.value)} aria-describedby="interaction-state" /></label>
+            <p id="interaction-state" className="interaction-state" role="status" aria-live="polite">
+              {answerDraft ? "Listening · your answer is ready to submit." : "Listening · write an answer when you are ready."}
+            </p>
             {answerError && <p className="error" role="alert">{answerError}</p>}
             <button className="button" type="submit">Submit answer <ArrowRight size={17} aria-hidden /></button>
           </form>
@@ -108,15 +116,22 @@ export function PracticeRoom({ session, onAction, onExit, persistenceMessage }: 
       )}
       {isNegotiating && <>
         <div className="negotiation-heading">
-          <h2 ref={heading} tabIndex={-1}>{stage === "final-offers" ? "Final offers." : "Negotiate your terms."}</h2>
+          <h2 ref={heading} tabIndex={-1} data-session-revision={session.revision}>{stage === "final-offers" ? "Final offers." : "Negotiate your terms."}</h2>
           <p className="rounds-remaining">{NEGOTIATION_RULES.counterBudget - session.roundsUsed} shared counters remaining</p>
+          <p className="interaction-state" role="status" aria-live="polite">{committedCounter ? "Reply recorded · " + NEGOTIATION_RULES.investors[committedCounter.investor].name + " responded to counter " + committedCounter.round + "." : "Select an investor to inspect the current terms."}</p>
           <p className="muted">{stage === "final-offers"
             ? "Your counter allowance is used. Accept an active offer or walk away."
             : "Every valid counter uses one shared round, including withdrawals and unchanged offers."}</p>
           <p className="muted">Compare funding and dilution alongside valuation. The highest valuation may not meet your funding needs.</p>
         </div>
+        <div className="investor-switcher" role="tablist" aria-label="Select an investor">
+          {INVESTOR_ORDER.map((id) => <button key={id} type="button" role="tab" aria-selected={selectedInvestor === id}
+            className={selectedInvestor === id ? "button investor-select selected" : "button investor-select secondary"}
+            onClick={() => setSelectedInvestor(id)}>{NEGOTIATION_RULES.investors[id].name} · {specialties[id]}</button>)}
+        </div>
         <div className="negotiation-offers">
           {INVESTOR_ORDER.map((id) => <OfferCard key={id} session={session} investor={id} pending={activePending}
+            selected={selectedInvestor === id} onSelect={() => setSelectedInvestor(id)}
             headingRef={(element) => { offerHeadings.current[id] = element; }}
             onOpen={open} onClose={() => setPending(null)} onAction={dispatch} />)}
         </div>
