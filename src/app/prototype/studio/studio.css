@@ -66,3 +66,4 @@
 .studio-counter-slots li[data-slot=used]{background:#2a3528;color:#8f9d8c;text-decoration:line-through}
 .studio-counter-slots li[data-slot=next]{border-color:#d5f27d;color:#d5f27d}
 .studio-concession{font-size:14px;line-height:1.55;color:#dfe7d0;border-left:3px solid #d5f27d;padding-left:12px}
+.studio-withdrawal{border-left-color:#c98b6b}

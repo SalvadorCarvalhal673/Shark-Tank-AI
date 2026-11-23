@@ -260,6 +260,24 @@ const clipTracks = {
     rotationTrack("RightForearm", [0, .9, 2.2], [[0, 0, 0], [-.62, .3, 0], [-.55, .25, 0]]),
     rotationTrack("LeftBrow", [0, .8, 2.2], [[0, 0, 0], [0, 0, .12], [0, 0, .1]]),
   ]],
+  // Policy-specific withdrawals (Issue #30). Both stay "Withdrawal" in the cue, but play their own clip.
+  // Above the cash ceiling: sits back and raises an open palm, brows up: "that is more than I can put in".
+  WithdrawalCash: [1.8, [
+    rotationTrack("Chest", [0, .7, 1.8], [[0, 0, 0], [-.12, 0, 0], [-.09, 0, 0]]),
+    rotationTrack("Head", [0, .7, 1.8], [[0, 0, 0], [-.07, -.08, 0], [-.05, -.06, 0]]),
+    rotationTrack("RightArm", [0, .6, 1.8], [[0, 0, 0], [-.42, -.12, -.2], [-.38, -.1, -.18]]),
+    rotationTrack("RightForearm", [0, .6, 1.8], [[0, 0, 0], [-1.05, .15, 0], [-.98, .12, 0]]),
+    rotationTrack("Brows", [0, .5, 1.8], [[0, 0, 0], [-.06, 0, 0], [-.05, 0, 0]]),
+  ]],
+  // Below the negotiable equity range: a slow head shake, a frown and the left hand drawing back off the desk.
+  WithdrawalEquity: [2, [
+    rotationTrack("Chest", [0, .9, 2], [[0, 0, 0], [-.1, 0, 0], [-.08, 0, 0]]),
+    rotationTrack("Head", [0, .4, .8, 1.2, 2], [[0, 0, 0], [.03, .12, 0], [.03, -.12, 0], [.02, .05, 0], [.02, 0, 0]]),
+    rotationTrack("LeftBrow", [0, .6, 2], [[0, 0, 0], [0, 0, -.24], [0, 0, -.2]]),
+    rotationTrack("RightBrow", [0, .6, 2], [[0, 0, 0], [0, 0, .24], [0, 0, .2]]),
+    rotationTrack("LeftArm", [0, .9, 2], [[0, 0, 0], [-.06, 0, .1], [-.05, 0, .08]]),
+    rotationTrack("LeftForearm", [0, .9, 2], [[0, 0, 0], [-.22, 0, 0], [-.18, 0, 0]]),
+  ]],
   // Holding at the concession limit: one short shake, level lowered brows, settling back.
   Firm: [1.6, [
     rotationTrack("Head", [0, .35, .7, 1.05, 1.6], [[0, 0, 0], [0, .08, 0], [0, -.08, 0], [0, .02, 0], [0, 0, 0]]),

@@ -30,15 +30,15 @@ function Avatar({investor,index,props}:{investor:InvestorId;index:number;props:S
  const cue=sceneCue(props.session,investor);
  const action=useRef<ReturnType<typeof instance.mixer.clipAction> | null>(null);
  useEffect(()=>{
-  const clip=animations.find(clip=>clip.name===cue.pose);
+  const clip=animations.find(clip=>clip.name===cue.clip);
   if(!clip)return;
   const next=instance.mixer.clipAction(clip);
   action.current?.fadeOut(.16);next.reset().setLoop(LoopOnce,1);
   next.clampWhenFinished=true;next.fadeIn(.16).play();action.current=next;
-  if(props.reducedMotion){instance.mixer.update(REDUCED_MOTION_POSE[cue.pose]);next.paused=true;}
+  if(props.reducedMotion){instance.mixer.update(REDUCED_MOTION_POSE[cue.clip]);next.paused=true;}
   invalidate();
 
- },[animations,cue.key,cue.pose,instance,props.reducedMotion,invalidate]);
+ },[animations,cue.key,cue.clip,instance,props.reducedMotion,invalidate]);
  useEffect(()=>()=>instance.dispose(),[instance]);
  useFrame((_,delta)=>{if(!props.reducedMotion)instance.mixer.update(Math.min(delta,.05));});
  return <group position={[positions[index],0,0]} onClick={event=>{event.stopPropagation();props.onSelect(investor);}}>

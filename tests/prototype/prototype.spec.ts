@@ -253,3 +253,18 @@ test("a committed concession is explained with exact terms and only that investo
  await expect(page.getByRole("button",{name:/Adrian Vale Growth/})).toContainText("Offering");
  await expect(page.getByRole("button",{name:/Sofia Mendes Operations/})).toContainText("Offering");
 });
+
+test("a withdrawal shows its policy reason, its own clip and keeps the last offer in the history",async({page})=>{
+ await offers(page);await enter(page);
+ await page.getByLabel("Investment (EUR)",{exact:true}).fill("100000.01");
+ await page.getByRole("button",{name:"Send counter to Maya",exact:true}).click();
+ const note=page.getByTestId("withdrawal-note");
+ await expect(note).toHaveAttribute("data-reason","above-cash-ceiling");
+ await expect(note).toHaveAttribute("data-clip","WithdrawalCash");
+ await expect(note).toContainText("you asked for €100,000.01, more than this investor can invest");
+ await expect(note).toContainText("stays in the history");
+ await expect(page.getByRole("button",{name:/Maya Chen Finance/})).toContainText("Withdrawal");
+ await page.getByText("Committed negotiation history").click();
+ await expect(page.locator(".studio-history")).toContainText("withdrawn");
+ await expect(page.getByTestId("session-meta")).toHaveAttribute("data-rounds","1");
+});
