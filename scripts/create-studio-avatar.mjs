@@ -228,6 +228,33 @@ const clipTracks = {
     rotationTrack("LeftBrow", [0, .6, 1.7], [[0, 0, 0], [0, 0, -.22], [0, 0, -.2]]),
     rotationTrack("RightBrow", [0, .6, 1.7], [[0, 0, 0], [0, 0, .22], [0, 0, .2]]),
   ]],
+  // Reactions to committed decision reasons (Issue #10).
+  // Passing on a repeated answer: a quizzical tilt, one brow cocked, a slight lean away.
+  Skeptical: [1.8, [
+    rotationTrack("Head", [0, .7, 1.8], [[0, 0, 0], [-.02, -.1, .12], [-.01, -.06, .09]]),
+    rotationTrack("Chest", [0, .7, 1.8], [[0, 0, 0], [-.05, 0, 0], [-.04, 0, 0]]),
+    rotationTrack("RightBrow", [0, .6, 1.8], [[0, 0, 0], [0, 0, -.25], [0, 0, -.2]]),
+    rotationTrack("LeftBrow", [0, .6, 1.8], [[0, 0, 0], [0, 0, -.12], [0, 0, -.1]]),
+  ]],
+  // Agreeing within limits or closing a deal: two warm nods, lifted brows, a parted smile.
+  Agreeing: [1.6, [
+    rotationTrack("Head", [0, .3, .6, .9, 1.2, 1.6], [[0, 0, 0], [.12, 0, 0], [.01, 0, 0], [.1, 0, 0], [.02, 0, 0], [.03, 0, 0]]),
+    rotationTrack("Brows", [0, .4, 1.6], [[0, 0, 0], [-.06, 0, 0], [-.04, 0, 0]]),
+    rotationTrack("Jaw", [0, .4, 1.6], [[0, 0, 0], [.05, 0, 0], [.03, 0, 0]]),
+  ]],
+  // Revising with a limited concession: a thoughtful tilt and a hand rising toward the chin.
+  Considering: [2.2, [
+    rotationTrack("Head", [0, .9, 2.2], [[0, 0, 0], [.06, .05, -.1], [.04, .03, -.08]]),
+    rotationTrack("RightArm", [0, .9, 2.2], [[0, 0, 0], [-.32, -.22, -.28], [-.28, -.18, -.24]]),
+    rotationTrack("RightForearm", [0, .9, 2.2], [[0, 0, 0], [-.62, .3, 0], [-.55, .25, 0]]),
+    rotationTrack("LeftBrow", [0, .8, 2.2], [[0, 0, 0], [0, 0, .12], [0, 0, .1]]),
+  ]],
+  // Holding at the concession limit: one short shake, level lowered brows, settling back.
+  Firm: [1.6, [
+    rotationTrack("Head", [0, .35, .7, 1.05, 1.6], [[0, 0, 0], [0, .08, 0], [0, -.08, 0], [0, .02, 0], [0, 0, 0]]),
+    rotationTrack("Chest", [0, .7, 1.6], [[0, 0, 0], [-.04, 0, 0], [-.03, 0, 0]]),
+    rotationTrack("Brows", [0, .5, 1.6], [[0, 0, 0], [.03, 0, 0], [.025, 0, 0]]),
+  ]],
 };
 const clips = RIG_CLIPS.map(name => new THREE.AnimationClip(name, ...clipTracks[name]));
 

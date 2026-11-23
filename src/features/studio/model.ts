@@ -4,7 +4,25 @@ import type { NegotiationPitch, NegotiationSession } from "../simulation/negotia
 import { INVESTOR_ORDER, type InvestorId } from "../simulation/negotiation/investor-policy.ts";
 
 export type CameraView = "panel" | InvestorId;
-export type Pose = "Listening" | "Explaining" | "Offering" | "Withdrawal";
+export type Pose = "Listening" | "Explaining" | "Offering" | "Withdrawal" | "Skeptical" | "Agreeing" | "Considering" | "Firm";
+
+type DecisionEvent = Extract<NegotiationSession["history"][number], { kind: "opening" | "counter" }>;
+
+/**
+ * Reaction for a committed decision reason (Issue #10). Every reason the engine can record maps to
+ * exactly one recognisable reaction; the map is exhaustive by type, so a new reason fails to compile.
+ * DECISION: reactions only follow committed decisions, so a face never anticipates an outcome.
+ */
+export const REACTIONS: Record<DecisionEvent["reason"], Pose> = {
+  "required-signals-supplied": "Offering",
+  "repeated-answer": "Skeptical",
+  "missing-required-signals": "Withdrawal",
+  "within-limits": "Agreeing",
+  "limited-concession": "Considering",
+  "at-concession-limit": "Firm",
+  "above-cash-ceiling": "Withdrawal",
+  "below-withdrawal-band": "Withdrawal",
+};
 /**
  * Camera presets (Issue #11). The panel shot is the founder's view of all three investors; each
  * investor shot is a medium close-up from just above eye level, so the face, hands and desk read.
@@ -55,11 +73,11 @@ export function sceneCue(session: NegotiationSession | null, investor: InvestorI
     const asking = INVESTOR_ORDER[session.answers.length] === investor;
     return {pose: asking ? "Explaining" : "Listening", key: session.id+":q"+session.answers.length+":"+investor+":"+(asking ? "Explaining" : "Listening")};
   }
-  const event = session.history.findLast(item =>
+  const event = session.history.findLast((item): item is DecisionEvent =>
     (item.kind==="opening" || item.kind==="counter") && item.investor===investor);
-  const pose: Pose = !event ? "Listening" :
-    (event.kind==="opening" && event.decision==="pass") ||
-    (event.kind==="counter" && event.decision==="withdraw") ? "Withdrawal" : "Offering";
+  const outcome = session.outcome;
+  const closedWith = outcome?.kind==="accepted-deal" && session.offers.find(offer => offer.id===outcome.offerId)?.investor===investor;
+  const pose: Pose = closedWith ? "Agreeing" : !event ? "Listening" : REACTIONS[event.reason];
   return {pose,key:session.id+":"+ (event?.revision ?? 0)+":"+investor+":"+pose};
 }
 export function financialPreview(amount: string, equity: string, founderBeforeBps: number) {

@@ -57,7 +57,7 @@ test("original local GLB has embedded geometry and the required gesture clips",a
  assert.equal(json.images,undefined);assert.equal(json.extensionsRequired,undefined);
  const gltf=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),"");
  // Issue #9 adds Explaining after the three original clips, which keep their names and order.
- assert.deepEqual(gltf.animations.map(c=>c.name),["Listening","Offering","Withdrawal","Explaining"]);
+ assert.deepEqual(gltf.animations.map(c=>c.name),["Listening","Offering","Withdrawal","Explaining","Skeptical","Agreeing","Considering","Firm"]);
 });
 test("three characters have independent bones, mixers and materials but share geometry",async()=>{
  const bytes=await fs.readFile(new URL("../public/studio/investor-v1.glb",import.meta.url));
