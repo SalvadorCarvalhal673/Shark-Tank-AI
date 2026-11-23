@@ -44,7 +44,7 @@ Use `npm run demo:check` after the build. The demo guide includes the exact Lunc
 
 ## Security, hosting and attribution
 
-The desktop demonstration can run locally. Before public hosting, review the selected HTTPS artifact, environment, dependency and vendored-code exposure, privacy, and monitoring. Owner approval is tracked in [#90](https://github.com/SalvadorCarvalhal673/Shark-Tank-AI/issues/90). The scoped SE-001 exception was retired after advisory reassessment. [Security record](docs/security-exceptions.md)
+The application is hosted on Vercel over HTTPS, and the desktop demonstration can also run locally. The public Edge verification covered the 3D practice journey through deal confirmation. Windows WebKit recovery cases remain unresolved, and Safari, physical mobile devices, spoken screen readers and beginner usability remain unverified. The scoped SE-001 exception was retired after advisory reassessment. [Security record](docs/security-exceptions.md)
 
 The asset manifest identifies original studio art, the generated icon, locally shipped fonts, and their notices. See [asset provenance](docs/design/asset-provenance.md) and the [manifest](docs/design/asset-manifest.json) for redistribution terms. The asset terms do not grant a blanket licence for the project source.
 
@@ -52,11 +52,11 @@ The asset manifest identifies original studio art, the generated icon, locally s
 
 ## Team
 
-| Member | Name | Student number | Verified contribution |
+| Member | Full name | Student number | Main contributions |
 | --- | --- | --- | --- |
-| 1 | Salvador Carvalhal | To be confirmed by the group | Repository coordination, simulator foundation, AI architecture and integration |
-| 2 | Madalena Monteiro | To be supplied | 3D studio, characters, cameras and reactions |
-| 3 | Full name to be supplied (`zevsmouraa`) | To be supplied | Interactive onboarding and gameplay |
-| 4 | Full name to be supplied (`carmogalhardas`) | To be supplied | Outcomes, scorecard, decision review and replay |
+| 1 | Salvador Carvalhal | 80673 | Repository coordination, simulator foundation, AI architecture and integration |
+| 2 | Madalena Monteiro | 62417 | 3D studio, characters, cameras and animations |
+| 3 | Jose Moura | 62560 | Interactive onboarding, gameplay and negotiation |
+| 4 | Carmo Galhardas | 62546 | Outcomes, scorecard, decision review and replay |
 
 [Contributor workflow](CONTRIBUTING.md) · [Development history](docs/DEVELOPMENT-HISTORY.md)
