@@ -109,4 +109,19 @@ The issue numbers below map to evidence on this release candidate. Issues are cl
 
 ## Verification results
 
-To be filled from the release-candidate run below.
+Run on 23 November 2026 in the Linux container, with code at `f8404260552d15a1ba1cc4f2c5ad455bfe002052`. The only later commit adds this document. Node 24, Chromium 1243 (Playwright 1.65.1).
+
+| Check | Result |
+| --- | --- |
+| `npm ci` | OK |
+| `npm run lint` | 0 errors |
+| `npm run typecheck` | 0 errors |
+| `npm test` | **337 / 337** passed (baseline on `develop` was 328) |
+| `npm run build` | OK |
+| `npm run test:e2e` (production build) | **107 / 107** passed (baseline 98) |
+| Prototype suite (development server, lavapipe GPU emulation) | **20 / 20** passed |
+| CI suite (`playwright.ci.config.ts`, SwiftShader) | **20 / 20** passed, 3 consecutive runs |
+| `npm audit` / `npm audit --omit=dev` | 0 / 0 vulnerabilities |
+| WebKit suite | **Not run:** WebKit cannot be downloaded in this container |
+
+The first combined run of the two prototype suites failed during start-up, because a previous, interrupted run still held the development-server port. After that process was stopped, both suites were rerun from a clean state and passed as listed. No test was skipped.
