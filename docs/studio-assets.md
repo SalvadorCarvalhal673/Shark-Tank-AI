@@ -5,15 +5,15 @@ No character, environment, texture, HDRI or animation pack was downloaded or pur
 
 | Asset | Source and modifications | Rights / redistribution |
 | --- | --- | --- |
-| public/studio/investor-v1.glb | Original procedural cast created specifically for this project by scripts/create-studio-avatar.mjs, following the rig contract in src/features/studio/rig.ts (Issue #8): one shared body and one feature mesh per investor, all weighted to one 11-bone seated rig. Includes Listening, Offering and Withdrawal quaternion clips. | Original project artwork, not a third-party model. No separate public license has been applied to the original artwork. |
+| public/studio/investor-v1.glb | Original procedural cast created specifically for this project by scripts/create-studio-avatar.mjs, following the rig contract in src/features/studio/rig.ts (Issue #8): one shared body and one feature mesh per investor, all weighted to one 15-bone seated rig (11 body + 4 facial bones, Issue #5); production characters in docs/design/characters.md. Includes Listening, Offering and Withdrawal quaternion clips. | Original project artwork, not a third-party model. No separate public license has been applied to the original artwork. |
 | Room geometry and materials | Original procedural Rooftop VC Boardroom (Issue #1) in src/features/studio/room/: curved desk, chairs, glass wall, slat walls, furniture, plants, miniature skyline and lighting. Textures (wood, concrete, rug, sky, windows, artwork, contact shadows) are painted on canvas in code at load time. | Original project source; no image files, downloads or external art licenses. |
 | Materials and texture budget | Shared material library and texture sizes in src/features/studio/materials.ts (Issue #3); see docs/design/materials.md. | Original project source; no image files. |
 | Character variations | Original per-instance jacket, skin and hair materials; per-investor feature meshes, including Adrian's skinned procedural glasses. | Original project source; no downloaded textures or likenesses. |
 | Simplified portraits | Original HTML/CSS silhouettes, sharing the same investor identities. | Original project source. |
 | Fonts | Existing approved local project fonts and OFL notices, unchanged. | Existing notices remain in src/app/fonts. |
 
-The exported GLB is 214,364 bytes.
-SHA-256: ae2b45b91af268b22bd77743a527547c5d514388eabeb219e94ddfabc62212c6
+The exported GLB is 446,928 bytes.
+SHA-256: 31ed9cc485f48694528af80e148e32a0cb2b3f2e3103a5c72debd6f4208a4240
 
 Regenerate from the repository root:
 ```powershell

@@ -7,6 +7,13 @@ import type { InvestorId } from "../simulation/negotiation/investor-policy.ts";
 export const CAST_URL = "/studio/investor-v1.glb";
 
 /**
+ * Approved transfer budget for the whole cast file (Issue #5).
+ * DECISION: 1 MB raw and 300 KB gzip for all three production characters together. The studio loads
+ * the cast once, so this bounds the extra download before the investors appear.
+ */
+export const CAST_BUDGET = { bytes: 1024 * 1024, gzipBytes: 300 * 1024 } as const;
+
+/**
  * The single seated skeleton every investor uses: bone name, parent and rest offset from the parent
  * (metres). Bone names are the animation binding keys, so they must never be renamed per character.
  */
@@ -14,6 +21,12 @@ export const RIG_BONES = [
   { name: "Pelvis", parent: null, position: [0, .78, 0] },
   { name: "Chest", parent: "Pelvis", position: [0, .58, 0] },
   { name: "Head", parent: "Chest", position: [0, .49, 0] },
+  // Facial bones (Issue #5): the brow group pivots at the head centre so a small x rotation raises or
+  // lowers both brows; each brow pivots at its own centre so a z rotation tilts it; the jaw opens.
+  { name: "Brows", parent: "Head", position: [0, .18, 0] },
+  { name: "LeftBrow", parent: "Brows", position: [-.087, .1, .2] },
+  { name: "RightBrow", parent: "Brows", position: [.087, .1, .2] },
+  { name: "Jaw", parent: "Head", position: [0, .05, .02] },
   { name: "LeftArm", parent: "Chest", position: [-.34, .2, 0] },
   { name: "LeftForearm", parent: "LeftArm", position: [-.03, -.31, .07] },
   { name: "RightArm", parent: "Chest", position: [.34, .2, 0] },
