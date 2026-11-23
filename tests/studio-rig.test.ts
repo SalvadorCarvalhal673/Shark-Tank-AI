@@ -86,7 +86,9 @@ test("accessories follow the head: Adrian's glasses keep their offset from the h
   const head = glasses.skeleton.bones.find(bone => bone.name === "Head")!;
   const offset = () => {
     instance.root.updateMatrixWorld(true);
-    const local = glasses.getVertexPosition(0, new Vector3()).applyMatrix4(glasses.matrixWorld);
+    // Primitives share one vertex buffer, so take a vertex this primitive actually draws.
+    const vertex = glasses.geometry.index ? glasses.geometry.index.getX(0) : 0;
+    const local = glasses.getVertexPosition(vertex, new Vector3()).applyMatrix4(glasses.matrixWorld);
     return head.worldToLocal(local);
   };
   const rest = offset();
@@ -94,6 +96,7 @@ test("accessories follow the head: Adrian's glasses keep their offset from the h
   mixer.clipAction(gltf.animations.find(clip => clip.name === "Withdrawal")!).play();
   mixer.setTime(.5);
   assert.ok(head.quaternion.angleTo(skinned(gltf.scene)[0].skeleton.bones.find(b => b.name === "Head")!.quaternion) > .05, "the head actually turned");
-  assert.ok(offset().distanceTo(rest) < 1e-4, "glasses moved with the head instead of floating in place");
+  const moved = offset().distanceTo(rest);
+  assert.ok(moved < 1e-4, `glasses moved ${moved} relative to the head`);
   instance.dispose();
 });

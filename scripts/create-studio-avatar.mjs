@@ -132,11 +132,26 @@ const cast = {
     features.part(medium(), [-.06, 2.25, .1], [.12, .04, .1], "Head", "Hair", [.35, 0, .35]);
     features.part(new THREE.TorusGeometry(.105, .026, 6, 18), [0, 1.75, .015], [1, 1, .85], "Chest", "Shirt", [Math.PI / 2 - .2, 0, 0]);
   },
+  /**
+   * Adrian Vale, growth (Issue #6): energetic and approachable. Short textured copper hair swept up
+   * at the front, brass-rimmed glasses with temples to the ears, an unstructured cobalt blazer with
+   * narrow lapels and an open-collar shirt.
+   */
   adrian(features) {
-    sharedPlaceholderHair(features);
-    // Glasses are skinned to the Head bone, so they follow every head movement.
-    for (const x of [-.088, .088]) features.part(new THREE.TorusGeometry(.052, .007, 5, 14), [x, 2.07, .21], [1, 1, 1], "Head", "Brass");
-    features.part(box(), [0, 2.07, .21], [.07, .008, .008], "Head", "Brass");
+    features.part(hairCap(.46), [0, 2.05, 0], [1, .95, 1], "Head", "Hair", [-.4, 0, 0]);
+    crown(features);
+    for (const [x, y, z, sx, rz] of [[-.1, 2.27, .1, .07, .5], [-.02, 2.3, .13, .08, .2], [.07, 2.29, .12, .075, -.3], [.14, 2.24, .07, .06, -.6], [0, 2.31, .03, .09, 0]]) {
+      features.part(medium(), [x, y, z], [sx, .045, .06], "Head", "Hair", [.6, 0, rz]);
+    }
+    for (const side of [-1, 1]) {
+      features.part(rounded(.022, .07, .04, .5), [side * .198, 2.06, .09], [1, 1, 1], "Head", "Hair", [0, side * .4, 0]);
+      // Glasses: rims, temple arms to the ears, all skinned to the Head bone.
+      features.part(new THREE.TorusGeometry(.046, .0055, 5, 16), [side * .083, 2.07, .222], [1, .85, 1], "Head", "Brass");
+      features.part(box(), [side * .17, 2.075, .11], [.006, .006, .2], "Head", "Brass", [0, side * -.25, 0]);
+      features.part(rounded(.065, .26, .025, .4), [side * .085, 1.5, .205], [1, 1, 1], "Chest", "Jacket", [-.1, 0, side * .22]);
+      features.part(rounded(.075, .045, .02, .4), [side * .075, 1.69, .175], [1, 1, 1], "Chest", "Shirt", [.35, 0, side * .95]);
+    }
+    features.part(box(), [0, 2.075, .225], [.04, .006, .006], "Head", "Brass");
   },
   sofia(features) { sharedPlaceholderHair(features); },
 };

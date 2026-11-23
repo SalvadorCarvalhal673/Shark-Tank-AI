@@ -56,9 +56,10 @@ test("the shared face has eye whites, irises, brows and a mouth on the facial bo
 
 const expected: Partial<Record<InvestorId, { slots: string[]; note: string }>> = {
   maya: { slots: ["Hair", "Brass", "Shirt", "Jacket"], note: "sleek hair, brass hoops, high collar and lapels" },
+  adrian: { slots: ["Hair", "Brass", "Shirt", "Jacket"], note: "textured copper hair, glasses with temples, open collar and narrow lapels" },
 };
 for (const [investor, { slots: needed, note }] of Object.entries(expected) as [InvestorId, { slots: string[]; note: string }][]) {
-  test(`${investor} has her own production features: ${note}`, () => {
+  test(`${investor} has their own production features: ${note}`, () => {
     const own = meshes(createInvestorInstance(gltf.scene, investor).root, castMeshName(investor));
     assert.ok(own.length > 0);
     for (const slot of needed) assert.ok(slots(own).has(slot), `${investor} features use ${slot}`);

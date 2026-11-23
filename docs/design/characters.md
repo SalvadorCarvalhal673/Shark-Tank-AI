@@ -41,13 +41,32 @@ Composed and precise. The finance investor reads as the most formal of the three
 | Portrait, three-quarter | [maya-three-quarter.jpg](studio-concept/maya-three-quarter.jpg) |
 | In the studio, Maya camera | [maya-in-studio.jpg](studio-concept/maya-in-studio.jpg) |
 
+## Adrian Vale, growth (Issue #6)
+
+Energetic and approachable. The growth investor is the most casual of the three.
+
+| Feature | Design |
+| --- | --- |
+| Hair | Short, textured copper hair swept up at the front: a shorter hair shell, crown fill, five tufts and short sideburns |
+| Accessories | Brass-rimmed glasses with a bridge and temple arms to the ears, all skinned to the head so they follow every clip |
+| Clothing | Unstructured cobalt blazer with narrow lapels, open-collar shirt |
+| Colours | Jacket #355985, hair #9c5433, skin #dbac89 |
+
+| View | Image |
+| --- | --- |
+| Portrait, front | [adrian-portrait.jpg](studio-concept/adrian-portrait.jpg) |
+| Portrait, three-quarter | [adrian-three-quarter.jpg](studio-concept/adrian-three-quarter.jpg) |
+| In the studio, Adrian camera | [adrian-in-studio.jpg](studio-concept/adrian-in-studio.jpg) |
+
+**Test fix.** The Issue #8 glasses test sampled vertex 0 of the brass primitive. glTF primitives share one vertex buffer, so once Adrian gained lapels, vertex 0 belonged to a lapel on the chest bone. The test now samples a vertex the glasses primitive actually draws. This makes it stricter, not weaker.
+
 ## Budgets
 
-| Measure | Budget | Measured after Issue #5 |
-| --- | --- | --- |
-| Cast file | 1 MB raw, 300 KB gzip | 446,928 bytes raw; 80,323 bytes gzip |
-| Panel view | 90,000 triangles, 60 draw calls | 40,802 triangles, 50 draw calls |
-| Skinning | Every vertex fully weighted to one valid bone | Verified for every mesh |
-| Seat fit | No body vertex inside furniture in any frame | Verified for every seat and clip |
+| Measure | Budget | After Issue #5 | After Issue #6 |
+| --- | --- | --- | --- |
+| Cast file | 1 MB raw, 300 KB gzip | 446,928 bytes; 80,323 gzip | 582,044 bytes; 120,641 gzip |
+| Panel view | 90,000 triangles, 60 draw calls | 40,802 triangles, 50 draw calls | 44,350 triangles, 52 draw calls |
+| Skinning | Every vertex fully weighted to one valid bone | Verified | Verified |
+| Seat fit | No body vertex inside furniture in any frame | Verified | Verified |
 
 Unused UV coordinates are dropped from the cast file, because no character uses textures. Captures were made with a software renderer, and physical-phone performance remains unverified.
