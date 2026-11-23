@@ -1,5 +1,7 @@
 # Phase 4A.2 asset provenance and dependency notes
 
+The authoritative, test-checked record of every production asset (creator, source, licence, version, modifications, redistribution, notices, verification) is `docs/design/asset-manifest.json`; see design/asset-provenance.md (Issue #13).
+
 ## Original visual assets
 No character, environment, texture, HDRI or animation pack was downloaded or purchased.
 
