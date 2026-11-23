@@ -20,7 +20,7 @@ The map is `REACTIONS` in `src/features/studio/model.ts`. It is typed as `Record
 
 Other terminal outcomes (walk-away, all withdrawn, no offers) add no new reaction: each investor keeps the reaction to their last decision.
 
-**DECISION (for review):** both withdrawal reasons and a missing-signals pass share the Withdrawal clip. They mean the same thing to the founder (this investor is out), and reusing one clip keeps the file small. The reason is still shown in the HTML history, so the reaction does not need to distinguish them.
+**DECISION (superseded by Issue #30, see below):** both withdrawal reasons and a missing-signals pass share the Withdrawal clip. They mean the same thing to the founder (this investor is out), and reusing one clip keeps the file small. The reason is still shown in the HTML history, so the reaction does not need to distinguish them.
 
 **DECISION (for review):** a repeated answer gets its own Skeptical reaction instead of Withdrawal, because the founder can fix it by answering differently next time, so it should read as doubt rather than rejection.
 
@@ -64,3 +64,19 @@ When a counter keeps an investor in the deal, the studio shows that investor's c
 - Tests:
   - `tests/studio-concessions.test.ts` covers before/after/proposed terms for each decision, that the other investors' cues are unchanged, and that a withdrawal is not a concession.
   - A browser case checks the exact revised figures and that only Maya reacts.
+
+## Policy-specific withdrawals (Issue #30)
+
+**DECISION (approved):** each way of leaving now plays its own movement. The cue's `pose` stays `Withdrawal` for all of them, so existing labels and tests hold, and a new `clip` field picks the animation (`WITHDRAWAL_CLIPS` in `model.ts`).
+
+| Reason | Clip | Movement | Copy in the investor response box |
+| --- | --- | --- | --- |
+| `above-cash-ceiling` | WithdrawalCash | Sits back, raises an open palm, brows up | "Counter N: withdrew because you asked for €X, more than this investor can invest. Their last offer, €A for B%, stays in the history." |
+| `below-withdrawal-band` | WithdrawalEquity | Slow head shake, frown, left hand drawn back off the desk | "Counter N: withdrew because you offered Y% equity, below the range this investor can negotiate. Their last offer … stays in the history." |
+| `missing-required-signals` | Withdrawal | Unchanged | "Passed at the opening: the signals this investor asked for were not in your answer. …" |
+| `repeated-answer` | Skeptical | Unchanged | "Passed at the opening: your answer repeated an earlier one …" |
+
+- The copy names only the founder's own figures and the investor's last offer. It never reveals the investor's private limits.
+- The withdrawn offer stays in `session.offers` with status `withdrawn`, and stays in the committed history and the dialogue transcript.
+- `latestWithdrawal` (`withdrawal.ts`) only reads. `tests/studio-withdrawals.test.ts` also checks that the scene, avatar and presentation modules never dispatch actions, so no camera or gesture callback can withdraw.
+- Both new clips are rotation-only, pass the furniture-fit test in every frame and add no draw calls. The cast file grows to 749,248 bytes, and its provenance record was updated.

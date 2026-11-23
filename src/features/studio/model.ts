@@ -2,6 +2,7 @@ import { readTerms } from "../simulation/pitch.ts";
 import { ownershipAfterInvestment, valuations } from "../simulation/negotiation/financials.ts";
 import type { NegotiationPitch, NegotiationSession } from "../simulation/negotiation/session.ts";
 import { INVESTOR_ORDER, type InvestorId } from "../simulation/negotiation/investor-policy.ts";
+import type { RigClip } from "./rig.ts";
 
 export type CameraView = "panel" | InvestorId;
 export type Pose = "Listening" | "Explaining" | "Offering" | "Withdrawal" | "Skeptical" | "Agreeing" | "Considering" | "Firm";
@@ -23,6 +24,18 @@ export const REACTIONS: Record<DecisionEvent["reason"], Pose> = {
   "above-cash-ceiling": "Withdrawal",
   "below-withdrawal-band": "Withdrawal",
 };
+
+/**
+ * Policy-specific withdrawal clips (Issue #30). The cue's pose stays "Withdrawal" for every way an
+ * investor leaves, so existing behaviour and labels hold, but each reason plays its own movement.
+ * DECISION (approved): above the cash ceiling raises an open palm; below the equity range shakes the
+ * head and draws back; a pass for missing signals keeps the original Withdrawal clip.
+ */
+export const WITHDRAWAL_CLIPS = {
+  "missing-required-signals": "Withdrawal",
+  "above-cash-ceiling": "WithdrawalCash",
+  "below-withdrawal-band": "WithdrawalEquity",
+} as const satisfies Partial<Record<DecisionEvent["reason"], RigClip>>;
 /**
  * Camera presets (Issue #11). The panel shot is the founder's view of all three investors; each
  * investor shot is a medium close-up from just above eye level, so the face, hands and desk read.
@@ -67,18 +80,20 @@ export function cameraStep(deltaSeconds: number, reducedMotion: boolean) {
  * or selection), so presentation can never commit or imply a financial outcome.
  * During the question round the investor whose question is open is Explaining (Issue #9).
  */
-export function sceneCue(session: NegotiationSession | null, investor: InvestorId): { pose: Pose; key: string } {
-  if (!session) return {pose:"Listening",key:"idle"};
+export function sceneCue(session: NegotiationSession | null, investor: InvestorId): { pose: Pose; clip: RigClip; key: string } {
+  if (!session) return {pose:"Listening",clip:"Listening",key:"idle"};
   if (session.stage === "questions") {
     const asking = INVESTOR_ORDER[session.answers.length] === investor;
-    return {pose: asking ? "Explaining" : "Listening", key: session.id+":q"+session.answers.length+":"+investor+":"+(asking ? "Explaining" : "Listening")};
+    const pose = asking ? "Explaining" : "Listening";
+    return {pose, clip: pose, key: session.id+":q"+session.answers.length+":"+investor+":"+pose};
   }
   const event = session.history.findLast((item): item is DecisionEvent =>
     (item.kind==="opening" || item.kind==="counter") && item.investor===investor);
   const outcome = session.outcome;
   const closedWith = outcome?.kind==="accepted-deal" && session.offers.find(offer => offer.id===outcome.offerId)?.investor===investor;
   const pose: Pose = closedWith ? "Agreeing" : !event ? "Listening" : REACTIONS[event.reason];
-  return {pose,key:session.id+":"+ (event?.revision ?? 0)+":"+investor+":"+pose};
+  const clip: RigClip = pose === "Withdrawal" && event ? WITHDRAWAL_CLIPS[event.reason as keyof typeof WITHDRAWAL_CLIPS] ?? pose : pose;
+  return {pose,clip,key:session.id+":"+ (event?.revision ?? 0)+":"+investor+":"+pose};
 }
 export function financialPreview(amount: string, equity: string, founderBeforeBps: number) {
   const data = new FormData(); data.set("amount",amount); data.set("equity",equity);
