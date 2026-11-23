@@ -8,7 +8,7 @@ Issue #8. This document defines how every investor character is built, animated 
 
 | Part | Name in the file | Shared? |
 | --- | --- | --- |
-| Seated skeleton (11 bones) | `Pelvis`, `Chest`, `Head`, `Left/RightArm`, `Left/RightForearm`, `Left/RightThigh`, `Left/RightShin` | Whole cast |
+| Seated skeleton (15 bones) | `Pelvis`, `Chest`, `Head`, `Left/RightArm`, `Left/RightForearm`, `Left/RightThigh`, `Left/RightShin`, plus facial `Brows`, `Left/RightBrow`, `Jaw` (added in Issue #5) | Whole cast |
 | Body mesh | `Cast_Body` | Whole cast: same proportions for every investor |
 | Feature mesh per investor | `Cast_maya`, `Cast_adrian`, `Cast_sofia` | One investor each: hair, accessories, face details |
 | Clips | `Listening`, `Offering`, `Withdrawal` | Whole cast |
