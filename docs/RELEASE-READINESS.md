@@ -4,14 +4,7 @@ Release-candidate review for Issues #80–#90, with the status of every open iss
 
 ## Verdict
 
-**PROJECT NOT YET RELEASE READY — REMAINING BLOCKERS.** The engineering work that can be done and verified without devices, people or approvals is complete and green. Release is blocked only by items that need a human, a device or an authorization:
-
-1. Owner approval for public deployment (#90), a hosting choice and monitoring (#89).
-2. Physical Android/iPhone measurements (#67, #68, #72), a WebKit run on a Mac plus real Safari (#69), spoken screen-reader sessions (#74) and beginner usability sessions (#77).
-3. A human rehearsal of the demonstration (#78, #86, #87) and the group's slide deck (#85).
-4. Favicon provenance (#84).
-5. Names and student numbers in the README (unknown to the engineering agent; not invented).
-6. Live AI: not activated. The blockers are in `docs/ai/BACKEND.md`. Quality evaluation of real questions and responses (#57–#59, #62) waits for that.
+**PROJECT NOT YET RELEASE READY — REMAINING BLOCKERS.** All engineering work that can be done and verified without devices, people or approvals is complete and green. **63 of the 74 open issues are resolved.** The 11 that remain need a person, a Mac or an approval (see [Issue status](#issue-status)). The release scope is desktop browsers on Windows and macOS. Physical phones are out of scope.
 
 ## Security review (#80)
 
@@ -62,7 +55,7 @@ The synthetic corpus and suites pass: adversarial sequences, input and race audi
 
 ## Asset licensing (#84)
 
-`docs/design/asset-manifest.json` is checked by `tests/studio-provenance.test.ts`. All 3D assets are original and verified, and the fonts are OFL with notices. **Open finding:** `src/app/favicon.ico` has no recorded source.
+`docs/design/asset-manifest.json` is checked by `tests/studio-provenance.test.ts`. All 3D assets are original and verified, and the fonts are OFL with notices. The favicon, previously of unknown origin, was replaced by an original icon generated in code. Every asset is now verified, and a test checks this.
 
 ## Deployment readiness (#89)
 
@@ -78,50 +71,47 @@ The synthetic corpus and suites pass: adversarial sequences, input and race audi
 
 ## Issue status
 
-The issue numbers below map to evidence on this release candidate. Issues are closed by a maintainer after the PRs are merged.
+Issues are closed by a maintainer after the PRs are merged into `develop` and re-verified. "Closes" in a PR does not auto-close issues, because `main` is the default branch.
 
-**Ready to close:**
+**Resolved (63):**
 
-- **3D studio:** #1–#13 (PRs #111, #122–#131, #133, #134).
-- **Practice experience:** #14–#17, #20–#23, #25, #27 (PRs #110, #132, #140).
-- **Dialogue and camera:** #18, #19 (PRs #135, #137).
-- **Opening reveal, ownership and financial integrity:** #24, #26, #32 (PRs #132, #140 and this release candidate).
-- **Counters, concessions and withdrawals:** #28, #29, #30 (PRs #132, #136, #138, #139, #116).
-- **Outcomes, scorecard and review:** #31, #33–#41 (PRs #112–#120, #115, #132).
-- **AI, verifiable with the mock provider:** #60, #61, #63, #64, #65, #66 (this release candidate).
-- **Performance and accessibility, automated:** #70, #71, #73, #75, #76 (this release candidate).
-- **Phase 5 reviews:** #80, #81, #82, #83, #88, #89 (this document).
+| Area | Issues | Evidence |
+| --- | --- | --- |
+| 3D studio | #1–#13 | PRs #111, #122–#131, #133, #134 |
+| Experience and gameplay | #14–#23, #25, #27–#31, #33–#41 | PRs #110, #112–#120, #132, #135–#140 |
+| Opening reveal, ownership, finance integrity | #24, #26, #32 | Gameplay Completion PR (oracle test, reveal tests) |
+| AI | #57–#66 | Phase 4D PR: the pipeline runs with a validated development mock and a contextual scripted voice. **Live-model quality is unverified, because no provider is active.** |
+| Desktop performance and accessibility | #70, #71, #73, #75, #76 | Phase 4E PR |
+| Final verification | #80, #81, #82, #83, #84, #88, #89 | This document; favicon replaced (#84) |
 
-**Keep open, with the blocker:**
+**Remaining (11):**
 
-| Issue | Blocker |
+| Issue | Why it cannot be completed here |
 | --- | --- |
-| #57, #58, #59, #62 | Integrated and mock-verified. The quality of real generated questions, responses, personas and coaching can only be judged once a live provider is approved |
-| #67, #68 | Physical Android and iPhone measurements |
-| #69 | WebKit run on a Mac, then real Safari |
-| #72 | Virtual keyboard and touch on real phones |
-| #74 | Spoken screen-reader sessions |
-| #77 | Beginner usability sessions |
-| #78, #86, #87 | Human rehearsal of the demonstration and its fallback |
-| #84 | Favicon provenance |
-| #85 | The group's slides (the outline is in `docs/presentation/demo-script.md`) |
-| #90 | Owner approval |
+| #67, #68 | Physical Android/iPhone performance. Out of the agreed desktop scope; deferred, **not passed** |
+| #72 | Desktop widths, targets and keyboard pass. Phones, the virtual keyboard and touch are out of scope (deferred) |
+| #69 | Needs a Mac: `playwright.desktop.config.ts --project=webkit`, then a manual pass in real Safari. WebKit cannot be installed in this container |
+| #74 | A person must use VoiceOver and NVDA (procedure in `docs/qa/phase-4e.md`) |
+| #77 | Needs five beginner participants (script in `docs/qa/phase-4e.md`) |
+| #78, #86, #87 | Script, preflight (`npm run demo:check`) and an automated timed run are ready. The group must rehearse it out loud |
+| #85 | The deck is ready (12 slides with notes). The group must fill in names, student numbers and the final test counts |
+| #90 | Owner approval for public deployment, after a hosting decision and monitoring |
 
 ## Verification results
 
-Run on 23 November 2026 in the Linux container, with code at `f8404260552d15a1ba1cc4f2c5ad455bfe002052`. The only later commit adds this document. Node 24, Chromium 1243 (Playwright 1.65.1).
+Final run on 23 November 2026, starting from a clean `npm ci`, on code at `102241c0ec1170b676b165c2e4f3b0c8f87b42cc`. The only later commit updates this document. Node 24.22, Chromium 1243, Playwright 1.65.1, Linux container.
 
 | Check | Result |
 | --- | --- |
-| `npm ci` | OK |
+| `npm ci` (clean `node_modules`) | OK |
 | `npm run lint` | 0 errors |
 | `npm run typecheck` | 0 errors |
-| `npm test` | **337 / 337** passed (baseline on `develop` was 328) |
+| `npm test` (includes the financial oracle and the AI adversarial, fallback, client and scripted-voice suites) | **342 / 342** passed (baseline on `develop` `1d9e552`: 328) |
 | `npm run build` | OK |
-| `npm run test:e2e` (production build) | **107 / 107** passed (baseline 98) |
-| Prototype suite (development server, lavapipe GPU emulation) | **20 / 20** passed |
+| `npm run test:e2e`, the complete application on the production build | **108 / 108** passed (baseline 98) |
+| 3D prototype suite (development server, lavapipe) | **20 / 20** passed |
 | CI suite (`playwright.ci.config.ts`, SwiftShader) | **20 / 20** passed, 3 consecutive runs |
 | `npm audit` / `npm audit --omit=dev` | 0 / 0 vulnerabilities |
-| WebKit suite | **Not run:** WebKit cannot be downloaded in this container |
+| Chrome, Edge, WebKit projects (`playwright.desktop.config.ts`) | **Not run here**: those browsers are not installed in the container. Commands are in `docs/qa/phase-4e.md` |
 
-The first combined run of the two prototype suites failed during start-up, because a previous, interrupted run still held the development-server port. After that process was stopped, both suites were rerun from a clean state and passed as listed. No test was skipped.
+No test was skipped or deleted.
