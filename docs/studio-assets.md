@@ -12,8 +12,8 @@ No character, environment, texture, HDRI or animation pack was downloaded or pur
 | Simplified portraits | Original HTML/CSS silhouettes, sharing the same investor identities. | Original project source. |
 | Fonts | Existing approved local project fonts and OFL notices, unchanged. | Existing notices remain in src/app/fonts. |
 
-The exported GLB is 446,928 bytes.
-SHA-256: 31ed9cc485f48694528af80e148e32a0cb2b3f2e3103a5c72debd6f4208a4240
+The exported GLB is 582,044 bytes.
+SHA-256: 94fd52b3cf3d9043a93ad926dd7e5943050d0a38fec35df2e0e94afda5e10b76
 
 Regenerate from the repository root:
 ```powershell
